@@ -31,7 +31,6 @@ log_uri = string_replace(log_uri, "Roaming", "LocalLow\Wizards Of The Coast\MTGA
 show_debug_message("Log: "+log_uri);
 show_debug_message("WD: "+working_directory);
 
-
 log_size = 0;
 log_size_prev = 0;
 str = "";

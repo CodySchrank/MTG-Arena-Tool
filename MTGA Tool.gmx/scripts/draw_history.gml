@@ -65,17 +65,27 @@ if view_match != -1 {
         card = ds_list_find_value(deck, o);
         q = card[? "quantity"];
         cid = card[? "id"];
-        name = get_card_data(cid, 0);
-        cost = get_card_data(cid, 3);
-        draw_set_halign(fa_left);
-        draw_text(xx+16, yy+80+o*24, string(q));
-        draw_text(xx+32, yy+80+o*24, string(name));
-        draw_mana_cost(cost, xx+340, yy+80+o*24, 1, icons_16_spr)
-        card = ds_map_find_next(deck, card)
+               
+        if saved_data[? "decklist_style"] == 0 {
+            draw_tile_classic(q, cid, xx+16, yy+80+o*24, 324, 16);
+        }
+        if saved_data[? "decklist_style"] == 1 {
+            draw_tile_arena(card_tiles_24_spr, q, cid, xx+16, yy+80+o*28, 324);
+        }
+        
+        card = ds_map_find_next(deck, card);
     }
+    
+    if saved_data[? "decklist_style"] == 0
+        yy += size*24+80+32;
+    if saved_data[? "decklist_style"] == 1
+        yy += size*28+80+32;
+    height = yy + 48;
+    yy = toph + 16 + offset;
 
     draw_set_font(font_14);
     draw_set_halign(fa_right);
+    draw_set_color(color_white);
     pl = map[? "opponent"];
     pname = pl[? "name"];
     draw_text(view_wview-80, yy+32, pname);
@@ -100,17 +110,22 @@ if view_match != -1 {
         card = ds_list_find_value(deck, o);
         q = card[? "quantity"];
         cid = card[? "id"];
-        name = get_card_data(cid, 0);
-        cost = get_card_data(cid, 3);
-        draw_set_halign(fa_left);
-        draw_text(view_wview-340, yy+80+o*24, string(q));
-        draw_text(view_wview-324, yy+80+o*24, string(name));
-        draw_mana_cost(cost, view_wview-32, yy+80+o*24, 1, icons_16_spr)
+        
+        if saved_data[? "decklist_style"] == 0 {
+            draw_tile_classic(q, cid, view_wview-340, yy+80+o*24, 324, 16);
+        }
+        if saved_data[? "decklist_style"] == 1 {
+            draw_tile_arena(card_tiles_24_spr, q, cid, view_wview-340, yy+80+o*28, 324);
+        }
+        
         card = ds_map_find_next(deck, card)
     }
-
-    yy += size*24+80+32;
-    height = yy + 48;
+    
+    if saved_data[? "decklist_style"] == 0
+        yy += size*24+80+32;
+    if saved_data[? "decklist_style"] == 1
+        yy += size*28+80+32;
+    height = max(height, yy + 48);
     
     but = button_rectangle_simple(view_wview-170-64, yy-16, view_wview-170+64, yy+16);
     if but == 4 {

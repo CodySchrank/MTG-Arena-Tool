@@ -180,10 +180,12 @@ if view_deck != -1 {
         draw_set_halign(fa_left);
         draw_set_font(font_12_b);
         if q > 0 {
-            draw_text(xx+24, yy, string(q));
-            draw_set_font(font_12);
-            draw_text(xx+48, yy, string(name));
-            draw_mana_cost(cost, xx+320, yy, 1, icons_16_spr);
+            if saved_data[? "decklist_style"] == 0 {
+                draw_tile_classic(q, cid, xx+24, yy, 296, 24);
+            }
+            if saved_data[? "decklist_style"] == 1 {
+                draw_tile_arena(card_tiles_24_spr, q, cid, xx+24, yy, 296);
+            }
             yy += 28;
         }
     }
@@ -191,6 +193,7 @@ if view_deck != -1 {
     
     draw_set_font(font_12_b);
     draw_set_halign(fa_center);
+    draw_set_color(color_white);
     draw_text(xx+160, yy+12, "Sideboard ("+string(total_side)+")");
     draw_set_halign(fa_left);
     yy += 48
@@ -207,10 +210,12 @@ if view_deck != -1 {
         draw_set_halign(fa_left);
         draw_set_font(font_12_b);
         if q > 0 {
-            draw_text(xx+24, yy, string(q));
-            draw_set_font(font_12);
-            draw_text(xx+48, yy, string(name));
-            draw_mana_cost(cost, xx+320, yy, 1, icons_16_spr);
+            if saved_data[? "decklist_style"] == 0 {
+                draw_tile_classic(q, cid, xx+24, yy, 296, 24);
+            }
+            if saved_data[? "decklist_style"] == 1 {
+                draw_tile_arena(card_tiles_24_spr, q, cid, xx+24, yy, 296);
+            }
             yy += 28;
         }
     }
@@ -220,6 +225,8 @@ if view_deck != -1 {
     xx = sidew+320+64;
     yy = toph + 154 + offset;
     draw_set_font(font_12);
+    draw_set_color(color_white);
+    draw_set_halign(fa_left);
     
     if ds_map_exists(decks_stats, _deck[? "id"]) {
         dsmap = ds_map_find_value(decks_stats, _deck[? "id"]);

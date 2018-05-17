@@ -736,10 +736,7 @@ if async_id == async_request &amp;&amp; async_result != undefined {
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>//draw_set_halign(fa_left);
-//draw_text(16, 16, player_id);
-
-if keyboard_check_direct(vk_f1) {
+            <string>if keyboard_check_direct(vk_f1) {
     // Debug objects
     col = rgb(220, 210, 210);
     draw_rectangle_colour(-1, -1, view_wview+1, view_hview+1, col, col, col, col, 0)
@@ -773,10 +770,6 @@ if keyboard_check_direct(vk_f1) {
 
 
 if mode == 1 {
-    //sc = max(1, view_wview / 928, view_hview / 720);
-    //col = rgb(230, 220, 210);
-    //draw_rectangle_colour(-1, -1, view_wview+1, view_hview+1, col, col, col, col, 0)
-    
     sc = max(1, view_wview / 928, view_hview / 720);
     bx = (view_wview/2);
     by = (view_hview/2);
@@ -904,40 +897,39 @@ if mode == 1 {
         for (i=0; i&lt;size; i++) {
             _card = ds_list_find_value(deck_main, i);
             _cid = real(_card[? "id"]);
-            cardname = get_card_data( _cid, 0);
             number = _card[? "quantity"];
-            _cost = get_card_data( _cid, 3)
-            
+            //cardname = get_card_data( _cid, 0);
+            //_cost = get_card_data( _cid, 3)
+            //_fram = get_card_data( _cid, 7)
             if view_mode == 0 {
                 number = real(current_decklist_remaining[? string(_cid)]);
-                if number &gt; 0 {
-                    draw_set_font(font_12_b);
-                    draw_text(4, yy, string(number));
-                    draw_set_font(font_12);
-                    draw_text(30, yy, string(cardname));
-                    draw_mana_cost(_cost, view_wview - 16, yy, 1, icons_16_spr);
+            }
+
+            if (view_mode == 0 &amp;&amp; number &gt; 0) || view_mode == 1 {
+                if saved_data[? "decklist_style"] == 0 {
+                    draw_tile_classic(number, _cid, xx+4, yy, view_wview-4, 28);
                     yy += 24;
                 }
+                if saved_data[? "decklist_style"] == 1 {
+                    draw_tile_arena(card_tiles_24_spr, number, _cid, 0, yy, view_wview);
+                    yy += 28;
+                }
             }
-            if view_mode == 1 {
-                draw_set_font(font_12_b);
-                draw_text(4, yy, string(number));
-                draw_set_font(font_12);
-                draw_text(30, yy, string(cardname));
-                draw_mana_cost(_cost, view_wview - 16, yy, 1, icons_16_spr);
-                yy += 24;
-            }
+            
             if view_mode == 2 {
                 number = real(current_decklist_remaining[? string(_cid)]);
                 var hyper;
                 if number &gt; 0 {
                     hyper = hypergeometric(1, current_decklist_remaining_size, 1, number);
-                    draw_set_font(font_10);
-                    draw_text(4, yy, string(round(hyper*100))+"%");
-                    draw_set_font(font_12);
-                    draw_text(32, yy, string(cardname));
-                    draw_mana_cost(_cost, view_wview - 16, yy, 1, icons_16_spr);
-                    yy += 24;
+                    
+                    if saved_data[? "decklist_style"] == 0 {
+                        draw_tile_classic(string(round(hyper*100))+"%", _cid, xx+4, yy, view_wview-4, 28);
+                        yy += 24;
+                    }
+                    if saved_data[? "decklist_style"] == 1 {
+                        draw_tile_arena(card_tiles_24_spr, string(round(hyper*100))+"%", _cid, 0, yy, view_wview);
+                        yy += 28;
+                    }
                 }
                 
             }
@@ -946,6 +938,7 @@ if mode == 1 {
             yy += 8;
             hyper = hypergeometric(1, current_decklist_remaining_size, 1, current_deck_land_left);
             draw_set_halign(fa_left);
+            draw_set_color(color_white);
             draw_text(32, yy, "Odds of land:");
             draw_set_halign(fa_right);
             draw_text(view_wview-32, yy, string(round(hyper*100))+"%");

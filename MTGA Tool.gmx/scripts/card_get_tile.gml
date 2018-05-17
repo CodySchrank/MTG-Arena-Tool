@@ -1,78 +1,64 @@
 /// card_get_tile(cardid)
-var _cost = get_card_data(argument0, 3);
-var _type = string_lower(get_card_data(argument0, 2));
-var tile = 16;
+var _frame = argument0;
+var tile = 48;
 
-var _w = string_count("{W}", _cost);
-var _u = string_count("{U}", _cost);
-var _b = string_count("{B}", _cost);
-var _r = string_count("{R}", _cost);
-var _g = string_count("{G}", _cost);
-if string_pos("land", _type) {
-    var _w = string_count("plains", _type);
-    var _u = string_count("island", _type);
-    var _b = string_count("swamp", _type);
-    var _r = string_count("mountain", _type);
-    var _g = string_count("forest", _type);
-}
-
-_w = max(_w, 1);
-_u = max(_u, 1);
-_b = max(_b, 1);
-_r = max(_r, 1);
-_g = max(_g, 1);
+var _w = min(string_count("{W}", _frame), 1);
+var _u = min(string_count("{U}", _frame), 1);
+var _b = min(string_count("{B}", _frame), 1);
+var _r = min(string_count("{R}", _frame), 1);
+var _g = min(string_count("{G}", _frame), 1);
 
 // Colorless
 if _w + _u + _b + _r + _g = 0
-    tile = 16;
+    tile = 48;
 // White
 if _w = 1 && _u = 0 && _b = 0 && _r = 0 && _g = 0
     tile = 0;
 // Blue
-if _w = 0 && _u > 1 && _b = 0 && _r = 0 && _g = 0
-    tile = 1;
+if _w = 0 && _u = 1 && _b = 0 && _r = 0 && _g = 0
+    tile = 3;
 // Black
 if _w = 0 && _u = 0 && _b = 1 && _r = 0 && _g = 0
-    tile = 2;
+    tile = 6;
 // Red
 if _w = 0 && _u = 0 && _b = 0 && _r = 1 && _g = 0
-    tile = 3;
+    tile = 9;
 // Green
 if _w = 0 && _u = 0 && _b = 0 && _r = 0 && _g = 1
-    tile = 4;
+    tile = 12;
 // Gold
 if _w + _u + _b + _r + _g >= 3
-    tile = 5;
+    tile = 15;
 // WU
 if _w = 1 && _u = 1 && _b = 0 && _r = 0 && _g = 0
-    tile = 6;
+    tile = 18;
 // WB
 if _w = 1 && _u = 0 && _b = 1 && _r = 0 && _g = 0
-    tile = 7;
+    tile = 21;
 // UB
 if _w = 0 && _u = 1 && _b = 1 && _r = 0 && _g = 0
-    tile = 8;
+    tile = 24;
 // UR
 if _w = 0 && _u = 1 && _b = 0 && _r = 1 && _g = 0
-    tile = 9;
+    tile = 27;
 // BR
 if _w = 0 && _u = 0 && _b = 1 && _r = 1 && _g = 0
-    tile = 10;
+    tile = 30;
 // BG
 if _w = 0 && _u = 0 && _b = 1 && _r = 0 && _g = 1
-    tile = 11;
+    tile = 33;
 // RW
 if _w = 1 && _u = 0 && _b = 0 && _r = 1 && _g = 0
-    tile = 12;
+    tile = 36;
 // RG
 if _w = 0 && _u = 0 && _b = 0 && _r = 1 && _g = 1
-    tile = 13;
+    tile = 39;
 // GW
 if _w = 1 && _u = 0 && _b = 0 && _r = 0 && _g = 1
-    tile = 14;
+    tile = 42;
 // GU
 if _w = 0 && _u = 1 && _b = 0 && _r = 0 && _g = 1
-    tile = 15;
+    tile = 45;
 
 return tile;
 

@@ -181,13 +181,13 @@ else
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>draw_set_halign(fa_center);
+            <string>
+draw_set_halign(fa_center);
 draw_set_valign(fa_middle);
 if controller_obj.mode &gt; -1 {
     draw_sprite(stretch_spr, 0, view_wview, view_hview);
     exit;
 }
-
 
 sc = max(1, (view_wview - sidew) / 928, (view_hview - toph) / 720);
 bx = sidew+((view_wview-sidew)/2);
@@ -341,7 +341,6 @@ if but == 4 {
 }
 
 draw_sprite(stretch_spr, 0, view_wview, view_hview);
-
 
 </string>
           </argument>

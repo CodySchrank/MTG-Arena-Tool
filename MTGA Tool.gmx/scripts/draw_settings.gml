@@ -65,6 +65,38 @@ draw_set_color(color_dark);
 draw_text(view_wview-320, yy, txt[sel]);
 
 //
+yy += 48;
+draw_set_color(color_white);
+draw_set_halign(fa_left);
+draw_text(xx+40, yy, "Deck lists style:");
+
+but = button_rectangle_simple(view_wview-320-64, yy-12, view_wview-320+64, yy+12);
+sel = saved_data[? "decklist_style"];
+if is_undefined(sel)    sel = 0;
+if but == 4 {
+    sel += 1;
+    if sel > 1 sel = 0;
+    saved_data[? "decklist_style"] = sel;
+    save();
+}
+txt[0] = "Classic";
+txt[1] = "Arena";
+
+draw_sprite(but_normal_spr, but, view_wview-320, yy);
+draw_set_font(font_12);
+draw_set_halign(fa_center);
+draw_set_color(color_dark);
+draw_text(view_wview-320, yy, txt[sel]);
+
+yy += 48;
+if sel == 0 {
+    draw_tile_classic(4, 67518, xx+40, yy, view_wview-320-sidew, 24);
+}
+if sel == 1 {
+    draw_tile_arena(card_tiles_24_spr, 4, 67518, xx+40, yy, view_wview-320-sidew);
+}
+
+//
 /*
 yy += 48;
 draw_set_color(color_white);
