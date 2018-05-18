@@ -1,6 +1,9 @@
 # MTG Arena Tool
 An MTG Arena deck tracker and statistics manager.
 
+![History Screen](/Readme/screenshot_0.png)
+
+
 ### Current features
 - In-game overlay, showing cards left in deck, complete deck and odds of card draws.
 - Track your games and get historic data of all your matches.
