@@ -49,8 +49,6 @@ for (n=0; n<ds_list_size(msgs); n++) {
                 if !is_undefined(instance) {
                     cname = instance.name;
                 }
-
-                log("Player "+string(seat)+" "+string(aid)+" id: "+string(iid)+" ("+cname+")");
             }
         }
         */

@@ -177,7 +177,6 @@ if prev_size == 0 || demand_update {
             final_str = string_copy(verybigstr, pos, string_length(verybigstr));
             final_str = string_copy(final_str, 0, string_pos(endswith, final_str)-1);     
             show_debug_message("&gt; Get inventory: "+string(pos));
-            //clipboard_set_text(final_str);
             mtga_process_json(final_str);
         }
     }
@@ -188,8 +187,7 @@ if prev_size == 0 || demand_update {
         pos = string_rpos(lookfor, verybigstr);
         if pos != 0 {
             final_str = string_copy(verybigstr, pos, string_length(verybigstr));
-            final_str = string_copy(final_str, 0, string_pos(endswith, final_str)-1);     
-            clipboard_set_text(final_str);
+            final_str = string_copy(final_str, 0, string_pos(endswith, final_str)-1);
             mtga_process_json(final_str);
         }
     }

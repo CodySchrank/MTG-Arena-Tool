@@ -907,7 +907,7 @@ if mode == 1 {
 
             if (view_mode == 0 &amp;&amp; number &gt; 0) || view_mode == 1 {
                 if saved_data[? "decklist_style"] == 0 {
-                    draw_tile_classic(number, _cid, xx+4, yy, view_wview-4, 28);
+                    draw_tile_classic(number, _cid, 4, yy, view_wview-4, 28);
                     yy += 24;
                 }
                 if saved_data[? "decklist_style"] == 1 {
@@ -923,7 +923,7 @@ if mode == 1 {
                     hyper = hypergeometric(1, current_decklist_remaining_size, 1, number);
                     
                     if saved_data[? "decklist_style"] == 0 {
-                        draw_tile_classic(string(round(hyper*100))+"%", _cid, xx+4, yy, view_wview-4, 28);
+                        draw_tile_classic(string(round(hyper*100))+"%", _cid, 4, yy, view_wview-4, 28);
                         yy += 24;
                     }
                     if saved_data[? "decklist_style"] == 1 {

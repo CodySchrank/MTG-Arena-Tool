@@ -23,14 +23,14 @@ if argument0 == card_tiles_32_spr {
     draw_set_color(c_black);
     draw_set_halign(fa_left);
     draw_text(argument3+45, argument4, string(_name));
-    draw_mana_cost(_cost, argument3+_w+_sprw+_sprw, argument4, 1, icons_20_sh_spr);
+    draw_mana_cost(_cost, argument3+_w+_sprw+_sprw+3, argument4, 1, icons_20_sh_spr);
 }
 else {
     draw_text(argument3+12, argument4, string(argument1));
     draw_set_color(c_black);
     draw_set_halign(fa_left);
     draw_text(argument3+32, argument4, string(_name));
-    draw_mana_cost(_cost, argument3+_w+_sprw+_sprw, argument4, 1, icons_16_sh_spr);
+    draw_mana_cost(_cost, argument3+_w+_sprw+_sprw+3, argument4, 1, icons_16_sh_spr);
 }
 
 

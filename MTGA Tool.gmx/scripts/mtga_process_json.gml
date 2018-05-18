@@ -72,11 +72,5 @@ if string_pos(lookfor, argument0) {
     exit;
 }
 
-if instance_exists(macro_obj) {
-    lookfor = "Deck.CreateDeck {";
-    if string_pos(lookfor, argument0) {
-        mtga_CreateDeck(argument0);
-    }
-    exit;
-}
+
 

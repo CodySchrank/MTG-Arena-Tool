@@ -11,7 +11,7 @@ for (j=0; j<strnumb; j++) {
     str = string_extract(argument0, "(Filename:", j);
 
     //show_debug_message("  > Processing "+str);
-    clipboard_set_text(str);
+    //clipboard_set_text(str);
     //show_debug_message("  > ");
     mtga_process_json(str);
 }
