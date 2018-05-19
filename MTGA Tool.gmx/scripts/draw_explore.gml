@@ -11,10 +11,6 @@ draw_set_color(color_white);
 draw_set_font(font_13);
 draw_text(bx, by, 'Here you will be able to see winning decklists of the community');
 */
-if keyboard_check_pressed(vk_space) {
-    http_get_top_decks();
-}
-
 if ds_list_size(top_decks) > 0 {
     var size = ds_list_size(top_decks);
     for (i=0; i<size; i++) {
@@ -129,5 +125,8 @@ if ds_list_size(top_decks) > 0 {
         height += lineh;
     }
 }
-
+else if !requested_top {
+    http_get_top_decks();
+    requested_top = true;
+}
 

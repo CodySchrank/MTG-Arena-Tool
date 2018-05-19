@@ -48,10 +48,23 @@ else {
     draw_text(bx, yy, "Check Updates");
     
     if controller_obj.latest_version != -1 {
-        draw_set_color(color_light);
+        draw_set_color(color_green);
         draw_set_font(font_12_i);
-        draw_text(bx, yy+48, 'Client is up to date!');
+        draw_text(bx, yy+32, 'Client is up to date!');
     }
 }
+
+yy += 72;
+draw_set_font(font_12);
+but = button_rectangle_simple(bx-64, yy-16, bx+64, yy+16);
+if but == 2 {
+    url_open("https://github.com/Manuel-777/MTG-Arena-Tool");
+}
+draw_set_halign(fa_center);
+draw_sprite(but_normal_spr, but, bx, yy);
+draw_sprite(git_spr, 0, bx-40, yy)
+draw_set_color(color_dark);
+draw_text(bx+16, yy, "GitHub");
+
 
 

@@ -65,8 +65,8 @@ mouse_yprevious = mouse_y;
 mouse_ypressed = mouse_y;
 pressed = -1;
 released = 1000000;
+requested_top = false;
 
-//
 filestream = 0;
 upstream   = 0;
 downstream = 0;

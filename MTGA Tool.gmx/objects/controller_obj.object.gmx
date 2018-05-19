@@ -661,19 +661,14 @@ var async_status = ds_map_find_value(async_load, "status");
 var async_result = ds_map_find_value(async_load, "result");
 
 show_debug_message("htttp:  "+string(async_result));
-//show_debug_message("AR:  "+string(async_request));
-//show_debug_message("id:  "+string(async_id));
-//show_debug_message("status:  "+string(async_status));
 
 if async_id == async_request &amp;&amp; async_result != undefined {
     if async_status == 0 {
         json = json_decode(async_result);
         if json &gt; 0 {
             if json[? "ok"] != false {
-                auth_token = string_lower(json[? "token"]);
-                //show_debug_message("set token: "+string(auth_token))
-                //
                 if string_count("method=submit_course", async_url) {
+                    auth_token = string_lower(json[? "token"]);
                     ds_map_destroy(json);
                 }
                 else if string_count("method=get_top_decks", async_url) {

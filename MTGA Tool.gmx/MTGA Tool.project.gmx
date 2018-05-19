@@ -38,6 +38,7 @@
     <sprite>sprites\card_tiles_32_spr</sprite>
     <sprite>sprites\card_tiles_24_spr</sprite>
     <sprite>sprites\sprite24</sprite>
+    <sprite>sprites\git_spr</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
