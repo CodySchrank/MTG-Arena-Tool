@@ -33,6 +33,16 @@ if ds_list_size(top_decks) > 0 {
                 if but == 4 && is_not_drag(10) {
                     view_deck = i;
                     view_deck_type = 1;
+                    view_deck_desc = _deck[? "lastUpdated"];
+                    view_deck_desc = arenatime_to_datetime(view_deck_desc);
+                    view_deck_desc = date_date_string(view_deck_desc);
+                    view_deck_rank = "";
+                    view_deck_tier = 0;
+                    if !is_undefined(_deck[? "rank"]) {
+                        view_deck_rank = _deck[? "rank"];
+                        view_deck_tier = _deck[? "tier"];
+                    }
+                    
                     deck_sort(_deck[? "mainDeck"]);
                     deck_sort(_deck[? "sideboard"]);
                     selected = 0;
@@ -96,8 +106,11 @@ if ds_list_size(top_decks) > 0 {
             var nam = string(_deck[? "name"]);
             draw_set_font(font_14);
             draw_text(xx+24, yy+lineh/2-14, nam);
+            var w = string_width(nam+" ");
             draw_set_font(font_14_i);
-            draw_text(xx+24+string_width(nam), yy+lineh/2-14, "  ("+string(_entry[? "playername"])+")");
+            draw_set_alpha(0.75);
+            draw_text(xx+24+w, yy+lineh/2-14, "("+string(_entry[? "playername"])+")");
+            draw_set_alpha(1);
 
             if ds_map_exists(_deck, "colorIdentity") {
                 draw_mana_cost(_deck[? "colorIdentity"], xx+24+10, yy+lineh/2+14, 0, icons_20_spr);
@@ -108,8 +121,7 @@ if ds_list_size(top_decks) > 0 {
             
             draw_set_font(font_14);
             draw_set_halign(fa_center);
-            //draw_text(bx, yy+lineh/2-14, string(_deck[? "format"]));
-            draw_text(bx, yy+lineh/2, string_replace_all(string(_entry[? "event"]), "_", " "));
+            draw_text(bx, yy+lineh/2+14, string_replace_all(string(_entry[? "event"]), "_", " "));
             
             draw_set_font(font_12_i);
             draw_set_halign(fa_right);

@@ -123,10 +123,21 @@ if view_deck != -1 {
     
     draw_set_color(color_white);
     draw_set_alpha(1);
-    draw_set_font(font_14);
     draw_set_halign(fa_left);
     
-    draw_text(xx+36, yy+36, string(_deck[? "name"]));
+    if view_deck_rank != "" {
+        ii = get_rank_index(view_deck_rank, view_deck_tier);
+        draw_sprite_ext(ranks_spr, ii, xx+36+12, yy+36, 1, 1, 0, c_white, 1);
+        xx += 48;
+    }
+    
+    draw_set_font(font_14);
+    draw_text(xx+36, yy+36-14, string(_deck[? "name"]));
+    draw_set_font(font_12_i);
+    draw_text(xx+36, yy+36+14, view_deck_desc);
+    
+    xx = sidew;
+    
     if ds_map_exists(_deck, "colorIdentity") {
         draw_mana_cost(_deck[? "colorIdentity"], view_wview - 36, yy+36, 1, icons_20_spr);
     }
@@ -313,6 +324,9 @@ else if ds_list_size(decks) > 0 {
                     if but == 4 && is_not_drag(10) {
                         view_deck = i;
                         view_deck_type = 0;
+                        view_deck_desc = "";
+                        view_deck_rank = ""
+                        view_deck_tier = 0;
                         offset = 0;
                         _deck[? "hover"] = 0;
                     }

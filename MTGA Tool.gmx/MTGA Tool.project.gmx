@@ -127,6 +127,7 @@
     <script>scripts\card_get_tile.gml</script>
     <script>scripts\draw_tile_arena.gml</script>
     <script>scripts\draw_tile_classic.gml</script>
+    <script>scripts\arenatime_to_datetime.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\font_12</font>

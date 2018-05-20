@@ -48,6 +48,9 @@ opt[5] = "About"
 
 top_decks = ds_list_create();
 
+view_deck_rank = ""
+view_deck_tier = 0;
+view_deck_desc = "";
 view_deck = -1;
 total_main = 0;
 total_side = 0;

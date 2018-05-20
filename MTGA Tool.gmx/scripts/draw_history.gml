@@ -80,7 +80,8 @@ if view_match != -1 {
         yy += size*24+80+32;
     if saved_data[? "decklist_style"] == 1
         yy += size*28+80+32;
-    height = yy + 48;
+    
+    height = yy + 48 - offset;
     yy = toph + 16 + offset;
 
     draw_set_font(font_14);
@@ -125,7 +126,7 @@ if view_match != -1 {
         yy += size*24+80+32;
     if saved_data[? "decklist_style"] == 1
         yy += size*28+80+32;
-    height = max(height, yy + 48);
+    height = max(height, yy + 48 - offset);
     
     but = button_rectangle_simple(view_wview-170-64, yy-16, view_wview-170+64, yy+16);
     if but == 4 {

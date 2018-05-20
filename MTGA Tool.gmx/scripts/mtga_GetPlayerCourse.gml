@@ -24,6 +24,15 @@ if ds_map_exists(json, "CourseDeck") {
     if json[? "Id"] != "00000000-0000-0000-0000-000000000000" {
         json[? "_id"] = json[? "Id"];
         
+        if json[? "format"] == "Limited" {
+            json[? "rank"] = lim_rank;
+            json[? "tier"] = lim_tier;
+        }
+        else {
+            json[? "rank"] = con_rank;
+            json[? "tier"] = con_tier;
+        }
+        
         var cd = json[? "CourseDeck"];
         cd[? "colorIdentity"] = deck_get_colors(cd[? "mainDeck"], cd[? "sideboard"])
         ds_map_delete(json, "Id");
