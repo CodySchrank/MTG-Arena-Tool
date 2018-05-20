@@ -667,11 +667,16 @@ if async_id == async_request &amp;&amp; async_result != undefined {
         json = json_decode(async_result);
         if json &gt; 0 {
             if json[? "ok"] != false {
-                if string_count("method=submit_course", async_url) {
+                if string_count("method=auth", async_url) {
+                    auth_token = string_lower(json[? "token"]);
+                    ds_map_destroy(json);
+                }
+                else if string_count("method=submit_course", async_url) {
                     auth_token = string_lower(json[? "token"]);
                     ds_map_destroy(json);
                 }
                 else if string_count("method=get_top_decks", async_url) {
+                    auth_token = string_lower(json[? "token"]);
                     ds_list_copy(main_menu.top_decks, json[? "result"]);
                 }
                 else if string_count("method=get_version", async_url) {

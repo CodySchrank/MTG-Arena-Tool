@@ -96,7 +96,6 @@
       <script>scripts\reset_timer.gml</script>
       <script>scripts\json_get.gml</script>
       <script>scripts\json_set.gml</script>
-      <script>scripts\string_compare.gml</script>
       <script>scripts\string_extract.gml</script>
       <script>scripts\string_rpos.gml</script>
       <script>scripts\ab.gml</script>

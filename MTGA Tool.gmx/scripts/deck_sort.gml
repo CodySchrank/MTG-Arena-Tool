@@ -12,8 +12,7 @@ while (!sorted) {
         _card = ds_list_find_value(_list, cc+1);
         _cb = real(_card[? "id"]);
         
-        _comp = string_compare(get_card_data(_ca, 0), get_card_data(_cb, 0));
-        if _comp == 2 {
+        if get_card_data(_ca, 0) > get_card_data(_cb, 0) {
            _tmp = ds_map_create();
            ds_map_copy(_tmp, ds_list_find_value(_list, cc));
         
