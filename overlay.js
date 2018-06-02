@@ -62,11 +62,20 @@ ipc.on('set_deck', function (event, arg) {
 });
 
 function hoverCard(grpId) {
-	$('.overlay_hover').css("opacity", 1);
-	$('.overlay_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(database[arg].set)+"/"+database[arg].cid+".jpg");
-	setTimeout(function () {
+	if (grpId == undefined) {
 		$('.overlay_hover').css("opacity", 0);
-	}, 5000);
+	}
+	else {
+		let dfc = '';
+		if (database[grpId].dfc == 'DFC_Back')	dfc = 'a';
+		if (database[grpId].dfc == 'DFC_Front')	dfc = 'b';
+		if (database[grpId].dfc == 'SplitHalf')	dfc = 'a';
+		$('.overlay_hover').css("opacity", 1);
+		$('.overlay_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(database[grpId].set)+"/"+database[grpId].cid+dfc+".jpg");
+		setTimeout(function () {
+			$('.overlay_hover').css("opacity", 0);
+		}, 10000);
+	}
 }
 
 

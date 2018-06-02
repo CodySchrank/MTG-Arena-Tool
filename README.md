@@ -16,16 +16,18 @@ On Version 2.0.0 I move the source to Electron, mostly because its easier for ev
 ### Compiling / Run from source
 MTG Arena Tool is developed using Electron JS, To get started simply clone this repo and install:
 
+```
 git clone https://github.com/Manuel-777/MTG-Arena-Tool
 npm install
 npm start
+```
 
 ### Download
 Currently, we live [here at GitHub](https://github.com/Manuel-777/MTG-Arena-Tool/releases). You will find all stable and pre-production releases right here.
 
 Once downloaded the installer should guide your with ease, then simply run the app along MTG Arena. The app should read your user data and warn you if anything goes wrong.
 
-If you start hte app /while/ you are in a match some things may go wrong. Try not to do that.
+If you start hte app *while* you are in a match some things may go wrong. Try not to do that.
 
 ### Disclaimer
 
