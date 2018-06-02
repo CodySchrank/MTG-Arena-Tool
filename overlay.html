@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>MTGA Squirrel</title>
+        <link rel="stylesheet" href="index.css">
+        <script src="jquery-3.3.1.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+        <script src="database.js"></script>
+        <script src="util.js"></script>
+        <script src="overlay.js"></script>
+    </head>
+    <body>
+        <div class="overlay_wrapper" >
+
+            <div class="top" style="justify-content: flex-end;">
+                <div class="button settings"></div>
+                <div class="button minimize"></div>
+                <div class="button close"></div>
+            </div>
+
+            <div class="overlay_deckname"></div>
+            <div class="overlay_deckcolors"></div>
+            <div class="overlay_separator"></div>
+            <div class="overlay_decklist"></div>
+
+            <div class="overlay_hover_container">
+                <img class="overlay_hover"></img>
+            </div>
+        </div>
+    </body>
+</html>

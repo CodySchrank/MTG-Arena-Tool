@@ -1,0 +1,517 @@
+html {
+	-webkit-user-select:none;
+     cursor: default;
+    height: 100%;
+    font-family: "Mplantin"; 
+	-webkit-font-smoothing: antialiased !important;
+	text-rendering: optimizeLegibility !important;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+	background-color: #33281E;
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: 'belerenbold';
+    src: url('fonts/belerenbold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Mplantin';
+    src: url('fonts/Mplantin.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Mplantin-italic';
+    src: url('fonts/mplantinit.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Mplantin-bold';
+    src: url('fonts/mplantinbold.woff') format('woff');
+}
+
+.wrapper {
+    position: relative;
+    display: flex;
+    height: calc(100% - 48px);
+}
+
+.overlay_wrapper {
+    position: relative;
+    height: calc(100% - 16px);
+}
+
+.wrapper:before {
+    content: ' ';
+    top: 0;
+    left: 100px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: url(images/Mox-Amber-Dominaria-MtG-Art.jpg);
+    background-color: rgba(115, 93, 73, 1);
+    background-size: cover;
+    background-blend-mode: luminosity;
+    background-position: center;
+    opacity: 0.25;
+    z-index: -1;
+}
+
+.top {
+	-webkit-app-region:drag;
+	position: relative;
+	z-index: 30;
+    height: 48px;
+    background: url(images/top_bar.png);
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
+}
+
+.top_username {
+	color: #B7C89E;
+	font-size: 18px;
+    margin-left: 4px;
+    align-self: center;
+	-webkit-user-select:none;
+}
+
+.top_rank {
+    -webkit-app-region: no-drag;
+    align-self: center;
+    margin-left: 16px;
+    width: 48px;
+    height: 48px;
+    background: url(images/ranks_spr.png);
+    background-position: 48px 0px;
+}
+
+.sidebar {
+    position: relative;
+    padding: 16px 0 8px;
+    z-index: 20;
+    height: calc(100% - 24px);
+    width: 200px;
+    background: url(images/side_bar.png);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar_item {
+    margin: 3px 0 3px 0;
+    height: 40px;
+    cursor: pointer;
+    text-indent: 16px;
+    font-size: 18px;
+    line-height: 40px;
+    vertical-align: middle;
+    color: #FAE5D2;
+    opacity: 0.5;
+    -webkit-transition: all .25s ease-in-out;
+}
+
+.sidebar_item:hover {
+    opacity: 1;
+    text-indent: 24px;
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+.sidebar_separator {
+    height: 16px;
+}
+
+.item_selected {
+    opacity: 1;
+    text-indent: 24px;
+}
+
+.item_selected {
+    opacity: 1;
+}
+
+.button {
+    -webkit-app-region: no-drag;
+    cursor:pointer;
+    align-self: center;
+    position: relative;
+    left: 0px;
+    margin-right: 12px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+    -webkit-transition: all .33s ease-in-out;
+}
+
+.button:hover {
+    opacity: 0.2;
+    -webkit-transform: rotate(-90deg);
+}
+
+.button.minimize:hover {
+    opacity: 0.2;
+    -webkit-transform: rotate(-180deg);
+}
+
+.button.back:hover {
+    opacity: 1;
+    -webkit-transform: rotate(0deg);
+    left: -8px;
+}
+
+.button.settings {
+    background-image: url(images/icon_settings.png);
+}
+.button.minimize {
+    background-image: url(images/icon_minimize.png);
+}
+.button.close {
+    background-image: url(images/icon_close.png);
+}
+.button.back {
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 64px;
+    height: 64px;
+    background-image: url(images/icon_back.png);
+}
+
+.overflow_ux {
+    width: calc(100% - 200px);
+    height: 100%;
+    overflow: hidden;
+}
+
+.ux_item {
+    width: calc(100%);
+    height: 100%;
+    overflow: overlay;
+}
+
+.moving_ux {
+    position: relative;
+    display: flex;
+    width: calc(200%);
+    height: 100%;
+    -webkit-transition: left .1s ease-in-out-expo;
+}
+
+.deck_tile {
+    width: 128px;
+    height: 64px;
+    margin: 0px 16px 0px 0px;
+    opacity: 0.66;
+    background-image: url(https://img.scryfall.com/cards/art_crop/en/rix/189.jpg);
+    background-size: 200px;
+    background-position: center;
+    -webkit-transition: .2s ease-out;
+    transition: width opacity;
+}
+
+.deck_tile:hover {
+    opacity: 1;
+    width: 200px;
+}
+
+.list_deck {
+    cursor: pointer;
+	padding-left: 16px;
+	height: 64px;
+	display: flex;
+    background-color: rgba(255, 255, 255, 0);
+	-webkit-transition: background-color .2s ease-in;
+}
+
+.list_deck:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.list_fill {
+	padding-left: 16px;
+	height: 16px;
+	display: flex;
+	flex-direction: column;
+}
+
+.flex_top {
+	height: 50%;
+	display: flex;
+}
+
+.flex_bottom {
+	height: 50%;
+	display: flex;
+}
+
+.flex_item {
+	display: flex;
+}
+
+.list_deck_name {
+	-webkit-user-select:none;
+	align-self: center;
+	margin-left: 2px;
+	color: #FAE5D2;
+}
+
+
+.decklist {
+    padding: 16px;
+    width: calc(50% - 32px);
+}
+
+.decklist_top {
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    /* opacity: 0.8; */
+    width: calc(100% - 48px);
+    height: 80px;
+    display: flex;
+    margin-top: 24px;
+    padding: 16px 32px 16px 16px;
+    justify-content: space-between;
+}
+
+.deck_name {
+    align-self: center;
+    color: #FAE5D2;
+    font-size: 20px;
+    text-shadow: 0px 4px 16px rgb(0, 0, 0);
+}
+
+
+.mana_20 {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+}
+
+.mana_16 {
+    z-index: 15;
+    pointer-events: none;
+    width: 20px;
+    height: 20px;
+    margin: 2px 0 2px 0;
+}
+
+.mana_white     { background: url(images/w20.png) center;}
+.mana_blue      { background: url(images/u20.png) center;}
+.mana_black     { background: url(images/b20.png) center;}
+.mana_red       { background: url(images/r20.png) center;}
+.mana_green     { background: url(images/g20.png) center;}
+.mana_colorless { background: url(images/c20.png) center;}
+
+.mana_16.mana_white    { background: url(16sh/w.png) center;}
+.mana_16.mana_blue     { background: url(16sh/u.png) center;}
+.mana_16.mana_black    { background: url(16sh/b.png) center;}
+.mana_16.mana_red      { background: url(16sh/r.png) center;}
+.mana_16.mana_green    { background: url(16sh/g.png) center;}
+.mana_16.mana_colorless{ background: url(16sh/c.png) center;}
+.mana_16.mana_x        { background: url(16sh/x.png) center;}
+.mana_16.mana_g0       { background: url(16sh/0.png) center;}
+.mana_16.mana_g1       { background: url(16sh/1.png) center;}
+.mana_16.mana_g2       { background: url(16sh/2.png) center;}
+.mana_16.mana_g3       { background: url(16sh/3.png) center;}
+.mana_16.mana_g4       { background: url(16sh/4.png) center;}
+.mana_16.mana_g5       { background: url(16sh/5.png) center;}
+.mana_16.mana_g6       { background: url(16sh/6.png) center;}
+.mana_16.mana_g7       { background: url(16sh/7.png) center;}
+.mana_16.mana_g8       { background: url(16sh/8.png) center;}
+.mana_16.mana_g9       { background: url(16sh/9.png) center;}
+.mana_16.mana_g10      { background: url(16sh/10.png) center;}
+.mana_16.mana_g11      { background: url(16sh/11.png) center;}
+.mana_16.mana_g12      { background: url(16sh/12.png) center;}
+.mana_16.mana_g13      { background: url(16sh/13.png) center;}
+.mana_16.mana_g14      { background: url(16sh/14.png) center;}
+.mana_16.mana_g15      { background: url(16sh/15.png) center;}
+.mana_16.mana_g16      { background: url(16sh/16.png) center;}
+.mana_16.mana_g17      { background: url(16sh/17.png) center;}
+.mana_16.mana_g18      { background: url(16sh/18.png) center;}
+.mana_16.mana_g19      { background: url(16sh/19.png) center;}
+.mana_16.mana_g20      { background: url(16sh/20.png) center;}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #33281E;
+    border-radius: 10px;
+    margin-top: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #917961;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #B59579; 
+}
+
+.overlay_decklist {
+    /*padding-right: 12px;*/
+    height: calc(100% - 128px);
+    overflow: overlay;
+}
+
+.overlay_deckname {
+    padding: 12px 0 0 0;
+    text-align: center;
+    color: #FAE5D2;
+}
+
+.overlay_deckcolors {
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.overlay_separator {
+    padding: 4px;
+    height: 16px;
+    background: url(images/separator_spr.png) center no-repeat;
+}
+
+
+.overlay_hover {
+    pointer-events: none;
+    width: 90%;
+    max-width: 300px;
+    opacity: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    -webkit-border-radius: 4.75% / 3.5%;
+    box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.5);
+    -webkit-transition: opacity .2s ease-in;
+}
+
+.overlay_hover_container {
+    pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    float: right;
+    width: 100%;
+    z-index: 50;
+}
+
+.card_tile {
+    width: 100%;
+    min-width: calc(100% - 48px);
+    height: 24px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-style: solid;
+    border-width: 0px 8px;
+    -webkit-transition: all .15s ease-in;
+    cursor: pointer;
+}
+
+.card_tile_glow {
+    width: 100%;
+    left: calc(0px - 100% + 32px);
+    min-width: calc(100% - 48px);
+    height: 24px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-style: solid;
+    border-width: 0px 8px;
+    position: relative;
+    opacity: 0;
+    -webkit-border-image: url(images/over.png) 0 15 0 15 stretch;
+    -webkit-transition: opacity .12s ease-in-out, margin-top .12s ease-in-out, border-image .2s ease-out;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.card_tile_glow:hover {
+    opacity: 1;
+    margin-top: 0px;
+    -webkit-border-image: url(images/flash.png) 0 15 0 15 stretch;
+}
+
+span {
+    align-self: center;
+}
+
+.card_tile_quantity {
+    text-indent: -3px;
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    height: 24px;
+    min-width: 24px;
+    width: 24px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    text-align: center;
+    font-family: Mplantin;
+    background: url(images/quantity.png);
+    background-size: cover;
+}
+
+.card_tile_container {
+    display: flex;
+}
+
+.card_tile_separator {
+    color: rgba(255, 255, 255, 0.8);
+    height: 32px;
+    vertical-align: middle;
+    line-height: 32px;
+    font-size: 15px;
+    text-align: center;
+    font-family: beleren;
+    align-self: center;
+}
+
+.card_tile_name {
+    padding-left: 2px;
+    overflow: hidden;
+    height: 16px;
+    font-size: 14px;
+    font-family: "belerenbold";
+    align-self: center;
+    justify-content: flex-start;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.flex_end {
+    justify-content: flex-end;
+}
+
+.tile_w {     -webkit-border-image: url(images/w.png) 0 15 0 15 stretch;}
+.tile_u {     -webkit-border-image: url(images/u.png) 0 15 0 15 stretch;}
+.tile_b {     -webkit-border-image: url(images/b.png) 0 15 0 15 stretch;}
+.tile_r {     -webkit-border-image: url(images/r.png) 0 15 0 15 stretch;}
+.tile_g {     -webkit-border-image: url(images/g.png) 0 15 0 15 stretch;}
+.tile_c {     -webkit-border-image: url(images/c.png) 0 15 0 15 stretch;}
+.tile_multi { -webkit-border-image: url(images/multi.png) 0 15 0 15 stretch;}
+
+.tile_wr { -webkit-border-image: url(images/wr.png) 0 15 0 15 stretch;}
+.tile_wb { -webkit-border-image: url(images/wb.png) 0 15 0 15 stretch;}
+.tile_uw { -webkit-border-image: url(images/uw.png) 0 15 0 15 stretch;}
+.tile_ur { -webkit-border-image: url(images/ur.png) 0 15 0 15 stretch;}
+.tile_ug { -webkit-border-image: url(images/ug.png) 0 15 0 15 stretch;}
+.tile_ub { -webkit-border-image: url(images/ub.png) 0 15 0 15 stretch;}
+.tile_rg { -webkit-border-image: url(images/rg.png) 0 15 0 15 stretch;}
+.tile_gw { -webkit-border-image: url(images/gw.png) 0 15 0 15 stretch;}
+.tile_br { -webkit-border-image: url(images/br.png) 0 15 0 15 stretch;}
+.tile_bg { -webkit-border-image: url(images/bg.png) 0 15 0 15 stretch;}
+
+
+
+    

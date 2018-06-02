@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>MTGA Squirrel</title>
+        <link rel="stylesheet" href="index.css">
+        <script src="jquery-3.3.1.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+        <script src="jquery.easing.1.3.js"></script>
+        <script src="database.js"></script>
+        <script src="util.js"></script>
+        <script src="renderer.js"></script>
+    </head>
+    <body>
+        <div class="top">
+            <div class="flex_item">
+                <!- App logo could go here ->
+            </div>
+            <div class="flex_item">
+                <div class="button settings"></div>
+                <div class="button minimize"></div>
+                <div class="button close"></div>
+            </div>
+        </div>
+
+        <div class="wrapper" >
+            <div class="sidebar">
+                <div class="flex_item">
+                    <div class="top_rank" ></div>
+                    <div class="top_username"></div>
+                </div>
+                <div class="sidebar_separator"></div>
+                <div class="sidebar_item it0 item_selected">My Decks</div>
+                <div class="sidebar_item it1">History</div>
+                <div class="sidebar_item it2">Explore</div>
+                <div class="sidebar_item it3">Settings</div>
+                <div class="sidebar_item it4">About</div>
+            </div>
+
+            <div class="overflow_ux">
+                <div class="moving_ux">
+                    <div class="ux_item" id="ux_0">
+                    </div>
+
+                    <div class="ux_item" id="ux_1">
+                    </div>
+                </div>
+
+        </div>
+    </body>
+</html>
