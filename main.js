@@ -3,29 +3,22 @@ var database = {"64801":{"name":"Angel of Sanctions","set":"Amonkhet","type":"Cr
 
 const electron = require('electron');
 const {app, Menu, Tray} = require('electron');
-
 const path  = require('path');
-
-// Store class
 const Store = require('electron-store');
-//const store = new Store();
+
 const store = new Store({
 	configName: 'data',
 	defaults: {
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
-		overlayBounds: { width: 180, height: 600, x: 0, y: 0 },
-		settings: {}
+		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
+		settings: {},
+		matches_index:[],
 	}
 });
 
-const history = new Store({
-	configName: 'history',
-	defaults: {
-		_index: []
-	}
-});
 
 const debugLog = false;
+const debugLogSpeed = 1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 var renderer_state = 0;
@@ -76,6 +69,18 @@ ipc.on('renderer_state', function (event, state) {
     renderer_state = state;
     console.log("Renderer state: ", state);
 });
+
+ipc.on('request_history', function (event, state) {
+	var history = {};
+	history.matches = store.get('matches_index');
+	history.matches.forEach(function(id) {
+		history[id] = store.get(id);
+	});
+	
+    mainWindow.webContents.send("set_history", history);
+});
+
+
 
 // Events
 ipc.on('window_close', function (event, state) {
@@ -285,7 +290,7 @@ function processLog(err, bytecount, buff) {
 			(function(i, str){
 				setTimeout(function(){
 					processLogData(str);
-				}, i * 25);
+				}, i * debugLogSpeed);
 			}(i, str));
 		}
 		else {
@@ -620,7 +625,7 @@ function forceDeckUpdate() {
 }
 
 function getOppDeck() {
-	var oppDeck = [];
+	var oppDeck = {mainDeck: [], sideboard : []};
 	var doAdd = true;
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
@@ -628,7 +633,7 @@ function getOppDeck() {
                 if (gameObjs[key].ownerSeatId == oppSeat && gameObjs[key].type == "GameObjectType_Card") {
 
                 	doAdd = true;
-                    oppDeck.forEach(function(card) {
+                    oppDeck.mainDeck.forEach(function(card) {
                         if (card.id == gameObjs[key].grpId) {
                             doAdd = false;
                             card.quantity += 1;
@@ -636,7 +641,7 @@ function getOppDeck() {
                     });
 
                     if (doAdd) {
-						oppDeck.push( {id: gameObjs[key].grpId, quantity: 1} );
+						oppDeck.mainDeck.push( {id: gameObjs[key].grpId, quantity: 1} );
                     }
                 }
             }
@@ -654,18 +659,27 @@ function saveMatch() {
 		rank: oppRank,
 		tier: oppTier,
 		userid: oppId,
-		seat: oppSeat 
+		seat: oppSeat,
+		win: oppWin
 	}
 	match.player = {
 		name: playerName,
 		rank: playerRank,
 		tier: playerTier,
 		userid: playerId,
-		seat: playerSeat 
+		seat: playerSeat, 
+		win: playerWin
 	}
 	match.playerDeck = currentDeck;
 	match.oppDeck = getOppDeck();
+	match.date = new Date();
 
 	console.log("Save match:", match);
-	history.set(currentMatchId, match);
+	var matches = store.get('matches_index');
+	if (!matches.includes(currentMatchId)) {
+		matches.push(currentMatchId);
+	}
+
+	store.set('matches_index', matches);
+	store.set(currentMatchId, match);
 }

@@ -56,7 +56,7 @@ ipc.on('set_deck', function (event, arg) {
 		}
 		*/
 
-		addCardTile(grpId, card.quantity, $(".overlay_decklist"));
+		addCardTile(grpId, 'a' card.quantity, $(".overlay_decklist"));
 		prevIndex = grpId;
 	});
 });

@@ -179,7 +179,7 @@ body {
     background-position: center;
     width: 64px;
     height: 64px;
-    background-image: url(images/icon_back.png);
+    background-image: url(images/icon_back_light.png);
 }
 
 .overflow_ux {
@@ -207,7 +207,7 @@ body {
     height: 64px;
     margin: 0px 16px 0px 0px;
     opacity: 0.66;
-    background-image: url(https://img.scryfall.com/cards/art_crop/en/rix/189.jpg);
+    background-image: url('');
     background-size: 200px;
     background-position: center;
     -webkit-transition: .2s ease-out;
@@ -232,12 +232,76 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+.list_match {
+    cursor: pointer;
+    padding-left: 16px;
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0);
+    -webkit-transition: background-color .2s ease-in;
+}
+
+.list_match:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.list_match_title {
+    width: -webkit-fill-available;
+    margin-right: 16px;
+    line-height: 32px;
+    vertical-align: middle;
+    text-align: right;
+    font-family: Mplantin-italic;
+    font-size: 16px;
+    color: rgba(250, 229, 210, 1);
+}
+
+.list_match_time {
+    width: -webkit-fill-available;
+    margin-right: 16px;
+    font-family: Mplantin-italic;
+    text-align: right;
+    font-size: 16px;
+    color: rgba(250, 229, 210, 0.5);
+}
+
+.list_match_result_win {
+    font-family: Mplantin-italic;
+    font-size: 20px;
+    line-height: 64px;
+    margin-right: 32px;
+    color: rgba(183, 200, 158, 1);
+}
+
+.list_match_result_loss {
+    line-height: 64px;
+    font-family: Mplantin-italic;
+    font-size: 20px;
+    margin-right: 32px;
+    color: rgba(221, 130, 99, 1);
+}
+
+.opp_rank {
+    -webkit-app-region: no-drag;
+    align-self: center;
+    margin-left: 16px;
+    width: 48px;
+    height: 48px;
+    background: url(images/ranks_spr.png);
+    background-position: 48px 0px;
+}
+
+
+
 .list_fill {
 	padding-left: 16px;
 	height: 16px;
 	display: flex;
 	flex-direction: column;
 }
+
+
 
 .flex_top {
 	height: 50%;
