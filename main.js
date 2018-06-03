@@ -18,9 +18,10 @@ const store = new Store({
 
 
 const debugLog = false;
-const debugLogSpeed = 1;
+const debugLogSpeed = 0.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
+var firstPass = true;
 var renderer_state = 0;
 var currentChunk = "";
 var currentDeck = {};
@@ -53,6 +54,8 @@ var turnStorm = 0;
 var zones = {};
 var gameObjs = {};
 var hoverCard = undefined;
+var history = {};
+
 
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
@@ -71,13 +74,18 @@ ipc.on('renderer_state', function (event, state) {
 });
 
 ipc.on('request_history', function (event, state) {
-	var history = {};
 	history.matches = store.get('matches_index');
 	history.matches.forEach(function(id) {
 		history[id] = store.get(id);
 	});
 	
-    mainWindow.webContents.send("set_history", history);
+	if (state == 1) {
+	    mainWindow.webContents.send("set_history", history);
+	}
+	else {
+	    mainWindow.webContents.send("set_history_data", history);
+	}
+
 });
 
 
@@ -284,19 +292,27 @@ function processLog(err, bytecount, buff) {
 
     var str;
     for (var i=0; i<splitString.length; i++) {
-
-    	if (debugLog) {
-	    	str = splitString[i];
-			(function(i, str){
-				setTimeout(function(){
-					processLogData(str);
-				}, i * debugLogSpeed);
-			}(i, str));
-		}
-		else {
-	        processLogData(splitString[i]);
-	    }
+    	str = splitString[i];
+    	//processLogData(str);
+    	
+		(function(i, str){
+			setTimeout(function(){
+				processLogData(str);
+			}, i * debugLogSpeed);
+		}(i, str));
     }
+    if (firstPass) {
+		setTimeout(function(){
+	        firstPass = false;
+
+			history.matches = store.get('matches_index');
+			history.matches.forEach(function(id) {
+				history[id] = store.get(id);
+			});
+			
+	        mainWindow.webContents.send("set_history_data", history);
+		}, (splitString.length + 2) * debugLogSpeed);
+	}
 
     prevLogSize+=bytecount;
     process.nextTick(readLog);
@@ -362,7 +378,7 @@ function processLogData(data) {
         strCheck = 'Event.MatchCreated ';
    		json = checkJson(data, strCheck, '');
     	if (json != false) {
-            create_match(json);
+            createMatch(json);
         }
 
         // Game Room State Changed
@@ -386,6 +402,7 @@ function processLogData(data) {
 
                 saveOverlayPos();
                 overlay.hide();
+                mainWindow.show();
                 saveMatch();
             }
 
@@ -441,16 +458,18 @@ function processLogData(data) {
     }
 }
 
-function create_match(arg) {
+function createMatch(arg) {
 	var obj = store.get('overlayBounds');
-	console.log(obj);
 	annotationsRead = [];
     zones = {};
     gameObjs = {};
-    hideWindow();
-    overlay.show();
-    overlay.focus();
-    overlay.setBounds(obj);
+
+    if (!firstPass) {
+	    hideWindow();
+	    overlay.show();
+	    overlay.focus();
+	    overlay.setBounds(obj);
+    }
 
     oppName = arg.opponentScreenName;
     oppRank = arg.opponentRankingClass;
@@ -569,7 +588,7 @@ function gre_to_client(data) {
 	                        affected.forEach(function(aff) {
 		                        if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
 		                        	if (gameObjs[aff] !== undefined) {
-			                        	console.log(obj.id, database[gameObjs[aff].grpId].name, "Entered", zones[affector].type);
+			                        	//console.log(obj.id, database[gameObjs[aff].grpId].name, "Entered", zones[affector].type);
 			                        	//annotationsRead[obj.id] = true;
 			                        }
 		                        	
@@ -674,10 +693,13 @@ function saveMatch() {
 	match.oppDeck = getOppDeck();
 	match.date = new Date();
 
-	console.log("Save match:", match);
+	console.log("Save match:", match.id);
 	var matches = store.get('matches_index');
 	if (!matches.includes(currentMatchId)) {
 		matches.push(currentMatchId);
+	}
+	else {
+		match.date = store.get(currentMatchId).date;
 	}
 
 	store.set('matches_index', matches);

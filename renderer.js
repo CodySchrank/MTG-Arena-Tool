@@ -34,6 +34,13 @@ ipc.on('set_history', function (event, arg) {
 	setHistory(arg);
 });
 
+//
+ipc.on('set_history_data', function (event, arg) {
+	if (arg != null) {
+		matchesHistory = arg;
+	}
+});
+
 
 
 $(".list_deck").on('mouseenter mouseleave', function(e) {
@@ -187,6 +194,8 @@ function setDecks(arg) {
 
 		var fll = $('<div class="flex_item"></div>');
 		var flc = $('<div class="flex_item"></div>');
+		var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
+		var flr = $('<div class="flex_item"></div>');
 		flc.css("flex-direction","column")
 
 		var flt = $('<div class="flex_top"></div>');
@@ -197,12 +206,19 @@ function setDecks(arg) {
 			$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
 		});
 
+		var wr = getDeckWinrate(deck.id);
+		if (wr != 0) {
+			$('<div class="list_deck_winrate">Winrate: '+wr+'%</div>').appendTo(flr);
+		}
+
 		fll.appendTo(div);
 		tile.appendTo(fll);
 
 		flc.appendTo(div);
+		flcf.appendTo(div);
 		flt.appendTo(flc);
 		flb.appendTo(flc);
+		flr.appendTo(div);
 		$("#ux_0").append(div);
 
 		$('.'+deck.id).on('mouseenter', function(e) {
@@ -292,7 +308,32 @@ function open_match(id) {
 	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
 	var fld = $('<div class="flex_item"></div>');
 
+	// this is a mess
+	var flt = $('<div class="flex_item"></div>')
+	var fltl = $('<div class="flex_item"></div>')
+	var r = $('<div class="top_rank"></div>'); r.appendTo(fltl);
+
+	var fltr = $('<div class="flex_item"></div>'); fltr.css("flex-direction","column");
+	var fltrt = $('<div class="flex_top"></div>');
+	var fltrb = $('<div class="flex_bottom"></div>');
+	fltrt.appendTo(fltr); fltrb.appendTo(fltr);
+
+	fltl.appendTo(flt); fltr.appendTo(flt);
+
+	var rank = match.player.rank;
+	var tier = match.player.tier;
+	r.css("background-position", (get_rank_index(rank, tier)*-48)+"px 0px").attr("title", rank+" "+tier);
+
+	var name = $('<div class="list_match_player_left">'+match.player.name+'</div>');
+	name.appendTo(fltrt);
+
+	if (match.player.win > match.opponent.win) {
+		var w = $('<div class="list_match_player_left green">Winner</div>');
+		w.appendTo(fltrb);
+	}
+
 	var dl = $('<div class="decklist"></div>');
+	flt.appendTo(dl);
 
 	var deck = match.playerDeck;
 	var prevIndex = 0;
@@ -314,7 +355,32 @@ function open_match(id) {
 		prevIndex = grpId;
 	});
 
+	var flt = $('<div class="flex_item" style="flex-direction: row-reverse;"></div>')
+	var fltl = $('<div class="flex_item"></div>')
+	var r = $('<div class="top_rank"></div>'); r.appendTo(fltl);
+
+	var fltr = $('<div class="flex_item"></div>'); fltr.css("flex-direction","column"); fltr.css("align-items","flex-end");
+	var fltrt = $('<div class="flex_top"></div>');
+	var fltrb = $('<div class="flex_bottom"></div>');
+	fltrt.appendTo(fltr); fltrb.appendTo(fltr);
+
+	fltl.appendTo(flt);fltr.appendTo(flt);
+
+	var rank = match.opponent.rank;
+	var tier = match.opponent.tier;
+	r.css("background-position", (get_rank_index(rank, tier)*-48)+"px 0px").attr("title", rank+" "+tier);
+
+	var name = $('<div class="list_match_player_right">'+match.opponent.name+'</div>');
+	name.appendTo(fltrt);
+
+	if (match.player.win < match.opponent.win) {
+		var w = $('<div class="list_match_player_right green">Winner</div>');
+		w.appendTo(fltrb);
+	}
+
 	var odl = $('<div class="decklist"></div>');
+	flt.appendTo(odl);
+
 	var deck = match.oppDeck;
 	var prevIndex = 0;
 	deck.mainDeck.forEach(function(card) {
@@ -345,6 +411,31 @@ function open_match(id) {
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
 
+}
+
+//
+function getDeckWinrate(deckid) {
+	var wins = 0;
+	var loss = 0;
+	if (matchesHistory == undefined) {
+		return 0;
+	}
+	matchesHistory.matches.forEach(function(match, index) {
+		match = matchesHistory[match];
+		if (match.playerDeck.id == deckid) {
+			if (match.player.win > match.opponent.win) {
+				wins++;
+			}
+			else {
+				loss++;
+			}
+		}
+	});
+
+	if (wins == 0) {
+		return 0;
+	}
+	return Math.round((1/(wins+loss)*wins) * 100) / 100
 }
 
 //
@@ -383,6 +474,8 @@ function sort_history() {
 
 //
 function compare_matches(a, b) {
+	a = matchesHistory[a];
+	b = matchesHistory[b];
 	a = Date.parse(a.date);
 	b = Date.parse(b.date);
 	if (a < b)	return 1;

@@ -221,6 +221,7 @@ body {
 
 .list_deck {
     cursor: pointer;
+    justify-content: space-between;
 	padding-left: 16px;
 	height: 64px;
 	display: flex;
@@ -282,6 +283,30 @@ body {
     color: rgba(221, 130, 99, 1);
 }
 
+.list_match_player_left {
+    -webkit-user-select: none;
+    align-self: center;
+    margin-left: 16px;
+    font-family: Mplantin-italic;
+    color: #FAE5D2;
+}
+
+.list_match_player_right {
+    -webkit-user-select: none;
+    align-self: center;
+    margin-right: 16px;
+    font-family: Mplantin-italic;
+    color: #FAE5D2;
+}
+
+.green {
+    color: rgba(183, 200, 158, 1) !important;
+}
+
+.red {
+    color: rgba(221, 130, 99, 1) !important;
+}
+
 .opp_rank {
     -webkit-app-region: no-drag;
     align-self: center;
@@ -322,6 +347,14 @@ body {
 	align-self: center;
 	margin-left: 2px;
 	color: #FAE5D2;
+}
+
+.list_deck_winrate {
+    -webkit-user-select:none;
+    align-self: right;
+    margin-right: 16px;
+    line-height: 64px;
+    color: #FAE5D2;
 }
 
 

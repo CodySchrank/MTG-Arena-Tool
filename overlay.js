@@ -45,6 +45,8 @@ ipc.on('set_deck', function (event, arg) {
 	arg.mainDeck.forEach(function(card) {
 		var grpId = card.id;
 		/*
+		// Print type separators on overlay
+		// It doesnt look good, but you can try..
 		var type = database[grpId].type;
 		if (prevIndex == 0) ;
 			addCardSeparator(get_card_type_sort(type), $(".overlay_decklist"));
@@ -56,7 +58,7 @@ ipc.on('set_deck', function (event, arg) {
 		}
 		*/
 
-		addCardTile(grpId, 'a' card.quantity, $(".overlay_decklist"));
+		addCardTile(grpId, 'a', card.quantity, $(".overlay_decklist"));
 		prevIndex = grpId;
 	});
 });
