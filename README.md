@@ -12,6 +12,7 @@ An MTG Arena deck tracker and statistics manager.
 
 
 On Version 2.0.0 I move the source to Electron, mostly because its easier for everyone to compile/run and see the source. Also because it allow for FAR more interaction with the system (always on top made simpler, no crashes on simple bugs, multiple windows, etcetera).
+We are currently merging all the feature from v1 to v2, if you want the most complete version you should download the installer here at GitHub, if you want the fastest and more stable version then you are welcome to try v2, trough you will have to run from source until its full featured.
 
 ### Compiling / Run from source
 MTG Arena Tool is developed using Electron JS, To get started simply clone this repo and install:
@@ -27,8 +28,6 @@ Currently, we live [here at GitHub](https://github.com/Manuel-777/MTG-Arena-Tool
 
 Once downloaded the installer should guide your with ease, then simply run the app along MTG Arena. The app should read your user data and warn you if anything goes wrong.
 
-If you start hte app *while* you are in a match some things may go wrong. Try not to do that.
-
 ### Disclaimer
 
 Even trough no official statement has been made about third party software by MTG Arena developers, I am obligued to put a warning about the use of this software.
@@ -43,6 +42,8 @@ MtG Arena Tool is unofficial Fan Content permitted under the Fan Content Policy.
 [Electron Store by Sindre Sorhus](https://github.com/sindresorhus/electron-store)
 
 [Jquery Easing by GSGD](http://gsgd.co.uk/sandbox/jquery/easing/)
+
+[Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse. These guys deserve all the love in the world for not only recompiling and uploading, but keeping the most up-to-date database with images, languages and pretty much every single bit of data we always hoped for in a MTG card search engine. Respect!
 
 ### Questions?
 You can find me on [Twitter](https://twitter.com/MEtchegaray7)

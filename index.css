@@ -35,8 +35,14 @@ body {
     src: url('fonts/mplantinbold.woff') format('woff');
 }
 
+.hidden {
+    display: none !important;
+    opacity: 0;
+}
+
 .wrapper {
     position: relative;
+    opacity: 1;
     display: flex;
     height: calc(100% - 48px);
 }
@@ -49,7 +55,7 @@ body {
 .wrapper:before {
     content: ' ';
     top: 0;
-    left: 100px;
+    left: 0px;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -76,9 +82,10 @@ body {
 
 .top_username {
 	color: #B7C89E;
-	font-size: 18px;
+	font-size: 17px;
     margin-left: 4px;
     align-self: center;
+    /*font-family: Beleren;*/
 	-webkit-user-select:none;
 }
 
@@ -102,6 +109,8 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
+    opacity: 1;
+    -webkit-transition: all .5s ease-in-out;
 }
 
 .sidebar_item {
@@ -307,6 +316,50 @@ body {
     color: rgba(221, 130, 99, 1) !important;
 }
 
+.white {
+    color: #FAE5D2 !important;
+}
+
+.about {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.message_center {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.message_big {
+    font-size: 32px;
+    font-family: Mplantin;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.message_sub {
+    font-size: 20px;
+    opacity: 0.5;
+    font-family: Mplantin-italic;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.message_sub_16 {
+    font-size: 16px;
+    opacity: 0.5;
+    font-family: Mplantin-italic;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
 .opp_rank {
     -webkit-app-region: no-drag;
     align-self: center;
@@ -343,16 +396,33 @@ body {
 }
 
 .list_deck_name {
-	-webkit-user-select:none;
-	align-self: center;
-	margin-left: 2px;
-	color: #FAE5D2;
+    -webkit-user-select:none;
+    align-self: center;
+    margin-left: 2px;
+    color: #FAE5D2;
+}
+
+.list_deck_name_it {
+    -webkit-user-select:none;
+    align-self: center;
+    margin-left: 8px;
+    color: #FAE5D2;
+    font-family: Mplantin-italic;
+    opacity: 0.5;
 }
 
 .list_deck_winrate {
     -webkit-user-select:none;
     align-self: right;
-    margin-right: 16px;
+    margin-right: 18px;
+    line-height: 64px;
+    color: #FAE5D2;
+}
+
+.list_deck_record {
+    -webkit-user-select:none;
+    align-self: right;
+    margin-right: 18px;
     line-height: 64px;
     color: #FAE5D2;
 }
@@ -395,7 +465,7 @@ body {
     pointer-events: none;
     width: 20px;
     height: 20px;
-    margin: 2px 0 2px 0;
+    margin: 2px -1px 2px -1px;
 }
 
 .mana_white     { background: url(images/w20.png) center;}

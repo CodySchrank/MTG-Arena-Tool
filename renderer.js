@@ -2,6 +2,7 @@ var electron = require('electron');
 window.ipc = electron.ipcRenderer;
 var decks = null;
 var matchesHistory = null;
+var explore = null;
 
 var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
 
@@ -41,7 +42,18 @@ ipc.on('set_history_data', function (event, arg) {
 	}
 });
 
+//
+ipc.on('set_explore', function (event, arg) {
+	setExplore(arg);
+});
 
+//
+ipc.on('initialize', function (event, arg) {
+	$('.sidebar').removeClass('hidden');
+	$('.overflow_ux').removeClass('hidden');
+	$('.message_center').css('display', 'none');
+	//$('.wrapper').css('left', '100%');
+});
 
 $(".list_deck").on('mouseenter mouseleave', function(e) {
     $(".deck_tile").trigger(e.type);
@@ -79,12 +91,13 @@ $(document).ready(function() {
 			}
 			if ($(this).hasClass("it2")) {
 				$("#ux_0").html('');
+				ipc.send('request_explore', 1);
 			}
 			if ($(this).hasClass("it3")) {
 				open_settings();
 			}
 			if ($(this).hasClass("it4")) {
-				$("#ux_0").html('About');
+				open_about();
 			}
 		}
 	});
@@ -232,7 +245,74 @@ function setDecks(arg) {
 		});
 
 		$('.'+deck.id).on('click', function(e) {
-			open_deck(index);
+			open_deck(index, 0);
+		    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
+		});
+
+	});
+	$("#ux_0").append('<div class="list_fill"></div>');
+}
+
+//
+function setExplore(arg) {
+	if (arg != null) {
+		explore = arg;
+	}
+
+	$("#ux_0").html('');
+	$("#ux_0").append('<div class="list_fill"></div>');
+	explore.forEach(function(_deck, index) {
+		deck = _deck.deck;
+
+		var tileGrpid = deck.deckTileId;
+		var tile = $('<div class="'+deck.id+'t deck_tile"></div>');
+		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
+
+		var div = $('<div class="'+deck.id+' list_deck"></div>');
+
+		var fll = $('<div class="flex_item"></div>');
+		var flc = $('<div class="flex_item"></div>');
+		var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
+		var flr = $('<div class="flex_item"></div>');
+		flc.css("flex-direction","column")
+
+		var flt = $('<div class="flex_top"></div>');
+		var flb = $('<div class="flex_bottom"></div>');
+
+		$('<div class="list_deck_name">'+deck.name+'</div>').appendTo(flt);
+		$('<div class="list_deck_name_it">by '+_deck.playername+'</div>').appendTo(flt);
+		deck.colors = get_deck_colors(deck);
+		deck.colors.forEach(function(color) {
+			$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
+		});
+
+		$('<div class="list_deck_record">'+_deck.record.CurrentWins+' - '+_deck.record.CurrentLosses+'</div>').appendTo(flr);
+
+
+		fll.appendTo(div);
+		tile.appendTo(fll);
+
+		flc.appendTo(div);
+		flcf.appendTo(div);
+		flt.appendTo(flc);
+		flb.appendTo(flc);
+		flr.appendTo(div);
+		$("#ux_0").append(div);
+
+		$('.'+deck.id).on('mouseenter', function(e) {
+		    $('.'+deck.id+'t').css('opacity', 1);
+		    $('.'+deck.id+'t').css('width', '200px');
+		});
+
+		$('.'+deck.id).on('mouseleave', function(e) {
+		    $('.'+deck.id+'t').css('opacity', 0.66);
+		    $('.'+deck.id+'t').css('width', '128px');
+		});
+
+		$('.'+deck.id).on('click', function(e) {
+			deck.mainDeck.sort(compare_cards);
+			deck.sideboard.sort(compare_cards);
+			open_deck(index, 1);
 		    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
 		});
 
@@ -241,26 +321,32 @@ function setDecks(arg) {
 }
 
 // 
-function open_deck(i) {
+function open_deck(i, type) {
+	if (type == 0) {
+		_deck = decks[i];
+	}
+	if (type == 1) {
+		_deck = explore[i].deck;
+	}
 	$("#ux_1").html('');
 
-	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">'+decks[i].name+'</div></div>');
+	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">'+_deck.name+'</div></div>');
 	flr = $('<div class="flex_item" style="align-self: center;"></div>');
 
-	decks[i].colors.forEach(function(color) {
+	_deck.colors.forEach(function(color) {
 		var m = $('<div class="mana_20 mana_'+mana[color]+'"></div>');
 		flr.append(m);
 	});
 	top.append(flr);
 
 
-	var tileGrpid = decks[i].deckTileId;
+	var tileGrpid = _deck.deckTileId;
 	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
 	var fld = $('<div class="flex_item"></div>');
 
 	var dl = $('<div class="decklist"></div>');
 
-	var deck = decks[i];
+	var deck = _deck;
 	var prevIndex = 0;
 	deck.mainDeck.forEach(function(card) {
 		var grpId = card.id;
@@ -290,6 +376,7 @@ function open_deck(i) {
 	});
 }
 
+//
 function open_match(id) {
 	$("#ux_1").html('');
 	var match = matchesHistory[id];
@@ -414,6 +501,18 @@ function open_match(id) {
 }
 
 //
+function open_settings() {
+}
+
+//
+function open_about() {
+	$("#ux_0").html('');
+	var div = $('<div class="about"><div class="message_big green">MTG Squirrel</div><div class="message_sub white">By Manuel Etchegaray, 2018</div><div class="message_sub white">Version 2.0.0</div></div>');
+
+	$("#ux_0").append(div);
+}
+
+//
 function getDeckWinrate(deckid) {
 	var wins = 0;
 	var loss = 0;
@@ -484,7 +583,3 @@ function compare_matches(a, b) {
 }
 
 
-//
-function open_settings() {
-	
-}
