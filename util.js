@@ -6,7 +6,7 @@ function addCardTile(grpId, indent, quantity, element) {
 	cont.append('<div class="card_tile_quantity"><span>'+quantity+'</span></div>');
 	element.append(cont);
 	
-	var div = $('<div id="t'+grpId+indent+'" class="card_tile '+get_frame_class(database[grpId].frame)+'"></div>');
+	var div = $('<div id="t'+grpId+indent+'" class="card_tile '+get_frame_class(cardsDb.get(grpId).frame)+'"></div>');
 	cont.append(div);
 
 	// Glow hover
@@ -18,10 +18,10 @@ function addCardTile(grpId, indent, quantity, element) {
 
 		$('.main_hover').css("opacity", 1);
 		let dfc = '';
-		if (database[grpId].dfc == 'DFC_Back')	dfc = 'a';
-		if (database[grpId].dfc == 'DFC_Front')	dfc = 'b';
-		if (database[grpId].dfc == 'SplitHalf')	dfc = 'a';
-		$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(database[grpId].set)+"/"+database[grpId].cid+dfc+".jpg");
+		if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
+		if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
+		if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
+		$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
 	});
 
 	glow.on('mouseleave', function(e) {
@@ -32,12 +32,12 @@ function addCardTile(grpId, indent, quantity, element) {
 
 	//
 	var fl = $('<div class="flex_item"></div>');
-	fl.append('<div class="card_tile_name">'+database[grpId].name+'</div>');
+	fl.append('<div class="card_tile_name">'+cardsDb.get(grpId).name+'</div>');
 	div.append(fl);
 
 	fl = $('<div class="flex_item"></div>"');
 	div.append(fl);
-	database[grpId].cost.forEach(function(cost) {
+	cardsDb.get(grpId).cost.forEach(function(cost) {
 		if (cost.color > 0 && cost.color < 7 || cost.color == 8) {
 			for (var i=0; i<cost.count; i++) {
 				fl.append('<div class="mana_16 flex_end mana_'+mana[cost.color]+'"></div>');
@@ -52,11 +52,12 @@ function addCardTile(grpId, indent, quantity, element) {
 //
 function get_rank_index(_rank, _tier) {
     var ii = 25;
-    if (_rank == "Bronze" || _rank == "Beginner")       ii = 0  + _tier;
-    if (_rank == "Silver" || _rank == "Intermediate")   ii = 5  + _tier;
-    if (_rank == "Gold" || _rank == "Advanced")         ii = 10 + _tier;
-    if (_rank == "Diamond")                             ii = 15 + _tier;
-    if (_rank == "Master")                              ii = 20 + _tier;
+    if (_rank == "Beginner")	ii = 25;
+    if (_rank == "Bronze")      ii = 0  + _tier;
+    if (_rank == "Silver")   	ii = 5  + _tier;
+    if (_rank == "Gold")        ii = 10 + _tier;
+    if (_rank == "Diamond")		ii = 15 + _tier;
+    if (_rank == "Master")		ii = 20 + _tier;
     return ii;
 }
 
@@ -94,8 +95,8 @@ function get_card_type_sort(a) {
 //
 function compare_cards(a, b) {
 	// Yeah this is lazy.. I know
-	a = database[a.id];
-	b = database[b.id];
+	a = cardsDb.get(a.id);
+	b = cardsDb.get(b.id);
 	var as = get_card_type_sort(a.type);
 	var bs = get_card_type_sort(b.type);
 
@@ -130,12 +131,15 @@ function compare_cards(a, b) {
 //
 function get_set_scryfall(set) {
 	switch (set) {
-	    case "Dominaria": return "dom";
-	    case "Rivals of Ixalan": return "rix";
-	    case "Ixalan": return "xln";
+	    case "Dominaria": 			return "dom";
+	    case "Rivals of Ixalan": 	return "rix";
+	    case "Ixalan": 				return "xln";
 	    case "Hour of Devastation": return "hou";
-	    case "Amonkhet": return "akh";
-	    default: return "dom";
+	    case "Amonkhet": 			return "akh";
+	    case "Aether Revolt": 		return "aer";
+	    case "Kaladesh": 			return "kld";
+	    case "Welcome Deck 2017": 	return "w17";
+	    default: 					return "dom";
 	}
 }
 
@@ -145,8 +149,8 @@ function get_deck_colors(deck) {
 	deck.colors = [];
 	deck.mainDeck.forEach(function(card) {
 		var grpid = card.id;
-		var card_name = database[grpid].name;
-		var card_cost = database[grpid].cost;
+		var card_name = cardsDb.get(grpid).name;
+		var card_cost = cardsDb.get(grpid).cost;
 		card_cost.forEach(function(c) {
 			if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
 				deck.colors.push(c.color);
@@ -156,8 +160,8 @@ function get_deck_colors(deck) {
 
 	deck.sideboard.forEach(function(card) {
 		var grpid = card.id;
-		var card_name = database[grpid].name;
-		var card_cost = database[grpid].cost;
+		var card_name = cardsDb.get(grpid).name;
+		var card_cost = cardsDb.get(grpid).cost;
 		card_cost.forEach(function(c) {
 			if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
 				deck.colors.push(c.color);

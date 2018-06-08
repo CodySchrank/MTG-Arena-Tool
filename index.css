@@ -341,7 +341,7 @@ body {
     font-size: 32px;
     font-family: Mplantin;
     text-align: center;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .message_sub {
@@ -349,7 +349,7 @@ body {
     opacity: 0.5;
     font-family: Mplantin-italic;
     text-align: center;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .message_sub_16 {
@@ -357,7 +357,15 @@ body {
     opacity: 0.5;
     font-family: Mplantin-italic;
     text-align: center;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+}
+
+.message_sub_15 {
+    font-size: 15px;
+    opacity: 0.5;
+    font-family: Mplantin-italic;
+    text-align: center;
+    margin-bottom: 6;
 }
 
 .opp_rank {

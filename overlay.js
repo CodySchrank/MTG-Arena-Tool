@@ -1,6 +1,9 @@
 var electron = require('electron');
 window.ipc = electron.ipcRenderer;
 
+const Database = require('./database.js');
+const cardsDb = new Database();
+
 var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"};
 
 ipc_log = function (str, arg) {
@@ -47,12 +50,12 @@ ipc.on('set_deck', function (event, arg) {
 		/*
 		// Print type separators on overlay
 		// It doesnt look good, but you can try..
-		var type = database[grpId].type;
+		var type = cardsDb.get(grpId).type;
 		if (prevIndex == 0) ;
 			addCardSeparator(get_card_type_sort(type), $(".overlay_decklist"));
 		}
 		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(database[prevIndex].type)) {
+			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
 				addCardSeparator(get_card_type_sort(type), $(".overlay_decklist"));
 			}
 		}
@@ -69,11 +72,11 @@ function hoverCard(grpId) {
 	}
 	else {
 		let dfc = '';
-		if (database[grpId].dfc == 'DFC_Back')	dfc = 'a';
-		if (database[grpId].dfc == 'DFC_Front')	dfc = 'b';
-		if (database[grpId].dfc == 'SplitHalf')	dfc = 'a';
+		if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
+		if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
+		if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
 		$('.overlay_hover').css("opacity", 1);
-		$('.overlay_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(database[grpId].set)+"/"+database[grpId].cid+dfc+".jpg");
+		$('.overlay_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
 		setTimeout(function () {
 			$('.overlay_hover').css("opacity", 0);
 		}, 10000);

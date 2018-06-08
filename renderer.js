@@ -4,6 +4,10 @@ var decks = null;
 var matchesHistory = null;
 var explore = null;
 
+const Database = require('./database.js');
+const cardsDb = new Database();
+
+
 var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
 
 ipc_log = function (str, arg) {
@@ -140,7 +144,7 @@ function setHistory(arg) {
 
 		var tileGrpid = match.playerDeck.deckTileId;
 		var tile = $('<div class="'+match.id+'t deck_tile"></div>');
-		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
+		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 		tile.appendTo(fltl);
 
 		var d = $('<div class="list_deck_name">'+match.playerDeck.name+'</div>');
@@ -201,7 +205,7 @@ function setDecks(arg) {
 
 		var tileGrpid = deck.deckTileId;
 		var tile = $('<div class="'+deck.id+'t deck_tile"></div>');
-		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
+		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 
 		var div = $('<div class="'+deck.id+' list_deck"></div>');
 
@@ -266,7 +270,7 @@ function setExplore(arg) {
 
 		var tileGrpid = deck.deckTileId;
 		var tile = $('<div class="'+deck.id+'t deck_tile"></div>');
-		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
+		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 
 		var div = $('<div class="'+deck.id+' list_deck"></div>');
 
@@ -341,7 +345,7 @@ function open_deck(i, type) {
 
 
 	var tileGrpid = _deck.deckTileId;
-	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
+	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 	var fld = $('<div class="flex_item"></div>');
 
 	var dl = $('<div class="decklist"></div>');
@@ -350,12 +354,12 @@ function open_deck(i, type) {
 	var prevIndex = 0;
 	deck.mainDeck.forEach(function(card) {
 		var grpId = card.id;
-		var type = database[grpId].type;
+		var type = cardsDb.get(grpId).type;
 		if (prevIndex == 0) {
 			addCardSeparator(get_card_type_sort(type), dl);
 		}
 		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(database[prevIndex].type)) {
+			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
 				addCardSeparator(get_card_type_sort(type), dl);
 			}
 		}
@@ -392,7 +396,7 @@ function open_match(id) {
 
 
 	var tileGrpid = match.playerDeck.deckTileId;
-	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(database[tileGrpid].set)+"/"+database[tileGrpid].cid+".jpg)");
+	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 	var fld = $('<div class="flex_item"></div>');
 
 	// this is a mess
@@ -426,12 +430,12 @@ function open_match(id) {
 	var prevIndex = 0;
 	deck.mainDeck.forEach(function(card) {
 		var grpId = card.id;
-		var type = database[grpId].type;
+		var type = cardsDb.get(grpId).type;
 		if (prevIndex == 0) {
 			addCardSeparator(get_card_type_sort(type), dl);
 		}
 		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(database[prevIndex].type)) {
+			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
 				addCardSeparator(get_card_type_sort(type), dl);
 			}
 		}
@@ -472,12 +476,12 @@ function open_match(id) {
 	var prevIndex = 0;
 	deck.mainDeck.forEach(function(card) {
 		var grpId = card.id;
-		var type = database[grpId].type;
+		var type = cardsDb.get(grpId).type;
 		if (prevIndex == 0) {
 			addCardSeparator(get_card_type_sort(type), odl);
 		}
 		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(database[prevIndex].type)) {
+			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
 				addCardSeparator(get_card_type_sort(type), odl);
 			}
 		}
@@ -502,12 +506,24 @@ function open_match(id) {
 
 //
 function open_settings() {
+	// show overlay in-game?
+	// overlay transparency
+	// hover in-game cards?
+	// hover timeout
+	// hide when zero left
 }
 
 //
 function open_about() {
-	$("#ux_0").html('');
-	var div = $('<div class="about"><div class="message_big green">MTG Squirrel</div><div class="message_sub white">By Manuel Etchegaray, 2018</div><div class="message_sub white">Version 2.0.0</div></div>');
+	var aboutStr = '';
+	aboutStr += '<div class="about">'
+	aboutStr += '	<div class="message_big green">MTG Squirrel</div>'
+	aboutStr += '	<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>'
+	aboutStr += '	<div class="message_sub_15 white">Version 2.0.0</div>'
+	aboutStr += '	<img class="git_link"></img>'
+	aboutStr += '</div>'
+	$("#ux_0").html(aboutStr);
+	var div = $();
 
 	$("#ux_0").append(div);
 }
@@ -561,9 +577,15 @@ function sort_history() {
 	matchesHistory.matches.sort(compare_matches); 
 
 	matchesHistory.matches.forEach(function(mid) {
-		var match = matchesHistory[mid]
+		var match = matchesHistory[mid];
 
-		match.playerDeck.colors = get_deck_colors(match.playerDeck);
+		if (match.playerDeck.mainDeck == undefined) {
+			match.playerDeck = JSON.parse('{"deckTileId":67003,"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}');
+		}
+		else {
+			match.playerDeck.colors = get_deck_colors(match.playerDeck);
+		}
+
 		match.playerDeck.mainDeck.sort(compare_cards);
 
 		match.oppDeck.colors = get_deck_colors(match.oppDeck);
