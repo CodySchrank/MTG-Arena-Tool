@@ -31,6 +31,7 @@ var currentDeck = {};
 var currentDeckUpdated = {};
 var currentMatchId = null;
 var matchWincon = "";
+var duringMatch = false;
 
 var playerName = null;
 var playerRank = null;
@@ -190,7 +191,7 @@ function createMainWindow() {
         frame: false,
         width: obj.width,
         height: obj.height,
-        title: "MTGA Squirrel",
+        title: "MTG Arena Tool",
         icon:'images/icon.png'
     });
     win.loadURL(`file://${__dirname}/index.html`);
@@ -202,7 +203,7 @@ function createMainWindow() {
       {label: 'Quit', click: () => { quit();}}
     ])
     tray.on('double-click', toggleWindow);
-    tray.setToolTip('MTGA Squirrel');
+    tray.setToolTip('MTG Arena Tool');
     tray.setContextMenu(contextMenu);
 
 	win.on('resize', () => {
@@ -223,7 +224,7 @@ function createOverlay() {
         width: obj.width,
         height: obj.height,
         show: false,
-        title: "MTGA Squirrel",
+        title: "MTG Arena Tool",
         icon:'images/icon.png'
     });
     over.loadURL(`file://${__dirname}/overlay.html`);
@@ -385,6 +386,7 @@ function processLogData(data) {
 		playerTier = json.constructedTier;
 
         let rank = get_rank_index(playerRank, playerTier);
+
         mainWindow.webContents.send("set_rank", rank, playerRank+" "+playerTier);
     }
 
@@ -416,9 +418,13 @@ function processLogData(data) {
    		json = checkJson(data, strCheck, '');
     	if (json != false) {
             json = json.matchGameRoomStateChangedEvent.gameRoomInfo;
-            // read winners and losers here
-            if (json.stateType == "MatchGameRoomStateType_MatchCompleted") {
 
+            if (json.gameRoomConfig != undefined) {
+                currentMatchId = json.gameRoomConfig.matchId;
+                duringMatch = true;
+            }
+
+            if (json.stateType == "MatchGameRoomStateType_MatchCompleted") {
                 playerWin = 0;
                 oppWin = 0;
             	json.finalMatchResult.resultList.forEach(function(res) {
@@ -430,16 +436,15 @@ function processLogData(data) {
 	            			oppWin += 1;
 	            		}
 	            	}
+                    if (res.scope == "MatchScope_Match") {
+                        duringMatch = false;
+                    }
             	});
 
                 saveOverlayPos();
                 overlay.hide();
                 mainWindow.show();
                 saveMatch();
-            }
-
-            if (json.gameRoomConfig != undefined) {
-            	currentMatchId = json.gameRoomConfig.matchId;
             }
 
             if (json.players != undefined) {
@@ -495,6 +500,11 @@ function processLogData(data) {
                     tempSide[grpId] += 1;
                 }
             });
+
+            // Update on overlay
+            var str = JSON.stringify(currentDeck);
+            currentDeckUpdated = JSON.parse(str);
+            overlay.webContents.send("set_deck", currentDeck);
 
             currentDeck.mainDeck = [];
             Object.keys(tempMain).forEach(function(key) {
@@ -566,13 +576,15 @@ function debug_overlay_show() {
     overlay.webContents.send("set_deck", currentDeck);
 }
 
+//
 function get_rank_index(_rank, _tier) {
-    var ii = 25;
-    if (_rank == "Bronze" || _rank == "Beginner")       ii = 0  + _tier;
-    if (_rank == "Silver" || _rank == "Intermediate")   ii = 5  + _tier;
-    if (_rank == "Gold" || _rank == "Advanced")         ii = 10 + _tier;
-    if (_rank == "Diamond")                             ii = 15 + _tier;
-    if (_rank == "Master")                              ii = 20 + _tier;
+    var ii = 0;
+    if (_rank == "Beginner")    ii = 0;
+    if (_rank == "Bronze")      ii = 1  + _tier;
+    if (_rank == "Silver")      ii = 6  + _tier;
+    if (_rank == "Gold")        ii = 11 + _tier;
+    if (_rank == "Diamond")     ii = 16 + _tier;
+    if (_rank == "Master")      ii = 21;
     return ii;
 }
 
@@ -638,6 +650,9 @@ function gre_to_client(data) {
                                     oppWin += 1;
                                 }
                             }
+                            if (res.scope == "MatchScope_Match") {
+                                duringMatch = false;
+                            }
                         });
                     }
                 	if (msg.gameStateMessage.gameInfo.matchState == "MatchState_MatchComplete") {
@@ -702,14 +717,14 @@ function forceDeckUpdate() {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
                 if (gameObjs[key].ownerSeatId == playerSeat && gameObjs[key].type == "GameObjectType_Card") {
-                    //if (currentDeckUpdated.mainDeck != undefined) {
+                    if (currentDeckUpdated.mainDeck != undefined) {
                         currentDeckUpdated.mainDeck.forEach(function(card) {
                             if (card.id == gameObjs[key].grpId) {
                                 //console.log(cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
                                 card.quantity -= 1;
                             }
                         });
-                    //}
+                    }
                 }
             }
         }
@@ -784,7 +799,18 @@ function saveMatch() {
 function finishLoading() {
 	firstPass = false;
 
+    if (duringMatch) {
+        var obj = store.get('overlayBounds');
+
+        hideWindow();
+        overlay.show();
+        overlay.focus();
+        overlay.setBounds(obj);
+        update_deck();
+    }
+
 	history.matches = store.get('matches_index');
+    console.log(history.matches);
 	history.matches.forEach(function(id) {
 		history[id] = store.get(id);
 	});
@@ -799,7 +825,7 @@ function finishLoading() {
 function httpBasic(_headers) {
 	if (_headers.method == 'submit_course' || _headers.method == 'set_player') {
 		if (tokenAuth == undefined) {
-		    setTimeout( function() { httpBasic(_headers); }, 1500+Math.random(1500));
+		    setTimeout( function() { httpBasic(_headers); }, 500);
 			return;
 		}
 		_headers.token = tokenAuth;
@@ -825,7 +851,7 @@ function httpBasic(_headers) {
 					}
 				}
 				else if (parsedResult.error = "error 003") {
-					setTimeout( function() { httpBasic(_headers); }, 2500+Math.random(2500));
+					setTimeout( function() { httpBasic(_headers); }, 500);
 				}
 			} catch (e) {
 				console.error(e.message);

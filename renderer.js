@@ -225,7 +225,7 @@ function setDecks(arg) {
 
 		var wr = getDeckWinrate(deck.id);
 		if (wr != 0) {
-			$('<div class="list_deck_winrate">Winrate: '+wr+'%</div>').appendTo(flr);
+			$('<div class="list_deck_winrate">Winrate: '+wr*100+'%</div>').appendTo(flr);
 		}
 
 		fll.appendTo(div);
@@ -415,7 +415,7 @@ function open_match(id) {
 	var tier = match.player.tier;
 	r.css("background-position", (get_rank_index(rank, tier)*-48)+"px 0px").attr("title", rank+" "+tier);
 
-	var name = $('<div class="list_match_player_left">'+match.player.name+'</div>');
+	var name = $('<div class="list_match_player_left">'+match.player.name+' ('+match.player.win+')</div>');
 	name.appendTo(fltrt);
 
 	if (match.player.win > match.opponent.win) {
@@ -461,7 +461,7 @@ function open_match(id) {
 	var tier = match.opponent.tier;
 	r.css("background-position", (get_rank_index(rank, tier)*-48)+"px 0px").attr("title", rank+" "+tier);
 
-	var name = $('<div class="list_match_player_right">'+match.opponent.name+'</div>');
+	var name = $('<div class="list_match_player_right">'+match.opponent.name+' ('+match.opponent.win+')</div>');
 	name.appendTo(fltrt);
 
 	if (match.player.win < match.opponent.win) {

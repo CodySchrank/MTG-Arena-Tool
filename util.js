@@ -53,13 +53,13 @@ function addCardTile(grpId, indent, quantity, element) {
 
 //
 function get_rank_index(_rank, _tier) {
-    var ii = 25;
-    if (_rank == "Beginner")	ii = 25;
-    if (_rank == "Bronze")      ii = 0  + _tier;
-    if (_rank == "Silver")   	ii = 5  + _tier;
-    if (_rank == "Gold")        ii = 10 + _tier;
-    if (_rank == "Diamond")		ii = 15 + _tier;
-    if (_rank == "Master")		ii = 20 + _tier;
+    var ii = 0;
+    if (_rank == "Beginner")	ii = 0;
+    if (_rank == "Bronze")      ii = 1  + _tier;
+    if (_rank == "Silver")   	ii = 6  + _tier;
+    if (_rank == "Gold")        ii = 11 + _tier;
+    if (_rank == "Diamond")		ii = 16 + _tier;
+    if (_rank == "Master")		ii = 21;
     return ii;
 }
 

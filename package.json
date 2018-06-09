@@ -1,11 +1,16 @@
 {
-  "name": "mtga-squirrel",
-  "version": "2.0.0",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "dependencies": {
-    "electron-debug": "^1.5.0"
-  }
+	"name": "mtg-arena-tool",
+	"description": "An MTG Arena deck tracker and statistics manager.",
+	"author": "Manuel Etchegaray",
+	"version": "2.0.0",
+	"main": "main.js",
+	"build": {
+		"appId": "com.manuel777.mtgatool"
+	},
+	"scripts": {
+		"start": "electron ."
+	},
+	"dependencies": {
+		"electron-debug": "^1.5.0"
+	}
 }
