@@ -2,51 +2,53 @@ const emuns = {"Phase":{"0":"","1":"Beginning","2":"1st Main","3":"Combat","4":"
 
 //
 function addCardTile(grpId, indent, quantity, element) {
-	var cont = $('<div class="card_tile_container"></div>');
-	cont.append('<div class="card_tile_quantity"><span>'+quantity+'</span></div>');
-	element.append(cont);
-	
-	var div = $('<div id="t'+grpId+indent+'" class="card_tile '+get_frame_class(cardsDb.get(grpId).frame)+'"></div>');
-	cont.append(div);
+	if (quantity > 0) {
+		var cont = $('<div class="card_tile_container"></div>');
+		cont.append('<div class="card_tile_quantity"><span>'+quantity+'</span></div>');
+		element.append(cont);
+		
+		var div = $('<div id="t'+grpId+indent+'" class="card_tile '+get_frame_class(cardsDb.get(grpId).frame)+'"></div>');
+		cont.append(div);
 
-	// Glow hover
-	var glow = $('<div id="t'+grpId+indent+'" class="card_tile_glow"></div>');
-	cont.append(glow);
-	glow.on('mouseenter', function(e) {
-		var domid = $(this).attr('id');
-	    $('#'+domid).css('margin-top', '0px');
+		// Glow hover
+		var glow = $('<div id="t'+grpId+indent+'" class="card_tile_glow"></div>');
+		cont.append(glow);
+		glow.on('mouseenter', function(e) {
+			var domid = $(this).attr('id');
+		    $('#'+domid).css('margin-top', '0px');
 
-		$('.main_hover').css("opacity", 1);
-		let dfc = '';
-		if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
-		if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
-		if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
-		$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
-	});
+			$('.main_hover').css("opacity", 1);
+			let dfc = '';
+			if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
+			if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
+			if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
+			$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+		});
 
-	glow.on('mouseleave', function(e) {
-		var domid = $(this).attr('id');
-		$('.main_hover').css("opacity", 0);
-	    $('#'+domid).css('margin-top', '3px');
-	});
+		glow.on('mouseleave', function(e) {
+			var domid = $(this).attr('id');
+			$('.main_hover').css("opacity", 0);
+		    $('#'+domid).css('margin-top', '3px');
+		});
 
-	//
-	var fl = $('<div class="flex_item"></div>');
-	fl.append('<div class="card_tile_name">'+cardsDb.get(grpId).name+'</div>');
-	div.append(fl);
+		//
+		var fl = $('<div class="flex_item"></div>');
+		fl.append('<div class="card_tile_name">'+cardsDb.get(grpId).name+'</div>');
+		div.append(fl);
 
-	fl = $('<div class="flex_item"></div>"');
-	div.append(fl);
-	cardsDb.get(grpId).cost.forEach(function(cost) {
-		if (cost.color > 0 && cost.color < 7 || cost.color == 8) {
-			for (var i=0; i<cost.count; i++) {
-				fl.append('<div class="mana_16 flex_end mana_'+mana[cost.color]+'"></div>');
+		fl = $('<div class="flex_item"></div>"');
+		div.append(fl);
+		cardsDb.get(grpId).cost.forEach(function(cost) {
+			if (cost.color > 0 && cost.color < 7 || cost.color == 8) {
+				for (var i=0; i<cost.count; i++) {
+					fl.append('<div class="mana_16 flex_end mana_'+mana[cost.color]+'"></div>');
+				}
 			}
-		}
-		else if (cost.color == 7) {
-			fl.append('<div class="mana_16 flex_end mana_g'+cost.count+'"></div>');
-		}
-	});
+			else if (cost.color == 7) {
+				fl.append('<div class="mana_16 flex_end mana_g'+cost.count+'"></div>');
+			}
+		});
+	}
 }
 
 //

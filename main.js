@@ -30,6 +30,7 @@ var currentChunk = "";
 var currentDeck = {};
 var currentDeckUpdated = {};
 var currentMatchId = null;
+var matchWincon = "";
 
 var playerName = null;
 var playerRank = null;
@@ -404,7 +405,7 @@ function processLogData(data) {
         }
 
         // Match created
-        strCheck = 'Event.MatchCreated ';
+        strCheck = ' Event.MatchCreated ';
    		json = checkJson(data, strCheck, '');
     	if (json != false) {
             createMatch(json);
@@ -418,13 +419,15 @@ function processLogData(data) {
             // read winners and losers here
             if (json.stateType == "MatchGameRoomStateType_MatchCompleted") {
 
+                playerWin = 0;
+                oppWin = 0;
             	json.finalMatchResult.resultList.forEach(function(res) {
-            		if (res.scope == "MatchScope_Match") {
+            		if (res.scope == "MatchScope_Game") {
 	            		if (res.winningTeamId == playerSeat) {
-	            			playerWin = 1;
+                            playerWin += 1;
 	            		}
 	            		if (res.winningTeamId == oppSeat) {
-	            			oppWin = 1;
+	            			oppWin += 1;
 	            		}
 	            	}
             	});
@@ -459,14 +462,54 @@ function processLogData(data) {
             gre_to_client(json.greToClientEvent.greToClientMessages);
         }
 
+        // Get courses
         strCheck = '<== Event.GetPlayerCourse(';
         json = checkJsonWithStart(data, strCheck, '', ')');
         if (json != false) {
-        	if (json.Id != "00000000-0000-0000-0000-000000000000") {
-        		json._id = json.Id;
-        		delete json.Id;
-	        	httpSubmitCourse(json);
-        	}
+            if (json.Id != "00000000-0000-0000-0000-000000000000") {
+                json._id = json.Id;
+                delete json.Id;
+                httpSubmitCourse(json);
+            }
+        }
+
+        // Get sideboard changes
+        strCheck = 'Received unhandled GREMessageType: GREMessageType_SubmitDeckReq';
+        json = checkJson(data, strCheck, '');
+        if (json != false) {
+            var tempMain = {};
+            var tempSide = {};
+            json.submitDeckReq.deck.deckCards.forEach( function (grpId) {
+                if (tempMain[grpId] == undefined) {
+                    tempMain[grpId] = 1
+                }
+                else {
+                    tempMain[grpId] += 1;
+                }
+            });
+            json.submitDeckReq.deck.sideboardCards.forEach( function (grpId) {
+                if (tempSide[grpId] == undefined) {
+                    tempSide[grpId] = 1
+                }
+                else {
+                    tempSide[grpId] += 1;
+                }
+            });
+
+            currentDeck.mainDeck = [];
+            Object.keys(tempMain).forEach(function(key) {
+                var c = {"id": key, "quantity": tempMain[key]};
+                currentDeck.mainDeck.push(c);
+            });
+
+            currentDeck.sideboard = [];
+            Object.keys(tempSide).forEach(function(key) {
+                var c = {"id": key, "quantity": tempSide[key]};
+                currentDeck.sideboard.push(c);
+            });
+
+            console.log(JSON.stringify(currentDeck));
+            console.log(currentDeck);
         }
     }
 }
@@ -538,7 +581,7 @@ function gre_to_client(data) {
         if (msg.type == "GREMessageType_UIMessage") {
             if (msg.uiMessage.onHover != undefined) {
                 if (msg.uiMessage.onHover.objectId != undefined) {
-                    if (gameObjs[msg.uiMessage.onHover.objectId] != undefined) {
+                    if (gameObjs[msg.uiMessage.onHover.objectId] != undefined && gameObjs[msg.uiMessage.onHover.objectId].type == "GameObjectType_Card") {
                         hoverCard = gameObjs[msg.uiMessage.onHover.objectId].grpId;
                         if (cardsDb.get(gameObjs[msg.uiMessage.onHover.objectId].grpId) != undefined) {
                             overlay.webContents.send("set_hover", hoverCard);
@@ -554,6 +597,9 @@ function gre_to_client(data) {
             }
         }
 
+        if (msg.type == "GREMessageType_SubmitDeckReq") {
+            gameObjs = {};
+        }
 
 
         if (msg.type == "GREMessageType_GameStateMessage") {
@@ -574,24 +620,27 @@ function gre_to_client(data) {
                 	turnPriority = msg.gameStateMessage.turnInfo.priorityPlayer;
                 	turnDecision = msg.gameStateMessage.turnInfo.decisionPlayer;
                 	turnStorm = msg.gameStateMessage.turnInfo.stormCount;
-                	//console.log(msg.msgId, "Turn "+turnNumber, turnPhase, turnStep);
+                	console.log(msg.msgId, "Turn "+turnNumber, turnPhase, turnStep);
                 }
 
                 if (msg.gameStateMessage.gameInfo != undefined) {
+                    if (msg.gameStateMessage.gameInfo.matchState == "MatchState_GameComplete") {
+                        let results = msg.gameStateMessage.gameInfo.results;
+                        matchWincon = msg.gameStateMessage.gameInfo.matchWinCondition;
+                        playerWin = 0;
+                        oppWin = 0;
+                        results.forEach(function(res) {
+                            if (res.scope == "MatchScope_Game") {
+                                if (res.winningTeamId == playerSeat) {
+                                    playerWin += 1;
+                                }
+                                if (res.winningTeamId == oppSeat) {
+                                    oppWin += 1;
+                                }
+                            }
+                        });
+                    }
                 	if (msg.gameStateMessage.gameInfo.matchState == "MatchState_MatchComplete") {
-                		let results = msg.gameStateMessage.gameInfo.results
-
-		            	results.forEach(function(res) {
-		            		if (res.scope == "MatchScope_Match") {
-			            		if (res.winningTeamId == playerSeat) {
-			            			playerWin = 1;
-			            		}
-			            		if (res.winningTeamId == oppSeat) {
-			            			oppWin = 1;
-			            		}
-			            	}
-		            	});
-
 		                saveOverlayPos();
 		                overlay.hide();
 		                saveMatch();
@@ -612,6 +661,9 @@ function gre_to_client(data) {
 			                        }
 		                        	
 		                        }
+
+                                //if (obj.type.includes("AnnotationType_WinTheGame")) {
+                                //}
 	                        });
 	                    //}
                     });
