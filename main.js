@@ -13,7 +13,7 @@ const store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true},
+		settings: {show_overlay: true, startup: true},
         matches_index:[],
 	}
 });
@@ -85,11 +85,23 @@ ipc.on('renderer_state', function (event, state) {
 
     var settings = store.get("settings");
     mainWindow.webContents.send("set_settings", settings);
+
+    updateSettings(settings);
 });
 
 ipc.on('save_settings', function (event, settings) {
     store.set('settings', settings);
+
+    updateSettings(settings);
 });
+
+function updateSettings(settings) {
+    const exeName = path.basename(process.execPath);
+
+    app.setLoginItemSettings({
+        openAtLogin: settings.startup
+    });
+}
 
 ipc.on('request_history', function (event, state) {
 	history.matches = store.get('matches_index');

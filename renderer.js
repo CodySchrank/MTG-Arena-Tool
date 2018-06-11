@@ -636,6 +636,17 @@ function open_settings() {
 	$("#ux_0").html('');
 	var div = $('<div class="settings_page"></div>');
 
+	// Launch on startup
+	var label = $('<label class="check_container">Launch on startup</label>');
+	label.appendTo(div);
+	var check_new = $('<input type="checkbox" id="settings_startup" onclick="updateSettings()" />');
+	check_new.appendTo(label);
+	check_new.prop('checked', settings.startup);
+
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
+
 	// Newly added only
 	var label = $('<label class="check_container">Show in-game overlay</label>');
 	label.appendTo(div);
@@ -656,9 +667,10 @@ function open_settings() {
 }
 
 function updateSettings() {
+	var startup = document.getElementById("settings_startup").checked;
 	var showOverlay = document.getElementById("settings_showoverlay").checked;
 
-	var settings = {show_overlay: showOverlay};
+	var settings = {show_overlay: showOverlay, startup: startup};
 
 	ipc.send('save_settings', settings);
 }

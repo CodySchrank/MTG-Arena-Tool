@@ -1,12 +1,12 @@
 {
-	"name": "mtg-arena-tool",
+	"name": "MTG-Arena-Tool",
 	"description": "An MTG Arena deck tracker and statistics manager.",
 	"author": "Manuel-777",
 	"repository": "https://github.com/Manuel-777/MTG-Arena-Tool",
 	"version": "2.0.0",
 	"main": "main.js",
 	"build": {
-		"appId": "com.Manuel-777.mtgatool",
+		"appId": "com.github.manuel777.mtgatool",
 		"win": {
 			"target": "NSIS",
 			"icon": "icon.ico"
@@ -20,11 +20,11 @@
 	},
 	"dependencies": {
 		"electron-store": "^2.0.0",
-		"electron-debug": "^1.5.0"
+		"electron-debug": "^1.5.0",
+		"electron-updater": "^2.21.10"
 	},
 	"devDependencies": {
 		"electron": "^2.0.2",
-		"electron-builder": "^20.15.1",
-		"electron-updater": "^2.21.10"
+		"electron-builder": "^20.15.1"
 	}
 }
