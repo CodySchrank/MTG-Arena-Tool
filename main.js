@@ -1,7 +1,7 @@
 'use strict';
 
 const electron = require('electron');
-const {app, Menu, Tray, net} = require('electron');
+const {app, Menu, Tray, net, clipboard} = require('electron');
 const path  = require('path');
 const Store = require('electron-store');
 
@@ -10,8 +10,9 @@ const store = new Store({
 	defaults: {
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
-		settings: {},
-		matches_index:[],
+        cards: { cards_time: 0, cards_before:[], cards:[] },
+		settings: {show_overlay: true},
+        matches_index:[],
 	}
 });
 
@@ -61,7 +62,7 @@ var gameObjs = {};
 var hoverCard = undefined;
 var history = {};
 var topDecks = {};
-
+var coursesToSubmit = {};
 
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
@@ -77,6 +78,13 @@ ipc.on('ipc_log', function (event, msg) {
 ipc.on('renderer_state', function (event, state) {
     renderer_state = state;
     console.log("Renderer state: ", state);
+
+    var settings = store.get("settings");
+    mainWindow.webContents.send("set_settings", settings);
+});
+
+ipc.on('save_settings', function (event, settings) {
+    store.set('settings', settings);
 });
 
 ipc.on('request_history', function (event, state) {
@@ -95,9 +103,8 @@ ipc.on('request_history', function (event, state) {
 });
 
 ipc.on('request_explore', function (event, state) {
-	httpGetTopDecks();
+    httpGetTopDecks();
 });
-
 
 
 // Events
@@ -115,6 +122,10 @@ ipc.on('overlay_close', function (event, state) {
 
 ipc.on('overlay_minimize', function (event, state) {
     overlay.minimize();
+});
+
+ipc.on('set_clipboard', function (event, arg) {
+    clipboard.writeText(arg);
 });
 
 // Catch exceptions
@@ -361,6 +372,13 @@ function checkJsonWithStart(str, check, chop, start) {
     return false;
 }
 
+
+/**
+***
+***
+***
+**/
+
 function processLogData(data) {
 	currentChunk = data;
     var strCheck, json;
@@ -397,131 +415,296 @@ function processLogData(data) {
         mainWindow.webContents.send("set_decks", json);
     }
 
-    // If this isnt while loading..
-    if (prevLogSize !== 0) {
-        // Select deck
-        strCheck = '<== Event.DeckSubmit(';
-   		json = checkJsonWithStart(data, strCheck, '', ')');
-    	if (json != false) {
-            select_deck(json);
+    // Get Cards
+    strCheck = '<== PlayerInventory.GetPlayerCardsV3(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        var date = new Date(store.get('cards.cards_time'));
+        var now = new Date();
+        var diff = Math.abs(now.getTime() - date.getTime());
+        var days = Math.floor(diff / (1000 * 3600 * 24));
+
+        if (store.get('cards.cards_time') == 0) {
+            store.set('cards.cards_time', now);
+            store.set('cards.cards_before', json);
+            store.set('cards.cards', json);
+        }
+        // If a day has passed since last update
+        else if (days > 0) {
+            var cardsPrev = store.get('cards.cards');
+            store.set('cards.cards_time', now);
+            store.set('cards.cards_before', cardsPrev);
+            store.set('cards.cards', json);
         }
 
-        // Match created
-        strCheck = ' Event.MatchCreated ';
-   		json = checkJson(data, strCheck, '');
-    	if (json != false) {
-            createMatch(json);
-        }
+        var cardsPrevious = store.get('cards.cards_before');
+        var cardsNewlyAdded = {};
 
-        // Game Room State Changed
-        strCheck = 'MatchGameRoomStateChangedEvent';
-   		json = checkJson(data, strCheck, '');
-    	if (json != false) {
-            json = json.matchGameRoomStateChangedEvent.gameRoomInfo;
-
-            if (json.gameRoomConfig != undefined) {
-                currentMatchId = json.gameRoomConfig.matchId;
-                duringMatch = true;
+        Object.keys(json).forEach(function(key) {
+            // get differences
+            if (cardsPrevious[key] == undefined) {
+                cardsNewlyAdded[key] = json[key];
             }
-
-            if (json.stateType == "MatchGameRoomStateType_MatchCompleted") {
-                playerWin = 0;
-                oppWin = 0;
-            	json.finalMatchResult.resultList.forEach(function(res) {
-            		if (res.scope == "MatchScope_Game") {
-	            		if (res.winningTeamId == playerSeat) {
-                            playerWin += 1;
-	            		}
-	            		if (res.winningTeamId == oppSeat) {
-	            			oppWin += 1;
-	            		}
-	            	}
-                    if (res.scope == "MatchScope_Match") {
-                        duringMatch = false;
-                    }
-            	});
-
-                saveOverlayPos();
-                overlay.hide();
-                mainWindow.show();
-                saveMatch();
+            else if (cardsPrevious[key] < json[key]) {
+                cardsNewlyAdded[key] = json[key] - cardsPrevious[key];
             }
+        });
 
-            if (json.players != undefined) {
-                json.players.forEach(function(player) {
-                    if (player.userId == playerId) {
-                        playerSeat = player.systemSeatId;
-                    }
-                    else {
-                    	oppId = player.userId;
-                    	oppSeat = player.systemSeatId;
-                    }
-                });
-            }
+        mainWindow.webContents.send("set_cards", json, cardsNewlyAdded);
+    }
+
+    // Select deck
+    strCheck = '<== Event.DeckSubmit(';
+		json = checkJsonWithStart(data, strCheck, '', ')');
+	if (json != false) {
+        select_deck(json);
+    }
+
+    // Match created
+    strCheck = ' Event.MatchCreated ';
+		json = checkJson(data, strCheck, '');
+	if (json != false) {
+        createMatch(json);
+    }
+
+    // Game Room State Changed
+    strCheck = 'MatchGameRoomStateChangedEvent';
+		json = checkJson(data, strCheck, '');
+	if (json != false) {
+        json = json.matchGameRoomStateChangedEvent.gameRoomInfo;
+
+        if (json.gameRoomConfig != undefined) {
+            currentMatchId = json.gameRoomConfig.matchId;
+            duringMatch = true;
         }
 
-        // Gre to Client Event
-        strCheck = 'GreToClientEvent';
-   		json = checkJson(data, strCheck, '');
-    	if (json != false) {
-            gre_to_client(json.greToClientEvent.greToClientMessages);
+        if (json.stateType == "MatchGameRoomStateType_MatchCompleted") {
+            playerWin = 0;
+            oppWin = 0;
+        	json.finalMatchResult.resultList.forEach(function(res) {
+        		if (res.scope == "MatchScope_Game") {
+            		if (res.winningTeamId == playerSeat) {
+                        playerWin += 1;
+            		}
+            		if (res.winningTeamId == oppSeat) {
+            			oppWin += 1;
+            		}
+            	}
+                if (res.scope == "MatchScope_Match") {
+                    duringMatch = false;
+                }
+        	});
+
+            saveOverlayPos();
+            overlay.hide();
+            mainWindow.show();
+            saveMatch();
         }
 
-        // Get courses
-        strCheck = '<== Event.GetPlayerCourse(';
-        json = checkJsonWithStart(data, strCheck, '', ')');
-        if (json != false) {
-            if (json.Id != "00000000-0000-0000-0000-000000000000") {
-                json._id = json.Id;
-                delete json.Id;
-                httpSubmitCourse(json);
-            }
-        }
-
-        // Get sideboard changes
-        strCheck = 'Received unhandled GREMessageType: GREMessageType_SubmitDeckReq';
-        json = checkJson(data, strCheck, '');
-        if (json != false) {
-            var tempMain = {};
-            var tempSide = {};
-            json.submitDeckReq.deck.deckCards.forEach( function (grpId) {
-                if (tempMain[grpId] == undefined) {
-                    tempMain[grpId] = 1
+        if (json.players != undefined) {
+            json.players.forEach(function(player) {
+                if (player.userId == playerId) {
+                    playerSeat = player.systemSeatId;
                 }
                 else {
-                    tempMain[grpId] += 1;
+                	oppId = player.userId;
+                	oppSeat = player.systemSeatId;
                 }
             });
-            json.submitDeckReq.deck.sideboardCards.forEach( function (grpId) {
-                if (tempSide[grpId] == undefined) {
-                    tempSide[grpId] = 1
-                }
-                else {
-                    tempSide[grpId] += 1;
-                }
-            });
-
-            // Update on overlay
-            var str = JSON.stringify(currentDeck);
-            currentDeckUpdated = JSON.parse(str);
-            overlay.webContents.send("set_deck", currentDeck);
-
-            currentDeck.mainDeck = [];
-            Object.keys(tempMain).forEach(function(key) {
-                var c = {"id": key, "quantity": tempMain[key]};
-                currentDeck.mainDeck.push(c);
-            });
-
-            currentDeck.sideboard = [];
-            Object.keys(tempSide).forEach(function(key) {
-                var c = {"id": key, "quantity": tempSide[key]};
-                currentDeck.sideboard.push(c);
-            });
-
-            console.log(JSON.stringify(currentDeck));
-            console.log(currentDeck);
         }
     }
+
+    // Gre to Client Event
+    strCheck = 'GreToClientEvent';
+		json = checkJson(data, strCheck, '');
+	if (json != false) {
+        gre_to_client(json.greToClientEvent.greToClientMessages);
+    }
+
+    // Get courses
+    strCheck = '<== Event.GetPlayerCourse(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        if (json.Id != "00000000-0000-0000-0000-000000000000") {
+            json._id = json.Id;
+            delete json.Id;
+
+
+            if (coursesToSubmit[json._id] == undefined) {
+                httpSubmitCourse(json._id, json);
+            }
+            coursesToSubmit[json._id] = json;
+        }
+    }
+
+    // Get sideboard changes
+    strCheck = 'Received unhandled GREMessageType: GREMessageType_SubmitDeckReq';
+    json = checkJson(data, strCheck, '');
+    if (json != false) {
+        var tempMain = {};
+        var tempSide = {};
+        json.submitDeckReq.deck.deckCards.forEach( function (grpId) {
+            if (tempMain[grpId] == undefined) {
+                tempMain[grpId] = 1
+            }
+            else {
+                tempMain[grpId] += 1;
+            }
+        });
+        json.submitDeckReq.deck.sideboardCards.forEach( function (grpId) {
+            if (tempSide[grpId] == undefined) {
+                tempSide[grpId] = 1
+            }
+            else {
+                tempSide[grpId] += 1;
+            }
+        });
+
+        // Update on overlay
+        var str = JSON.stringify(currentDeck);
+        currentDeckUpdated = JSON.parse(str);
+        overlay.webContents.send("set_deck", currentDeck);
+
+        currentDeck.mainDeck = [];
+        Object.keys(tempMain).forEach(function(key) {
+            var c = {"id": key, "quantity": tempMain[key]};
+            currentDeck.mainDeck.push(c);
+        });
+
+        currentDeck.sideboard = [];
+        Object.keys(tempSide).forEach(function(key) {
+            var c = {"id": key, "quantity": tempSide[key]};
+            currentDeck.sideboard.push(c);
+        });
+
+        console.log(JSON.stringify(currentDeck));
+        console.log(currentDeck);
+    }
+}
+
+
+function gre_to_client(data) {
+    data.forEach(function(msg) {
+        if (msg.type == "GREMessageType_UIMessage") {
+            if (msg.uiMessage.onHover != undefined) {
+                if (msg.uiMessage.onHover.objectId != undefined) {
+                    if (gameObjs[msg.uiMessage.onHover.objectId] != undefined && gameObjs[msg.uiMessage.onHover.objectId].type == "GameObjectType_Card") {
+                        hoverCard = gameObjs[msg.uiMessage.onHover.objectId].grpId;
+                        if (cardsDb.get(gameObjs[msg.uiMessage.onHover.objectId].grpId) != undefined) {
+                            overlay.webContents.send("set_hover", hoverCard);
+                        }
+                    }
+                    else {
+                        overlay.webContents.send("set_hover", undefined);
+                    }
+                }
+                else {
+                    overlay.webContents.send("set_hover", undefined);
+                }
+            }
+        }
+
+        if (msg.type == "GREMessageType_SubmitDeckReq") {
+            gameObjs = {};
+        }
+
+
+        if (msg.type == "GREMessageType_GameStateMessage") {
+            if (msg.gameStateMessage.type == "GameStateType_Full") {
+                if (msg.gameStateMessage.zones != undefined) {
+                    msg.gameStateMessage.zones.forEach(function(zone) {
+                        zones[zone.zoneId] = zone;
+                    });
+                }
+            }
+            else if (msg.gameStateMessage.type == "GameStateType_Diff") {
+
+                if (msg.gameStateMessage.turnInfo != undefined) {
+                    turnPhase = msg.gameStateMessage.turnInfo.phase;
+                    turnStep  = msg.gameStateMessage.turnInfo.step;
+                    turnNumber = msg.gameStateMessage.turnInfo.turnNumber;
+                    turnActive = msg.gameStateMessage.turnInfo.activePlayer;
+                    turnPriority = msg.gameStateMessage.turnInfo.priorityPlayer;
+                    turnDecision = msg.gameStateMessage.turnInfo.decisionPlayer;
+                    turnStorm = msg.gameStateMessage.turnInfo.stormCount;
+                    //console.log(msg.msgId, "Turn "+turnNumber, turnPhase, turnStep);
+                }
+
+                if (msg.gameStateMessage.gameInfo != undefined) {
+                    if (msg.gameStateMessage.gameInfo.matchState == "MatchState_GameComplete") {
+                        let results = msg.gameStateMessage.gameInfo.results;
+                        matchWincon = msg.gameStateMessage.gameInfo.matchWinCondition;
+                        playerWin = 0;
+                        oppWin = 0;
+                        results.forEach(function(res) {
+                            if (res.scope == "MatchScope_Game") {
+                                if (res.winningTeamId == playerSeat) {
+                                    playerWin += 1;
+                                }
+                                if (res.winningTeamId == oppSeat) {
+                                    oppWin += 1;
+                                }
+                            }
+                            if (res.scope == "MatchScope_Match") {
+                                duringMatch = false;
+                            }
+                        });
+                    }
+                    if (msg.gameStateMessage.gameInfo.matchState == "MatchState_MatchComplete") {
+                        saveOverlayPos();
+                        overlay.hide();
+                        saveMatch();
+                    }
+                }
+
+                if (msg.gameStateMessage.annotations != undefined) {
+                    msg.gameStateMessage.annotations.forEach(function(obj) {
+                        
+                        let affector = obj.affectorId;
+                        let affected = obj.affectedIds;
+                        //if (annotationsRead[obj.id] == undefined) {
+                            affected.forEach(function(aff) {
+                                if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
+                                    if (gameObjs[aff] !== undefined) {
+                                        //console.log(obj.id, cardsDb.get(gameObjs[aff].grpId).name, "Entered", zones[affector].type);
+                                        //annotationsRead[obj.id] = true;
+                                    }
+                                    
+                                }
+
+                                //if (obj.type.includes("AnnotationType_WinTheGame")) {
+                                //}
+                            });
+                        //}
+                    });
+                }
+
+                if (msg.gameStateMessage.zones != undefined) {
+                    msg.gameStateMessage.zones.forEach(function(zone) {
+                        zones[zone.zoneId] = zone;
+                    });
+                }
+
+                if (msg.gameStateMessage.gameObjects != undefined) {
+                    msg.gameStateMessage.gameObjects.forEach(function(obj) {
+                        gameObjs[obj.instanceId] = obj;
+                    });
+                }
+
+                if (msg.gameStateMessage.diffDeletedInstanceIds != undefined) {
+                    msg.gameStateMessage.diffDeletedInstanceIds.forEach(function(obj) {
+                        gameObjs[obj] = undefined;
+                    });
+                }
+            }
+        }
+        //
+    });
+    
+    var str = JSON.stringify(currentDeck);
+    currentDeckUpdated = JSON.parse(str);
+    forceDeckUpdate();
+    update_deck();
 }
 
 function createMatch(arg) {
@@ -530,7 +713,7 @@ function createMatch(arg) {
     zones = {};
     gameObjs = {};
 
-    if (!firstPass) {
+    if (!firstPass && store.get("settings").show_overlay == true) {
 	    hideWindow();
 	    overlay.show();
 	    overlay.focus();
@@ -586,130 +769,6 @@ function get_rank_index(_rank, _tier) {
     if (_rank == "Diamond")     ii = 16 + _tier;
     if (_rank == "Master")      ii = 21;
     return ii;
-}
-
-function gre_to_client(data) {
-    data.forEach(function(msg) {
-        if (msg.type == "GREMessageType_UIMessage") {
-            if (msg.uiMessage.onHover != undefined) {
-                if (msg.uiMessage.onHover.objectId != undefined) {
-                    if (gameObjs[msg.uiMessage.onHover.objectId] != undefined && gameObjs[msg.uiMessage.onHover.objectId].type == "GameObjectType_Card") {
-                        hoverCard = gameObjs[msg.uiMessage.onHover.objectId].grpId;
-                        if (cardsDb.get(gameObjs[msg.uiMessage.onHover.objectId].grpId) != undefined) {
-                            overlay.webContents.send("set_hover", hoverCard);
-                        }
-                    }
-                    else {
-                        overlay.webContents.send("set_hover", undefined);
-                    }
-                }
-                else {
-                    overlay.webContents.send("set_hover", undefined);
-                }
-            }
-        }
-
-        if (msg.type == "GREMessageType_SubmitDeckReq") {
-            gameObjs = {};
-        }
-
-
-        if (msg.type == "GREMessageType_GameStateMessage") {
-            if (msg.gameStateMessage.type == "GameStateType_Full") {
-                if (msg.gameStateMessage.zones != undefined) {
-                    msg.gameStateMessage.zones.forEach(function(zone) {
-                        zones[zone.zoneId] = zone;
-                    });
-                }
-            }
-            else if (msg.gameStateMessage.type == "GameStateType_Diff") {
-
-                if (msg.gameStateMessage.turnInfo != undefined) {
-                	turnPhase = msg.gameStateMessage.turnInfo.phase;
-                	turnStep  = msg.gameStateMessage.turnInfo.step;
-                	turnNumber = msg.gameStateMessage.turnInfo.turnNumber;
-                	turnActive = msg.gameStateMessage.turnInfo.activePlayer;
-                	turnPriority = msg.gameStateMessage.turnInfo.priorityPlayer;
-                	turnDecision = msg.gameStateMessage.turnInfo.decisionPlayer;
-                	turnStorm = msg.gameStateMessage.turnInfo.stormCount;
-                	console.log(msg.msgId, "Turn "+turnNumber, turnPhase, turnStep);
-                }
-
-                if (msg.gameStateMessage.gameInfo != undefined) {
-                    if (msg.gameStateMessage.gameInfo.matchState == "MatchState_GameComplete") {
-                        let results = msg.gameStateMessage.gameInfo.results;
-                        matchWincon = msg.gameStateMessage.gameInfo.matchWinCondition;
-                        playerWin = 0;
-                        oppWin = 0;
-                        results.forEach(function(res) {
-                            if (res.scope == "MatchScope_Game") {
-                                if (res.winningTeamId == playerSeat) {
-                                    playerWin += 1;
-                                }
-                                if (res.winningTeamId == oppSeat) {
-                                    oppWin += 1;
-                                }
-                            }
-                            if (res.scope == "MatchScope_Match") {
-                                duringMatch = false;
-                            }
-                        });
-                    }
-                	if (msg.gameStateMessage.gameInfo.matchState == "MatchState_MatchComplete") {
-		                saveOverlayPos();
-		                overlay.hide();
-		                saveMatch();
-                	}
-                }
-
-                if (msg.gameStateMessage.annotations != undefined) {
-                    msg.gameStateMessage.annotations.forEach(function(obj) {
-                        
-                        let affector = obj.affectorId;
-                        let affected = obj.affectedIds;
-                        //if (annotationsRead[obj.id] == undefined) {
-	                        affected.forEach(function(aff) {
-		                        if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
-		                        	if (gameObjs[aff] !== undefined) {
-			                        	//console.log(obj.id, cardsDb.get(gameObjs[aff].grpId).name, "Entered", zones[affector].type);
-			                        	//annotationsRead[obj.id] = true;
-			                        }
-		                        	
-		                        }
-
-                                //if (obj.type.includes("AnnotationType_WinTheGame")) {
-                                //}
-	                        });
-	                    //}
-                    });
-                }
-
-                if (msg.gameStateMessage.zones != undefined) {
-                    msg.gameStateMessage.zones.forEach(function(zone) {
-                        zones[zone.zoneId] = zone;
-                    });
-                }
-
-                if (msg.gameStateMessage.gameObjects != undefined) {
-                    msg.gameStateMessage.gameObjects.forEach(function(obj) {
-                        gameObjs[obj.instanceId] = obj;
-                    });
-                }
-
-                if (msg.gameStateMessage.diffDeletedInstanceIds != undefined) {
-                    msg.gameStateMessage.diffDeletedInstanceIds.forEach(function(obj) {
-                        gameObjs[obj] = undefined;
-                    });
-                }
-            }
-        }
-        //
-    });
-    
-    var str = JSON.stringify(currentDeck);
-    currentDeckUpdated = JSON.parse(str);
-    forceDeckUpdate();
-    update_deck();
 }
 
 function forceDeckUpdate() {
@@ -810,7 +869,6 @@ function finishLoading() {
     }
 
 	history.matches = store.get('matches_index');
-    console.log(history.matches);
 	history.matches.forEach(function(id) {
 		history[id] = store.get(id);
 	});
@@ -823,6 +881,7 @@ function finishLoading() {
 }
 
 function httpBasic(_headers) {
+    //console.log(_headers);
 	if (_headers.method == 'submit_course' || _headers.method == 'set_player') {
 		if (tokenAuth == undefined) {
 		    setTimeout( function() { httpBasic(_headers); }, 500);
@@ -846,9 +905,15 @@ function httpBasic(_headers) {
 				if (parsedResult.ok) {
 					tokenAuth = parsedResult.token;
 
+                    // set explore
 					if (_headers.method == 'get_top_decks') {
 						mainWindow.webContents.send("set_explore", parsedResult.result);
 					}
+
+                    // Remove course from list
+                    if (_headers.method == 'submit_course') {
+                        //coursesToSubmit[_headers.courseid] = undefined;
+                    }
 				}
 				else if (parsedResult.error = "error 003") {
 					setTimeout( function() { httpBasic(_headers); }, 500);
@@ -870,9 +935,9 @@ function httpAuth() {
 	httpBasic({ 'method': 'auth', 'uid': playerId });
 }
 
-function httpSubmitCourse(_course) {
-	_course = JSON.stringify(_course);
-	httpBasic({ 'method': 'submit_course', 'uid': playerId, 'course': _course });
+function httpSubmitCourse(_courseId, _course) {
+    _course = JSON.stringify(_course);
+	httpBasic({ 'method': 'submit_course', 'uid': playerId, 'course': _course, 'courseid': _courseId });
 }
 
 function httpGetVersion() {

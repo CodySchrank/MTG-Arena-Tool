@@ -141,7 +141,22 @@ function get_set_scryfall(set) {
 	    case "Aether Revolt": 		return "aer";
 	    case "Kaladesh": 			return "kld";
 	    case "Welcome Deck 2017": 	return "w17";
-	    default: 					return "dom";
+	    default: 					return "";
+	}
+}
+
+//
+function get_set_code(set) {
+	switch (set) {
+	    case "Dominaria": 			return "DAR";
+	    case "Rivals of Ixalan": 	return "RIX";
+	    case "Ixalan": 				return "XLN";
+	    case "Hour of Devastation": return "HOU";
+	    case "Amonkhet": 			return "AKH";
+	    case "Aether Revolt": 		return "AER";
+	    case "Kaladesh": 			return "KLD";
+	    case "Welcome Deck 2017": 	return "W17";
+	    default: 					return "";
 	}
 }
 
@@ -171,6 +186,32 @@ function get_deck_colors(deck) {
 		});
 	});
 	return deck.colors;
+}
+
+//
+function get_deck_export(deck) {
+	var str = "";
+	deck.mainDeck.forEach(function(card) {
+		var grpid = card.id;
+		var card_name = cardsDb.get(grpid).name;
+		var card_set = cardsDb.get(grpid).set;
+		var card_cn = cardsDb.get(grpid).cid;
+		
+		str += card.quantity+" "+card_name+" ("+get_set_code(card_set)+") "+card_cn+"\r\n";
+	});
+
+	str += "\r\n";
+
+	deck.sideboard.forEach(function(card) {
+		var grpid = card.id;
+		var card_name = cardsDb.get(grpid).name;
+		var card_set = cardsDb.get(grpid).set;
+		var card_cn = cardsDb.get(grpid).cid;
+		
+		str += card.quantity+" "+card_name+" ("+get_set_code(card_set)+") "+card_cn+"\r\n";
+	});
+
+	return str;
 }
 
 

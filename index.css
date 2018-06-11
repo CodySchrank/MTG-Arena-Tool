@@ -15,6 +15,12 @@ body {
     overflow: hidden;
 }
 
+label {
+    font-family: "Mplantin";
+    color: #FAE5D2;
+    margin-top: 8px;
+}
+
 @font-face {
     font-family: 'belerenbold';
     src: url('fonts/belerenbold.woff') format('woff');
@@ -378,16 +384,12 @@ body {
     background-position: 48px 0px;
 }
 
-
-
 .list_fill {
 	padding-left: 16px;
 	height: 16px;
 	display: flex;
 	flex-direction: column;
 }
-
-
 
 .flex_top {
 	height: 50%;
@@ -684,6 +686,142 @@ span {
     justify-content: flex-start;
     z-index: 15;
     pointer-events: none;
+}
+
+.inventory {
+    padding-left: 8px;
+    padding-right: 8px;
+    width: calc(100% - 16px);
+    height: calc(100% - 128px);
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.inventory_filters {
+    width: 100%;
+    height: 128px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.inventory_card {
+    max-width: 140px;
+    display: inline-block;
+    margin: 6px;
+}
+
+.inventory_card_img {
+    -webkit-border-radius: 4.75% / 3.5%;
+}
+
+.inventory_card_quantity_blue {
+    width: 35px;
+    height: 24px;
+    display: inline-block;
+    background: center no-repeat url('images/quantity_blue.png');
+}
+
+.inventory_card_quantity_green {
+    width: 35px;
+    height: 24px;
+    display: inline-block;
+    background: center no-repeat url('images/quantity_green.png');
+}
+
+.inventory_card_quantity_gray {
+    width: 35px;
+    height: 24px;
+    display: inline-block;
+    background: center no-repeat url('images/quantity_gray.png');
+}
+
+
+.input_container {
+    display: inline-block;
+    height: 24px;
+    margin-top: 12px;
+    margin-left: 16px;
+}
+
+.input_container input {
+    margin-left: 16px;
+    border-radius: 5px;
+    border-style: hidden;
+    height: 24px;
+    width: 320px;
+    font-size: 14px;
+    user-select: none;
+    font-family: Mplantin;
+    padding-left: 4px;
+}
+
+.input_container input:focus {
+    outline-style: none;
+}
+
+.check_container {
+    margin-top: 12px;
+    margin-left: 16px;
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.check_container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.check_container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.check_container input:checked ~ .checkmark {
+    background-color: rgba(145, 115, 75, 1);
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.check_container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.check_container .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }
 
 .flex_end {

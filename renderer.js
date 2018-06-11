@@ -3,6 +3,9 @@ window.ipc = electron.ipcRenderer;
 var decks = null;
 var matchesHistory = null;
 var explore = null;
+var cards = {};
+var cardsNew = {};
+var settings = null;
 
 const Database = require('./database.js');
 const cardsDb = new Database();
@@ -47,9 +50,22 @@ ipc.on('set_history_data', function (event, arg) {
 });
 
 //
+ipc.on('set_cards', function (event, _cards, _cardsnew) {
+	cards = _cards;
+	cardsNew = _cardsnew;
+});
+
+//
 ipc.on('set_explore', function (event, arg) {
 	setExplore(arg);
 });
+
+//
+ipc.on('set_settings', function (event, arg) {
+	settings = arg;
+});
+
+
 
 //
 ipc.on('initialize', function (event, arg) {
@@ -98,9 +114,12 @@ $(document).ready(function() {
 				ipc.send('request_explore', 1);
 			}
 			if ($(this).hasClass("it3")) {
-				open_settings();
+				open_cards();
 			}
 			if ($(this).hasClass("it4")) {
+				open_settings();
+			}
+			if ($(this).hasClass("it5")) {
 				open_about();
 			}
 		}
@@ -269,10 +288,10 @@ function setExplore(arg) {
 		deck = _deck.deck;
 
 		var tileGrpid = deck.deckTileId;
-		var tile = $('<div class="'+deck.id+'t deck_tile"></div>');
+		var tile = $('<div class="'+index+'t deck_tile"></div>');
 		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 
-		var div = $('<div class="'+deck.id+' list_deck"></div>');
+		var div = $('<div class="'+index+' list_deck"></div>');
 
 		var fll = $('<div class="flex_item"></div>');
 		var flc = $('<div class="flex_item"></div>');
@@ -303,17 +322,17 @@ function setExplore(arg) {
 		flr.appendTo(div);
 		$("#ux_0").append(div);
 
-		$('.'+deck.id).on('mouseenter', function(e) {
-		    $('.'+deck.id+'t').css('opacity', 1);
-		    $('.'+deck.id+'t').css('width', '200px');
+		$('.'+index).on('mouseenter', function(e) {
+		    $('.'+index+'t').css('opacity', 1);
+		    $('.'+index+'t').css('width', '200px');
 		});
 
-		$('.'+deck.id).on('mouseleave', function(e) {
-		    $('.'+deck.id+'t').css('opacity', 0.66);
-		    $('.'+deck.id+'t').css('width', '128px');
+		$('.'+index).on('mouseleave', function(e) {
+		    $('.'+index+'t').css('opacity', 0.66);
+		    $('.'+index+'t').css('width', '128px');
 		});
 
-		$('.'+deck.id).on('click', function(e) {
+		$('.'+index).on('click', function(e) {
 			deck.mainDeck.sort(compare_cards);
 			deck.sideboard.sort(compare_cards);
 			open_deck(index, 1);
@@ -332,6 +351,10 @@ function open_deck(i, type) {
 	if (type == 1) {
 		_deck = explore[i].deck;
 	}
+
+	let clip = get_deck_export(_deck);
+	ipc.send('set_clipboard', clip);
+
 	$("#ux_1").html('');
 
 	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">'+_deck.name+'</div></div>');
@@ -504,13 +527,121 @@ function open_match(id) {
 
 }
 
+function open_cards() {
+	$("#ux_0").html('');
+	var div = $('<div class="inventory"></div>');
+	
+	var filters = $('<div class="inventory_filters"></div>');
+
+
+	// Search box
+	var label = $('<label class="input_container">Search</label>');
+	label.appendTo(filters);
+	var input = $('<input type="search" id="query_name" autocomplete="off" />');
+	input.appendTo(label);
+
+	// Newly added only
+	var label = $('<label class="check_container">Newly aquired only</label>');
+	label.appendTo(filters);
+	var check_new = $('<input type="checkbox" id="query_new" onclick="printCards()" />');
+	check_new.appendTo(label);
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
+
+
+	input.on('input', function() {
+		printCards();
+	});
+
+	$("#ux_0").append(filters);
+	$("#ux_0").append(div);
+
+	printCards();
+}
+
+//
+function printCards() {
+	var div = $(".inventory");
+	div.html('');
+
+	filterName = document.getElementById("query_name").value.toLowerCase();
+	filterNew  = document.getElementById("query_new");
+	console.log("filter", filterNew.checked);
+
+    Object.keys(cards).forEach(function(key) {
+    	let grpId = key;
+    	let doDraw = true;
+
+    	let name = cardsDb.get(key).name.toLowerCase();
+    	let type = cardsDb.get(key).type.toLowerCase();
+
+		if (name.indexOf(filterName) == -1 && type.indexOf(filterName) == -1) {
+			doDraw = false;
+		}
+
+    	if (filterNew.checked && cardsNew[key] == undefined) {
+    		doDraw = false;
+    	}
+
+    	if (doDraw) {
+			let dfc = '';
+			if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
+			if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
+			if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
+
+	        var d = $('<div class="inventory_card"></div>');
+
+	        for (let i=0; i<4; i++) {
+	        	if (cardsNew[key] != undefined && i < cardsNew[key]) {
+				    $('<div class="inventory_card_quantity_blue"></div>').appendTo(d);
+	        	}
+	        	else if (i < cards[key]) {
+			        $('<div class="inventory_card_quantity_green"></div>').appendTo(d);
+	        	}
+	        	else {
+			        $('<div class="inventory_card_quantity_gray"></div>').appendTo(d);
+	        	}
+	        }
+
+	        var img = $('<img class="inventory_card_img"></img>');
+			img.attr("src", "https://img.scryfall.com/cards/small/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+			img.appendTo(d);
+			d.appendTo(div);
+		}
+    });
+}
+
 //
 function open_settings() {
+	$("#ux_0").html('');
+	var div = $('<div class="settings_page"></div>');
+
+	// Newly added only
+	var label = $('<label class="check_container">Show in-game overlay</label>');
+	label.appendTo(div);
+	var check_new = $('<input type="checkbox" id="settings_showoverlay" onclick="updateSettings()" />');
+	check_new.appendTo(label);
+	check_new.prop('checked', settings.show_overlay);
+
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
 	// show overlay in-game?
 	// overlay transparency
 	// hover in-game cards?
 	// hover timeout
 	// hide when zero left
+
+	$("#ux_0").append(div);
+}
+
+function updateSettings() {
+	var showOverlay = document.getElementById("settings_showoverlay").checked;
+
+	var settings = {show_overlay: showOverlay};
+
+	ipc.send('save_settings', settings);
 }
 
 //
