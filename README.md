@@ -1,18 +1,21 @@
 # MTG Arena Tool
-An MTG Arena deck tracker and statistics manager.
+An MTG Arena deck tracker and collection manager.
 
 ![History Screen](/Readme/screenshot_0.png)
 
-### Current features
-- In-game overlay, showing cards left in deck, complete deck and odds of card draws.
+## Current features
+- In-game overlay, showing cards left in decks.
 - Track your games and get historic data of all your matches.
-- Individual deck statistics and w/l ratio.
+- Individual deck statistics and win/loss ratio.
 - Support for all game modes (flash events/ quick draft / quick constructed/ ranked)
-- Online decklists, see what decks are being used on events and how they perform. `WIP`
+- Online decklists, see what decks are being used on events and how they perform.
 
-
-On Version 2.0.0 I move the source to Electron, mostly because its easier for everyone to compile/run and see the source. Also because it allow for FAR more interaction with the system (always on top made simpler, no crashes on simple bugs, multiple windows, etcetera).
-We are currently merging all the feature from v1 to v2, if you want the most complete version you should download the installer here at GitHub, if you want the fastest and more stable version then you are welcome to try v2, trough you will have to run from source until its full featured.
+## Roadmap
+`These are some features I would like to include, not ordered in any way`
+- Log of events (Player X casts Y spell, This targetted that, etc), save the log too
+- Metagame / Arquetypes of explore decks `this requires more data to be able to play with`
+- More stats in Deck view (mana curve, cards missing, wildcards value/required) 
+- Deck editor, for adding things like specific basic lands and then importing them to MTG Arena.
 
 ### Compiling / Run from source
 MTG Arena Tool is developed using Electron JS, To get started simply clone this repo and install:
@@ -26,7 +29,7 @@ npm start
 ### Download
 Currently, we live [here at GitHub](https://github.com/Manuel-777/MTG-Arena-Tool/releases). You will find all stable and pre-production releases right here.
 
-Once downloaded the installer should guide your with ease, then simply run the app along MTG Arena. The app should read your user data and warn you if anything goes wrong.
+Once downloaded the installer should simply install and run immediately. The app will read your user data and warn you if anything goes wrong.
 
 ### Disclaimer
 
@@ -43,9 +46,7 @@ MtG Arena Tool is unofficial Fan Content permitted under the Fan Content Policy.
 
 [Jquery Easing by GSGD](http://gsgd.co.uk/sandbox/jquery/easing/)
 
-[Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse. These guys deserve all the love in the world for not only recompiling and uploading, but keeping the most up-to-date database with images, languages and pretty much every single bit of data we always hoped for in a MTG card search engine. Respect!
+[Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse.
 
 ### Questions?
 You can find me on [Twitter](https://twitter.com/MEtchegaray7)
-
-I am `Manuel777` on MTG Arena (if we ever get friends lists there)
