@@ -5,6 +5,8 @@ const {app, Menu, Tray, net, clipboard} = require('electron');
 const path  = require('path');
 const Store = require('electron-store');
 
+const {autoUpdater} = require("electron-updater");
+
 const store = new Store({
 	configName: 'data',
 	defaults: {
@@ -24,6 +26,7 @@ const debugLog = false;
 const debugLogSpeed = 0.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
+
 var tokenAuth = undefined;
 var firstPass = true;
 var renderer_state = 0;
@@ -66,9 +69,10 @@ var coursesToSubmit = {};
 
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
-let mainWindow;
-let overlay;
-let tray = null;
+
+var mainWindow;
+var overlay;
+var tray = null;
 
 //Debug stuff
 ipc.on('ipc_log', function (event, msg) {
@@ -124,6 +128,11 @@ ipc.on('overlay_minimize', function (event, state) {
     overlay.minimize();
 });
 
+ipc.on('force_open_settings', function (event, state) {
+    mainWindow.webContents.send("force_open_settings", true);
+    showWindow();
+});
+
 ipc.on('set_clipboard', function (event, arg) {
     clipboard.writeText(arg);
 });
@@ -134,6 +143,37 @@ process.on('uncaughtException', function (err) {
     console.log(err.stack);
     //console.log('Current chunk:',  currentChunk);
 });
+
+/*
+    Auto update stuff
+*/
+
+autoUpdater.on('checking-for-update', () => {
+    console.log('Auto updater:', 'Checking for update...');
+})
+
+autoUpdater.on('update-available', (info) => {
+    console.log('Auto updater:', 'Update available.');
+})
+
+autoUpdater.on('update-not-available', (info) => {
+    console.log('Auto updater:', 'Update not available.');
+})
+
+autoUpdater.on('error', (err) => {
+    console.log('Auto updater:', 'Error in auto-updater. ' + err);
+})
+
+autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    console.log('Auto updater:', log_message);
+})
+autoUpdater.on('update-downloaded', (info) => {
+    console.log('Auto updater:', 'Update downloaded');
+});
+
 
 function onClosed() {
     mainWindow = null;
@@ -203,12 +243,14 @@ function createMainWindow() {
         width: obj.width,
         height: obj.height,
         title: "MTG Arena Tool",
-        icon:'images/icon.png'
+        icon:'icon.png'
     });
     win.loadURL(`file://${__dirname}/index.html`);
     win.on('closed', onClosed);
 
-    tray = new Tray('icon.ico')
+    let iconPath = path.join(__dirname, 'icon.ico');
+    tray = new Tray(iconPath);
+
     const contextMenu = Menu.buildFromTemplate([
       {label: 'Show', click: () => { showWindow();}},
       {label: 'Quit', click: () => { quit();}}
@@ -266,6 +308,7 @@ app.on('activate', () => {
 app.on('ready', () => {
     mainWindow = createMainWindow();
     overlay = createOverlay();
+    autoUpdater.checkForUpdatesAndNotify();
 });
 
 

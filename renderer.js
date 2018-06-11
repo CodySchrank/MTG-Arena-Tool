@@ -65,7 +65,10 @@ ipc.on('set_settings', function (event, arg) {
 	settings = arg;
 });
 
-
+//
+ipc.on('force_open_settings', function (event, arg) {
+	force_open_settings();
+});
 
 //
 ipc.on('initialize', function (event, arg) {
@@ -80,6 +83,17 @@ $(".list_deck").on('mouseenter mouseleave', function(e) {
 });
 
 
+function force_open_settings() {
+	$(".sidebar_item").each(function(index) {
+		$(this).removeClass("item_selected");
+		if ($(this).hasClass("it4")) {
+			$(this).addClass("item_selected");
+		}
+	});
+	$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
+	open_settings();
+}
+
 $(document).ready(function() {
 	//
 	$(".close").click(function () {
@@ -89,6 +103,11 @@ $(document).ready(function() {
 	//
 	$(".minimize").click(function () {
 	    ipc.send('window_minimize', 1);
+	});
+
+	//
+	$(".settings").click(function () {
+		force_open_settings();
 	});
 
 	//
@@ -650,7 +669,7 @@ function open_about() {
 	aboutStr += '<div class="about">'
 	aboutStr += '	<div class="message_big green">MTG Squirrel</div>'
 	aboutStr += '	<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>'
-	aboutStr += '	<div class="message_sub_15 white">Version 2.0.0</div>'
+	aboutStr += '	<div class="message_sub_15 white">Version '+window.electron.remote.app.getVersion()+'</div>'
 	aboutStr += '	<img class="git_link"></img>'
 	aboutStr += '</div>'
 	$("#ux_0").html(aboutStr);

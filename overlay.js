@@ -95,5 +95,8 @@ $(document).ready(function() {
 	    ipc.send('overlay_minimize', 1);
 	});
 
-
+	//
+	$(".settings").click(function () {
+		ipc.send('force_open_settings', 1);
+	});
 });
