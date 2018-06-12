@@ -702,7 +702,7 @@ function open_about() {
 
 	var aboutStr = '';
 	aboutStr += '<div class="about">'
-	aboutStr += '	<div class="message_big green">MTG Squirrel</div>'
+	aboutStr += '	<div class="top_logo_about"></div>'
 	aboutStr += '	<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>'
 	aboutStr += '	<div class="message_sub_15 white">Version '+window.electron.remote.app.getVersion()+'</div>'
 

@@ -41,6 +41,20 @@ label {
     src: url('fonts/mplantinbold.woff') format('woff');
 }
 
+@keyframes fadein {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+.fadein {
+    opacity: 0;
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    position: absolute;
+    animation: fadein 1s;
+}
+
 .hidden {
     display: none !important;
     opacity: 0;
@@ -79,12 +93,31 @@ label {
     -webkit-app-region:drag;
     position: relative;
     z-index: 30;
-    height: 48px;
+    height: 64px;
     background: url(images/top_bar.png);
     display: flex;
     justify-content: space-between;
     box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
 }
+
+.top_logo {
+    -webkit-app-region:drag;
+    padding-left: 128px;
+    width: 240px;
+    background: url(images/logo.png) no-repeat center;
+}
+
+.top_logo_about {
+    align-self: center;
+    width: 66%;
+    max-width: 400px;
+    height: 90px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-image: url(images/logo_big.png);
+}
+
 
 .button_simple {
     align-self: center;
@@ -116,9 +149,9 @@ label {
 }
 
 .top_username {
-	color: #B7C89E;
+	color: #d4c6af;
 	font-size: 17px;
-    margin-left: 4px;
+    margin-left: 16px;
     align-self: center;
     /*font-family: Beleren;*/
 	-webkit-user-select:none;
@@ -131,7 +164,7 @@ label {
     width: 48px;
     height: 48px;
     background: url(images/ranks_spr.png);
-    background-position: 48px 0px;
+    background-position: 0px 0px;
 }
 
 .sidebar {

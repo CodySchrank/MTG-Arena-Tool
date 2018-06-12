@@ -87,6 +87,7 @@ ipc.on('ipc_log', function (event, msg) {
 ipc.on('renderer_state', function (event, state) {
     renderer_state = state;
     console.log("Renderer state: ", state);
+    showWindow();
 
     var settings = store.get("settings");
     mainWindow.webContents.send("set_settings", settings);
@@ -285,6 +286,7 @@ function createMainWindow() {
 
     const win = new electron.BrowserWindow({
         frame: false,
+        show: false,
         width: obj.width,
         height: obj.height,
         title: "MTG Arena Tool",
