@@ -6,6 +6,8 @@ var explore = null;
 var cards = {};
 var cardsNew = {};
 var settings = null;
+var updateState =  {state: -1, available: false, progress: 0, speed: 0};
+var sidebarActive = 0;
 
 const Database = require('./database.js');
 const cardsDb = new Database();
@@ -66,6 +68,15 @@ ipc.on('set_settings', function (event, arg) {
 });
 
 //
+ipc.on('set_update', function (event, arg) {
+	updateState = arg;
+
+	if (sidebarActive == 5) {
+		open_about();
+	}
+});
+
+//
 ipc.on('force_open_settings', function (event, arg) {
 	force_open_settings();
 });
@@ -82,8 +93,12 @@ $(".list_deck").on('mouseenter mouseleave', function(e) {
     $(".deck_tile").trigger(e.type);
 });
 
+function installUpdate() {
+	ipc.send('update_install', 1);
+}
 
 function force_open_settings() {
+	sidebarActive = 4;
 	$(".sidebar_item").each(function(index) {
 		$(this).removeClass("item_selected");
 		if ($(this).hasClass("it4")) {
@@ -122,23 +137,29 @@ $(document).ready(function() {
 			$(this).addClass("item_selected");
 
 			if ($(this).hasClass("it0")) {
+				sidebarActive = 0;
 				setDecks(null);
 			}
 			if ($(this).hasClass("it1")) {
+				sidebarActive = 1;
 				$("#ux_0").html('');
 				ipc.send('request_history', 1);
 			}
 			if ($(this).hasClass("it2")) {
+				sidebarActive = 2;
 				$("#ux_0").html('');
 				ipc.send('request_explore', 1);
 			}
 			if ($(this).hasClass("it3")) {
+				sidebarActive = 3;
 				open_cards();
 			}
 			if ($(this).hasClass("it4")) {
+				sidebarActive = 4;
 				open_settings();
 			}
 			if ($(this).hasClass("it5")) {
+				sidebarActive = 5;
 				open_about();
 			}
 		}
@@ -677,11 +698,36 @@ function updateSettings() {
 
 //
 function open_about() {
+//updateState = {state: updateState, available: updateAvailable, progress: updateProgress, speed: updateSpeed};
+
 	var aboutStr = '';
 	aboutStr += '<div class="about">'
 	aboutStr += '	<div class="message_big green">MTG Squirrel</div>'
 	aboutStr += '	<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>'
 	aboutStr += '	<div class="message_sub_15 white">Version '+window.electron.remote.app.getVersion()+'</div>'
+
+	if (updateState.state == 0) {
+		aboutStr += '	<div class="message_updates white">Checking for updates..</div>'
+	}
+	if (updateState.state == 1) {
+		aboutStr += '	<div class="message_updates green">Update available.</div>'
+	}
+	if (updateState.state == -1) {
+		aboutStr += '	<div class="message_updates green">Client up to date.</div>'
+	}
+	if (updateState.state == -2) {
+		aboutStr += '	<div class="message_updates red">Error updating.</div>'
+	}
+	if (updateState.state == 2) {
+		aboutStr += '	<div class="message_updates green">Donwloading ('+updateState.progress+'%)</div>'
+	}
+	if (updateState.state == 3) {
+		aboutStr += '	<div class="message_updates green">Download complete.</div>'
+		aboutStr += '	<div class="button_simple" onClick="installUpdate()">Install</div>'
+	}
+
+                
+
 	aboutStr += '	<img class="git_link"></img>'
 	aboutStr += '</div>'
 	$("#ux_0").html(aboutStr);

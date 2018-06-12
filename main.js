@@ -67,6 +67,11 @@ var history = {};
 var topDecks = {};
 var coursesToSubmit = {};
 
+var updateAvailable = false;
+var updateState = -1;
+var updateProgress = -1;
+var updateSpeed = 0;
+
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
 
@@ -94,6 +99,13 @@ ipc.on('save_settings', function (event, settings) {
 
     updateSettings(settings);
 });
+
+ipc.on('update_install', function (event, settings) {
+    if (updateState == 3) {
+        autoUpdater.quitAndInstall();
+    }
+});
+
 
 function updateSettings(settings) {
     const exeName = path.basename(process.execPath);
@@ -159,33 +171,54 @@ process.on('uncaughtException', function (err) {
 /*
     Auto update stuff
 */
-
 autoUpdater.on('checking-for-update', () => {
+    updateState = 0;
+    sendUpdateState();
     console.log('Auto updater:', 'Checking for update...');
 })
 
 autoUpdater.on('update-available', (info) => {
+    updateState = 1;
+    updateAvailable = true;
+    sendUpdateState();
     console.log('Auto updater:', 'Update available.');
 })
 
 autoUpdater.on('update-not-available', (info) => {
+    updateState = -1;
+    updateAvailable = false;
+    sendUpdateState();
     console.log('Auto updater:', 'Update not available.');
 })
 
 autoUpdater.on('error', (err) => {
+    updateState = -2;
+    updateAvailable = false;
+    sendUpdateState();
     console.log('Auto updater:', 'Error in auto-updater. ' + err);
 })
 
 autoUpdater.on('download-progress', (progressObj) => {
+    updateState = 2;
+    updateProgress = Math.round(progressObj.percent * 100) / 100;
+    updateSpeed = progressObj.bytesPerSecond;
+    sendUpdateState();
+
     let log_message = "Download speed: " + progressObj.bytesPerSecond;
     log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
     console.log('Auto updater:', log_message);
 })
 autoUpdater.on('update-downloaded', (info) => {
+    updateState = 3;
+    sendUpdateState();
     console.log('Auto updater:', 'Update downloaded');
 });
 
+function sendUpdateState() {
+    var state = {state: updateState, available: updateAvailable, progress: updateProgress, speed: updateSpeed};
+    mainWindow.webContents.send("set_update", state);
+}
 
 function onClosed() {
     mainWindow = null;

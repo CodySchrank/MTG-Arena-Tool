@@ -76,14 +76,43 @@ label {
 }
 
 .top {
-	-webkit-app-region:drag;
-	position: relative;
-	z-index: 30;
+    -webkit-app-region:drag;
+    position: relative;
+    z-index: 30;
     height: 48px;
     background: url(images/top_bar.png);
     display: flex;
     justify-content: space-between;
     box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
+}
+
+.button_simple {
+    align-self: center;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    width: 160px;
+    height: 38px;
+    border-radius: 6px;
+    color: rgb(99, 79, 53);
+    font-size: 18px;
+    text-align: center;
+    line-height: 38px;
+    border: 1px solid rgba(145, 115, 75, 1);
+    background-color: rgb(195, 172, 130);
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.5);
+    -webkit-transition: all .1s ease-in;
+}
+
+.button_simple:hover {
+    background-color: rgb(220, 195, 150);
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.3);
+}
+
+.button_simple:active {
+    background-color: rgb(220, 195, 150);
+    line-height: 40px;
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.5);
 }
 
 .top_username {
@@ -373,6 +402,17 @@ label {
     text-align: center;
     margin-bottom: 6;
 }
+
+.message_updates {
+    font-size: 18px;
+    opacity: 0.5;
+    font-family: Mplantin-italic;
+    text-align: center;
+    margin-top: 6;
+    margin-bottom: 6;
+}
+
+
 
 .opp_rank {
     -webkit-app-region: no-drag;
