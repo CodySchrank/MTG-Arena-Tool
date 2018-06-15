@@ -1,4 +1,5 @@
 var electron = require('electron');
+var desktopCapturer = electron.desktopCapturer;
 window.ipc = electron.ipcRenderer;
 var decks = null;
 var matchesHistory = null;
@@ -8,6 +9,8 @@ var cardsNew = {};
 var settings = null;
 var updateState =  {state: -1, available: false, progress: 0, speed: 0};
 var sidebarActive = 0;
+var arenaRunning = false;
+//var initialized = false;
 
 const Database = require('./database.js');
 const cardsDb = new Database();
@@ -83,10 +86,23 @@ ipc.on('force_open_settings', function (event, arg) {
 
 //
 ipc.on('initialize', function (event, arg) {
+	//initialized = true;
 	$('.sidebar').removeClass('hidden');
 	$('.overflow_ux').removeClass('hidden');
 	$('.message_center').css('display', 'none');
+
+	//arenaCheckLoop();
 	//$('.wrapper').css('left', '100%');
+});
+
+
+//
+ipc.on('no_log', function (event, arg) {
+	console.log(arg)
+	$('.sidebar').addClass('hidden');
+	$('.overflow_ux').addClass('hidden');
+	$('.message_center').css('display', 'flex');
+	$('.message_center').html('<div class="message_big red">No Log found</div><div class="message_sub_16 white">check if it exists at '+arg+'</div><div class="message_sub_16 white">if it does, try closing MTG Arena and deleting it.</div>');
 });
 
 $(".list_deck").on('mouseenter mouseleave', function(e) {
@@ -109,7 +125,46 @@ function force_open_settings() {
 	open_settings();
 }
 
+function arenaCheckLoop() {
+	if (!arenaRunning) {
+		console.log("Arena is NOT running")
+		$('.sidebar').addClass('hidden');
+		$('.overflow_ux').addClass('hidden');
+		$('.message_center').css('display', 'flex');
+		$('.message_center').html('<div class="message_big red">Open MTG Arena</div><div class="message_sub white">...</div>');
+	}
+	else {
+		console.log("Arena is running")
+		$('.sidebar').removeClass('hidden');
+		$('.overflow_ux').removeClass('hidden');
+		$('.message_center').css('display', 'none');
+	}
+
+	isArenaRunning();
+	setTimeout( function() {
+		arenaCheckLoop();
+	}, 100);
+}
+
+function isArenaRunning() {
+	// This is not quite working as expected
+    desktopCapturer.getSources({
+        types: ['window', 'screen']
+    }, (error, sources) => {
+        if (error) throw error
+		arenaRunning = false;
+        for (let i = 0; i < sources.length; ++i) {
+        	// sometimes arena does not show up here
+        	console.log(sources[i].name);
+            if (sources[i].name.indexOf('MTGA') !== -1) {
+            	arenaRunning = true;
+            }
+        }
+    });
+}
+
 $(document).ready(function() {
+	
 	//
 	$(".close").click(function () {
 	    ipc.send('window_close', 1);
@@ -713,7 +768,7 @@ function open_about() {
 		aboutStr += '	<div class="message_updates green">Update available.</div>'
 	}
 	if (updateState.state == -1) {
-		aboutStr += '	<div class="message_updates green">Client up to date.</div>'
+		aboutStr += '	<div class="message_updates green">Client is up to date.</div>'
 	}
 	if (updateState.state == -2) {
 		aboutStr += '	<div class="message_updates red">Error updating.</div>'

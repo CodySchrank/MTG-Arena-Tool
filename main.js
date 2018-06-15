@@ -371,7 +371,11 @@ fs.open(logUri, 'r', function(err, fd) {
     file = fd;
 
 	if (err) {
-		console.log("no log file found");
+        setTimeout( function() {
+            mainWindow.webContents.send("no_log", logUri);
+        }, 1000);
+        console.log("No log file found");
+        
 	} else {
 		readLog();
 	}
@@ -545,7 +549,7 @@ function processLogData(data) {
 
     // Select deck
     strCheck = '<== Event.DeckSubmit(';
-		json = checkJsonWithStart(data, strCheck, '', ')');
+	json = checkJsonWithStart(data, strCheck, '', ')');
 	if (json != false) {
         select_deck(json);
     }
@@ -619,6 +623,7 @@ function processLogData(data) {
             json._id = json.Id;
             delete json.Id;
 
+            select_deck(json);
 
             if (coursesToSubmit[json._id] == undefined) {
                 httpSubmitCourse(json._id, json);
@@ -1041,4 +1046,3 @@ function httpSetPlayer(name, rank, tier) {
 function httpGetTopDecks() {
 	httpBasic({ 'method': 'get_top_decks', 'uid': playerId});
 }
-
