@@ -3,12 +3,12 @@
 const electron = require('electron');
 const {app, Menu, Tray, net, clipboard} = require('electron');
 const path  = require('path');
-const Store = require('electron-store');
+const Store = require('./store');
 
 const {autoUpdater} = require("electron-updater");
 
-const store = new Store({
-	configName: 'data',
+var store = new Store({
+	configName: 'default',
 	defaults: {
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
@@ -108,6 +108,24 @@ ipc.on('update_install', function (event, settings) {
 });
 
 
+function loadPlayerConfig(playerId) {
+    store = new Store({
+        configName: playerId,
+        defaults: {
+            windowBounds: { width: 800, height: 600, x: 0, y: 0 },
+            overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
+            cards: { cards_time: 0, cards_before:[], cards:[] },
+            settings: {show_overlay: true, startup: true},
+            matches_index:[],
+        }
+    });
+
+    var settings = store.get("settings");
+    mainWindow.webContents.send("set_settings", settings);
+    updateSettings(settings);
+}
+
+
 function updateSettings(settings) {
     const exeName = path.basename(process.execPath);
 
@@ -115,6 +133,7 @@ function updateSettings(settings) {
         openAtLogin: settings.startup
     });
 }
+
 
 ipc.on('request_history', function (event, state) {
 	history.matches = store.get('matches_index');
@@ -481,6 +500,7 @@ function processLogData(data) {
     strCheck = '"PlayerId":"';
     if (data.indexOf(strCheck) > -1) {
         playerId = dataChop(data, strCheck, '"');
+        loadPlayerConfig(playerId);
     }
 
     // Get User name
@@ -970,6 +990,9 @@ function finishLoading() {
 
 	mainWindow.webContents.send("set_history_data", history);
 	mainWindow.webContents.send("initialize", 1);
+
+    var obj = store.get('windowBounds');
+    mainWindow.setBounds(obj);
 
 	httpAuth();
 	httpSetPlayer(playerName, playerRank, playerTier);	
