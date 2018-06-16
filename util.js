@@ -48,6 +48,15 @@ function addCardTile(grpId, indent, quantity, element) {
 				fl.append('<div class="mana_16 flex_end mana_g'+cost.count+'"></div>');
 			}
 		});
+
+		if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1) {
+			if (cards[grpId] == undefined) {
+				cont.append('<div class="card_tile_not_owned"></div>');
+			}
+			else if (quantity > cards[grpId]) {
+				cont.append('<div class="card_tile_not_owned"></div>');
+			}
+		}
 	}
 }
 

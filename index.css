@@ -64,7 +64,7 @@ label {
     position: relative;
     opacity: 1;
     display: flex;
-    height: calc(100% - 48px);
+    height: calc(100% - 64px);
 }
 
 .overlay_wrapper {
@@ -678,7 +678,7 @@ label {
 
 .card_tile {
     width: 100%;
-    min-width: calc(100% - 48px);
+    min-width: calc(100% - 72px);
     height: 24px;
     display: flex;
     justify-content: space-between;
@@ -692,8 +692,8 @@ label {
 
 .card_tile_glow {
     width: 100%;
-    left: calc(0px - 100% + 32px);
-    min-width: calc(100% - 48px);
+    left: calc(0px - 100% + 56px);
+    min-width: calc(100% - 72px);
     height: 24px;
     margin-top: 3px;
     margin-bottom: 3px;
@@ -732,6 +732,13 @@ span {
     font-family: Mplantin;
     background: url(images/quantity.png);
     background-size: cover;
+}
+
+.card_tile_not_owned {
+    min-width: 24px;
+    left: calc(0px - 100% + 57px);
+    position: relative;
+    background: url(images/not_owned.png) center no-repeat;
 }
 
 .card_tile_container {
