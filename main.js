@@ -3,7 +3,7 @@
 const electron = require('electron');
 const {app, Menu, Tray, net, clipboard} = require('electron');
 const path  = require('path');
-const Store = require('./store');
+const Store = require('./store.js');
 
 const {autoUpdater} = require("electron-updater");
 

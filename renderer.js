@@ -489,7 +489,71 @@ function open_deck(i, type) {
 		prevIndex = grpId;
 	});
 
+
+	var stats = $('<div class="stats"></div>');
+
+	var curvediv = $('<div class="mana_curve"></div>');
+	var curve = get_deck_curve(_deck);
+
+	var curveMax = 0;
+	for (let i=0; i<curve.length; i++) {
+		if (curve[i] == undefined) {
+			curve[i] = 0;
+		}
+		if (curve[i] > curveMax) {
+			curveMax = curve[i];
+		}
+	}
+
+	for (let i=0; i<curve.length; i++) {
+		curvediv.append($('<div class="mana_curve_column" style="height: '+(curve[i]/curveMax*100)+'%"></div>'))
+	}
+	curvediv.appendTo(stats);
+	var curvediv = $('<div class="mana_curve_numbers"></div>');
+	for (let i=0; i<curve.length; i++) {
+		curvediv.append($('<div class="mana_curve_column_number"><div style="margin: 0 auto !important" class="mana_16 mana_g'+i+'"></div></div>'))
+	}
+	curvediv.appendTo(stats);
+
+	//var missing = get_deck_missing(_deck);
+
+	// Deck colors
+	var colorspie = get_deck_colors_ammount(_deck);
+	var wp = colorspie.w / colorspie.total * 100;
+	var up = wp+colorspie.u / colorspie.total * 100;
+	var bp = up+colorspie.b / colorspie.total * 100;
+	var rp = bp+colorspie.r / colorspie.total * 100;
+	var gp = rp+colorspie.g / colorspie.total * 100;
+	var cp = gp+colorspie.c / colorspie.total * 100;
+
+	var gradient = new ConicGradient({
+	    stops: '#E7CA8E '+wp+'%, #AABEDF 0 '+up+'%, #A18E87 0 '+bp+'%, #DD8263 0 '+rp+'%, #B7C89E 0 '+gp+'%, #E3E3E3 0 '+cp+'%', // required
+	    size: 400 // Default: Math.max(innerWidth, innerHeight)
+	});
+	var piechart = $('<div class="pie_container"><span>Mana Simbols</span><svg class="pie">'+gradient.svg+'</svg></div>');
+	piechart.appendTo(stats);
+
+	// Lands colors
+	colorspie = get_deck_lands_ammount(_deck);
+	wp = colorspie.w / colorspie.total * 100;
+	up = wp+colorspie.u / colorspie.total * 100;
+	bp = up+colorspie.b / colorspie.total * 100;
+	rp = bp+colorspie.r / colorspie.total * 100;
+	gp = rp+colorspie.g / colorspie.total * 100;
+	cp = gp+colorspie.c / colorspie.total * 100;
+
+	gradient = new ConicGradient({
+	    stops: '#E7CA8E '+wp+'%, #AABEDF 0 '+up+'%, #A18E87 0 '+bp+'%, #DD8263 0 '+rp+'%, #B7C89E 0 '+gp+'%, #E3E3E3 0 '+cp+'%', // required
+	    size: 400 // Default: Math.max(innerWidth, innerHeight)
+	});
+	piechart = $('<div class="pie_container"><span>Mana Sources</span><svg class="pie">'+gradient.svg+'</svg></div>');
+	piechart.appendTo(stats);
+
+
+
+
 	dl.appendTo(fld);
+	stats.appendTo(fld);
 	$("#ux_1").append(top);
 	$("#ux_1").append(fld);
 	//

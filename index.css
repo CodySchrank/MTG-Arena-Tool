@@ -516,6 +516,11 @@ label {
     width: calc(50% - 32px);
 }
 
+.stats {
+    padding: 32px 0;
+    width: calc(50% - 48px);
+}
+
 .decklist_top {
     background-size: cover;
     background-attachment: fixed;
@@ -536,6 +541,59 @@ label {
     text-shadow: 0px 4px 16px rgb(0, 0, 0);
 }
 
+.mana_curve {
+    display: flex;
+    align-items: flex-end;
+    height: 128px;
+    padding: 16px 0 4px 0;
+    border-bottom: 2px solid #917961;
+    width: 100%;
+}
+.mana_curve_column {
+    width: 1000px;
+    margin: 0px 2px;
+    display: flex;
+    background-color: #917961;
+}
+
+.mana_curve_numbers {
+    display: flex;
+    align-items: flex-end;
+    height: 24px;
+    width: 100%;
+}
+
+
+.mana_curve_column_number {
+    color: #FAE5D2;
+    width: 100%;
+    font-family: beleren;
+}
+
+.mana_curve_column span {
+  align-self: flex-end;
+}
+
+.pie_container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 16px auto;
+    height: 160px;
+}
+
+.pie_container span {
+    margin-bottom: 12px;
+    font-family: 'Mplantin';
+    font-size: 16px;
+    color: #FAE5D2;
+}
+
+.pie {
+  width: 128px; height: 128px;
+  border-radius: 50%;
+}
 
 .mana_20 {
     width: 20px;

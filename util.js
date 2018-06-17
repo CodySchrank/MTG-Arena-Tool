@@ -49,7 +49,7 @@ function addCardTile(grpId, indent, quantity, element) {
 			}
 		});
 
-		if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1) {
+		if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1 && cards !== undefined) {
 			if (cards[grpId] == undefined) {
 				cont.append('<div class="card_tile_not_owned"></div>');
 			}
@@ -195,6 +195,148 @@ function get_deck_colors(deck) {
 		});
 	});
 	return deck.colors;
+}
+
+//
+function get_deck_missing(deck) {
+	var missing = {rare: 0, common: 0, uncommon: 0, mythic: 0};
+
+	deck.mainDeck.forEach(function(card) {
+		var grpid = card.id;
+		var quantity = card.quantity;
+		var add = 0;
+		var rarity = cardsDb.get(grpid).rarity;
+
+		if (cards[grpid] == undefined) {
+			add = quantity;
+		}
+		else if (quantity > cards[grpid]) {
+			add = quantity - cards[grpid];
+		}
+
+		if (rarity == 'common')		{missing.common += add;}
+		if (rarity == 'uncommon')	{missing.uncommon += add;}
+		if (rarity == 'rare')		{missing.rare += add;}
+		if (rarity == 'mythic')		{missing.mythic += add;}
+	});
+
+	deck.sideboard.forEach(function(card) {
+		var grpid = card.id;
+		var quantity = card.quantity;
+		var add = 0;
+		var rarity = cardsDb.get(grpid).rarity;
+
+		if (cards[grpid] == undefined) {
+			add = quantity;
+		}
+		else if (quantity > cards[grpid]) {
+			add = quantity - cards[grpid];
+		}
+
+		if (rarity == 'common')		{missing.common += add;}
+		if (rarity == 'uncommon')	{missing.uncommon += add;}
+		if (rarity == 'rare')		{missing.rare += add;}
+		if (rarity == 'mythic')		{missing.mythic += add;}
+	});
+	
+	return missing;
+}
+
+//
+function get_deck_curve(deck) {
+	var curve = [];
+
+	deck.mainDeck.forEach(function(card) {
+		var grpid = card.id;
+		var cmc = cardsDb.get(grpid).cmc;
+		if (curve[cmc] == undefined)	curve[cmc] = 0;
+
+		if (cardsDb.get(grpid).type.indexOf("Land") == -1) {
+			curve[cmc] += card.quantity
+		}
+	});
+	/*
+	// Do not account sideboard?
+	deck.sideboard.forEach(function(card) {
+		var grpid = card.id;
+		var cmc = cardsDb.get(grpid).cmc;
+		if (curve[cmc] == undefined)	curve[cmc] = 0;
+		curve[cmc] += card.quantity
+
+		if (cardsDb.get(grpid).rarity !== 'land') {
+			curve[cmc] += card.quantity
+		}
+	});
+	*/
+	console.log(curve);
+	return curve;
+}
+
+//
+function get_deck_colors_ammount(deck) {
+	var colors = {total:0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0};
+
+	//var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
+	deck.mainDeck.forEach(function(card) {
+		cardsDb.get(card.id).cost.forEach(function(c) {
+			if (c.color == 1) {
+				colors.w += c.count; colors.total += c.count;
+			}
+			if (c.color == 2) {
+				colors.u += c.count; colors.total += c.count;
+			}
+			if (c.color == 3) {
+				colors.b += c.count; colors.total += c.count;
+			}
+			if (c.color == 4) {
+				colors.r += c.count; colors.total += c.count;
+			}
+			if (c.color == 5) {
+				colors.g += c.count; colors.total += c.count;
+			}
+			if (c.color == 6) {
+				colors.c += c.count; colors.total += c.count;
+			}
+		});
+	});
+
+	return colors;
+}
+
+//
+function get_deck_lands_ammount(deck) {
+	var colors = {total:0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0};
+
+	//var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
+	deck.mainDeck.forEach(function(card) {
+		var card = cardsDb.get(card.id);
+		if (card.type.indexOf("Land") != -1) {
+			if (card.frame.length < 5) {
+				card.frame.forEach(function(c) {
+					if (c == 1) {
+						colors.w += 1; colors.total += 1;
+					}
+					if (c == 2) {
+						colors.u += 1; colors.total += 1;
+					}
+					if (c == 3) {
+						colors.b += 1; colors.total += 1;
+					}
+					if (c == 4) {
+						colors.r += 1; colors.total += 1;
+					}
+					if (c == 5) {
+						colors.g += 1; colors.total += 1;
+					}
+					if (c == 6) {
+						colors.c += 1; colors.total += 1;
+					}
+				});
+			}
+		}
+	});
+
+	return colors;
 }
 
 //
