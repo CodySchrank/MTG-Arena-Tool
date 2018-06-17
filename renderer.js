@@ -10,6 +10,7 @@ var settings = null;
 var updateState =  {state: -1, available: false, progress: 0, speed: 0};
 var sidebarActive = 0;
 var arenaRunning = false;
+var renderer = 0;
 //var initialized = false;
 
 const Database = require('./database.js');

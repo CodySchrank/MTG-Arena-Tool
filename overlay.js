@@ -1,5 +1,6 @@
 var electron = require('electron');
 window.ipc = electron.ipcRenderer;
+var renderer = 1;
 
 const Database = require('./database.js');
 const cardsDb = new Database();

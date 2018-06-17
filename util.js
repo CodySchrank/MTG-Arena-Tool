@@ -49,12 +49,14 @@ function addCardTile(grpId, indent, quantity, element) {
 			}
 		});
 
-		if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1 && cards !== undefined) {
-			if (cards[grpId] == undefined) {
-				cont.append('<div class="card_tile_not_owned"></div>');
-			}
-			else if (quantity > cards[grpId]) {
-				cont.append('<div class="card_tile_not_owned"></div>');
+		if (renderer == 0) {
+			if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1) {
+				if (cards[grpId] == undefined) {
+					cont.append('<div class="card_tile_not_owned"></div>');
+				}
+				else if (quantity > cards[grpId]) {
+					cont.append('<div class="card_tile_not_owned"></div>');
+				}
 			}
 		}
 	}

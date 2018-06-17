@@ -13,9 +13,10 @@ An MTG Arena deck tracker and collection manager.
 ## Roadmap
 `These are some features I would like to include, not ordered in any way`
 - Log of events (Player X casts Y spell, This targetted that, etc), save the log too
-- Metagame / Arquetypes of explore decks `this requires more data to be able to play with`
+- Metagame / Arquetypes on decks explorer `this requires more data to be able to play with`
 - More stats in Deck view (mana curve, cards missing, wildcards value/required) 
 - Deck editor, for adding things like specific basic lands and then importing them to MTG Arena.
+- Draft tracker / replayer
 
 ### Compiling / Run from source
 MTG Arena Tool is developed using Electron JS, To get started simply clone this repo and install:
@@ -45,6 +46,8 @@ MtG Arena Tool is unofficial Fan Content permitted under the Fan Content Policy.
 [Electron Store by Sindre Sorhus](https://github.com/sindresorhus/electron-store)
 
 [Jquery Easing by GSGD](http://gsgd.co.uk/sandbox/jquery/easing/)
+
+[Conic Gradient Polyfill by Lea Verou](https://leaverou.github.io/conic-gradient/)
 
 [Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse.
 
