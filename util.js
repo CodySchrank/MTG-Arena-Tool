@@ -311,27 +311,28 @@ function get_deck_lands_ammount(deck) {
 
 	//var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
 	deck.mainDeck.forEach(function(card) {
-		var card = cardsDb.get(card.id);
-		if (card.type.indexOf("Land") != -1) {
+		var quantity = card.quantity;
+		var card = cardsDb.get(card.id); 
+		if (card.type.indexOf("Land") != -1 || card.type.indexOf("land") != -1) {
 			if (card.frame.length < 5) {
 				card.frame.forEach(function(c) {
 					if (c == 1) {
-						colors.w += 1; colors.total += 1;
+						colors.w += quantity; colors.total += quantity;
 					}
 					if (c == 2) {
-						colors.u += 1; colors.total += 1;
+						colors.u += quantity; colors.total += quantity;
 					}
 					if (c == 3) {
-						colors.b += 1; colors.total += 1;
+						colors.b += quantity; colors.total += quantity;
 					}
 					if (c == 4) {
-						colors.r += 1; colors.total += 1;
+						colors.r += quantity; colors.total += quantity;
 					}
 					if (c == 5) {
-						colors.g += 1; colors.total += 1;
+						colors.g += quantity; colors.total += quantity;
 					}
 					if (c == 6) {
-						colors.c += 1; colors.total += 1;
+						colors.c += quantity; colors.total += quantity;
 					}
 				});
 			}
