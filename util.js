@@ -52,10 +52,10 @@ function addCardTile(grpId, indent, quantity, element) {
 		if (renderer == 0) {
 			if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1) {
 				if (cards[grpId] == undefined) {
-					cont.append('<div class="card_tile_not_owned"></div>');
+					cont.append('<div class="card_tile_not_owned" title="'+quantity+' missing"></div>');
 				}
 				else if (quantity > cards[grpId]) {
-					cont.append('<div class="card_tile_not_owned"></div>');
+					cont.append('<div class="card_tile_not_owned" title="'+(quantity-cards[grpId])+' missing"></div>');
 				}
 			}
 		}
@@ -242,6 +242,33 @@ function get_deck_missing(deck) {
 	});
 	
 	return missing;
+}
+
+//
+function get_deck_cost(deck) {
+	var cost = {rare: 0, common: 0, uncommon: 0, mythic: 0};
+
+	deck.mainDeck.forEach(function(card) {
+		var grpid = card.id;
+		var rarity = cardsDb.get(grpid).rarity;
+
+		if (rarity == 'common')		{cost.common += card.quantity;}
+		if (rarity == 'uncommon')	{cost.uncommon += card.quantity;}
+		if (rarity == 'rare')		{cost.rare += card.quantity;}
+		if (rarity == 'mythic')		{cost.mythic += card.quantity;}
+	});
+
+	deck.sideboard.forEach(function(card) {
+		var grpid = card.id;
+		var rarity = cardsDb.get(grpid).rarity;
+
+		if (rarity == 'common')		{cost.common += card.quantity;}
+		if (rarity == 'uncommon')	{cost.uncommon += card.quantity;}
+		if (rarity == 'rare')		{cost.rare += card.quantity;}
+		if (rarity == 'mythic')		{cost.mythic += card.quantity;}
+	});
+	
+	return cost;
 }
 
 //

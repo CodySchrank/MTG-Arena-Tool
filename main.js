@@ -700,6 +700,8 @@ function processLogData(data) {
 
 function gre_to_client(data) {
     data.forEach(function(msg) {
+        /*
+        // Only shows what the opp hovers now.. :(
         if (msg.type == "GREMessageType_UIMessage") {
             if (msg.uiMessage.onHover != undefined) {
                 if (msg.uiMessage.onHover.objectId != undefined) {
@@ -718,6 +720,7 @@ function gre_to_client(data) {
                 }
             }
         }
+        */
 
         if (msg.type == "GREMessageType_SubmitDeckReq") {
             gameObjs = {};

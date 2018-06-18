@@ -165,7 +165,6 @@ function isArenaRunning() {
 }
 
 $(document).ready(function() {
-	
 	//
 	$(".close").click(function () {
 	    ipc.send('window_close', 1);
@@ -238,8 +237,6 @@ function setHistory(arg) {
 		match = matchesHistory[match];
 
 		var div = $('<div class="'+match.id+' list_match"></div>');
-
-
 		var fltl = $('<div class="flex_item"></div>');
 
 		var fll = $('<div class="flex_item"></div>');
@@ -448,8 +445,9 @@ function open_deck(i, type) {
 		_deck = explore[i].deck;
 	}
 
-	let clip = get_deck_export(_deck);
-	ipc.send('set_clipboard', clip);
+	// woot this wasnt suposed to be here
+	//let clip = get_deck_export(_deck);
+	//ipc.send('set_clipboard', clip);
 
 	$("#ux_1").html('');
 
@@ -550,6 +548,25 @@ function open_deck(i, type) {
 	piechart = $('<div class="pie_container"><span>Mana Sources</span><svg class="pie">'+gradient.svg+'</svg></div>');
 	piechart.appendTo(stats);
 
+	var missingWildcards = get_deck_missing(_deck);
+
+	var cost = $('<div class="wildcards_cost"><span>Wildcards Needed</span></div>');
+
+	var _c = $('<div class="wc_cost wc_common">'+missingWildcards.common+'</div>');
+	_c.attr("title", "Common");
+	_c.appendTo(cost);
+	var _u = $('<div class="wc_cost wc_uncommon">'+missingWildcards.uncommon+'</div>');
+	_u.appendTo(cost);
+	_u.attr("title", "Uncommon");
+	var _r = $('<div class="wc_cost wc_rare">'+missingWildcards.rare+'</div>');
+	_r.appendTo(cost);
+	_r.attr("title", "Rare");
+	var _m = $('<div class="wc_cost wc_mythic">'+missingWildcards.mythic+'</div>');
+	_m.appendTo(cost);
+	_m.attr("title", "Mythic Rare");
+
+
+	cost.appendTo(stats);
 
 
 
@@ -798,9 +815,7 @@ function open_settings() {
 	var span = $('<span class="checkmark"></span>');
 	span.appendTo(label);
 
-	// show overlay in-game?
 	// overlay transparency
-	// hover in-game cards?
 	// hover timeout
 	// hide when zero left
 
@@ -818,8 +833,6 @@ function updateSettings() {
 
 //
 function open_about() {
-//updateState = {state: updateState, available: updateAvailable, progress: updateProgress, speed: updateSpeed};
-
 	var aboutStr = '';
 	aboutStr += '<div class="about">'
 	aboutStr += '	<div class="top_logo_about"></div>'
@@ -845,8 +858,6 @@ function open_about() {
 		aboutStr += '	<div class="message_updates green">Download complete.</div>'
 		aboutStr += '	<div class="button_simple" onClick="installUpdate()">Install</div>'
 	}
-
-                
 
 	aboutStr += '	<img class="git_link"></img>'
 	aboutStr += '</div>'

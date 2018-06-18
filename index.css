@@ -583,7 +583,7 @@ label {
     height: 160px;
 }
 
-.pie_container span {
+.pie_container span, .wildcards_cost span {
     margin-bottom: 12px;
     font-family: 'Mplantin';
     font-size: 16px;
@@ -594,6 +594,33 @@ label {
   width: 128px; height: 128px;
   border-radius: 50%;
 }
+
+.wildcards_cost {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 16px auto;
+    height: 160px;
+}
+
+.wc_cost {
+    font-family: Mplantin;
+    text-indent: 48px;
+    color: #FAE5D2;
+    width: 64px;
+    line-height: 29px;
+    height: 24px;
+    text-align: right;
+    background-position: left;
+    background-repeat: no-repeat;
+}
+
+.wc_common      { background-image: url('images/wc_common.png'); }
+.wc_uncommon    { background-image: url('images/wc_uncommon.png'); }
+.wc_rare        { background-image: url('images/wc_rare.png'); }
+.wc_mythic      { background-image: url('images/wc_mythic.png'); }
+
 
 .mana_20 {
     width: 20px;
