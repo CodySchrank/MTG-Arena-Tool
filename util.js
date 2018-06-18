@@ -18,11 +18,16 @@ function addCardTile(grpId, indent, quantity, element) {
 		    $('#'+domid).css('margin-top', '0px');
 
 			$('.main_hover').css("opacity", 1);
+			$('.loader').css("opacity", 1);
 			let dfc = '';
 			if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
 			if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
 			if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
 			$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+
+			$('.main_hover').on('load', function(){
+				$('.loader').css("opacity", 0);
+			});
 		});
 
 		glow.on('mouseleave', function(e) {
