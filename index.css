@@ -108,6 +108,7 @@ label {
 }
 
 .top_logo_about {
+    cursor: pointer;
     align-self: center;
     width: 66%;
     max-width: 400px;
@@ -489,6 +490,7 @@ label {
     -webkit-user-select:none;
     align-self: center;
     margin-left: 8px;
+    margin-right: 16px;
     color: #FAE5D2;
     font-family: Mplantin-italic;
     opacity: 0.5;
@@ -503,10 +505,10 @@ label {
 }
 
 .list_deck_record {
-    -webkit-user-select:none;
-    align-self: right;
-    margin-right: 18px;
-    line-height: 64px;
+    -webkit-user-select: none;
+    text-align: right;
+    margin-right: 16px;
+    line-height: 32px;
     color: #FAE5D2;
 }
 
@@ -936,6 +938,34 @@ span {
     height: 24px;
     display: inline-block;
     background: center no-repeat url('images/quantity_gray.png');
+}
+
+.sets_container {
+    padding-top: 12px;
+    margin-left: 16px;
+    margin-right: 32px;
+    display: flex;
+    width: 100%;
+}
+
+.set_filter {
+    opacity: 1;
+    background-repeat: no-repeat;
+    width: 26px;
+    margin: 0 auto;
+    height: 26px;
+    cursor: pointer;
+    background-size: contain;
+    filter: invert(1);
+    -webkit-transition: all .3s ease-in-out;
+}
+
+.set_filter:hover {
+    opacity: 0.6;
+}
+
+.set_filter_off {
+    opacity: 0.3 !important;
 }
 
 

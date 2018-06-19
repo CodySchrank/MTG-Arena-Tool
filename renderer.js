@@ -1,5 +1,6 @@
 var electron = require('electron');
 var desktopCapturer = electron.desktopCapturer;
+var shell = electron.shell;
 window.ipc = electron.ipcRenderer;
 var decks = null;
 var matchesHistory = null;
@@ -11,6 +12,8 @@ var updateState =  {state: -1, available: false, progress: 0, speed: 0};
 var sidebarActive = 0;
 var arenaRunning = false;
 var renderer = 0;
+
+var filteredSets = [];
 //var initialized = false;
 
 const Database = require('./database.js');
@@ -391,6 +394,7 @@ function setExplore(arg) {
 		var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
 		var flr = $('<div class="flex_item"></div>');
 		flc.css("flex-direction","column")
+		flr.css("flex-direction","column")
 
 		var flt = $('<div class="flex_top"></div>');
 		var flb = $('<div class="flex_bottom"></div>');
@@ -403,6 +407,7 @@ function setExplore(arg) {
 		});
 
 		$('<div class="list_deck_record">'+_deck.record.CurrentWins+' - '+_deck.record.CurrentLosses+'</div>').appendTo(flr);
+		$('<div class="list_deck_name_it">'+_deck.event.replace(/_/g, " ")+'</div>').appendTo(flr);
 
 
 		fll.appendTo(div);
@@ -710,6 +715,26 @@ function open_cards() {
 	
 	var filters = $('<div class="inventory_filters"></div>');
 
+	var sets = $('<div class="sets_container"><label>Filter by set:</label></div>');
+	setsList.forEach(function(set) {
+		var setbutton = $('<div class="set_filter" style="background-image: url(sets/'+get_set_scryfall(set)+'.svg)" title="'+set+'"></div>');
+		setbutton.appendTo(sets);
+		setbutton.click(function() {
+			if (setbutton.hasClass('set_filter_off')) {
+				setbutton.removeClass('set_filter_off');
+				let n = filteredSets.indexOf(set);
+				if (n > -1) {
+					filteredSets.splice(n, 1);
+				}
+			}
+			else {
+				setbutton.addClass('set_filter_off');
+				filteredSets.push(set);
+			}
+			printCards();
+		});
+	});
+	sets.appendTo(filters);
 
 	// Search box
 	var label = $('<label class="input_container">Search</label>');
@@ -724,8 +749,6 @@ function open_cards() {
 	check_new.appendTo(label);
 	var span = $('<span class="checkmark"></span>');
 	span.appendTo(label);
-
-
 
 	input.on('input', function() {
 		printCards();
@@ -752,12 +775,17 @@ function printCards() {
 
     	let name = cardsDb.get(key).name.toLowerCase();
     	let type = cardsDb.get(key).type.toLowerCase();
+    	let set  = cardsDb.get(key).set;
 
 		if (name.indexOf(filterName) == -1 && type.indexOf(filterName) == -1) {
 			doDraw = false;
 		}
 
     	if (filterNew.checked && cardsNew[key] == undefined) {
+    		doDraw = false;
+    	}
+
+    	if (filteredSets.includes(set)) {
     		doDraw = false;
     	}
 
@@ -834,6 +862,18 @@ function open_settings() {
 	var span = $('<span class="checkmark"></span>');
 	span.appendTo(label);
 
+	// Close button behaviour
+	var label = $('<label class="check_container">Close to tray</label>');
+	label.appendTo(div);
+	var check_new = $('<input type="checkbox" id="settings_closetotray" onclick="updateSettings()" />');
+	check_new.appendTo(label);
+	check_new.prop('checked', settings.close_to_tray);
+
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
+
+
 	// overlay transparency
 	// hover timeout
 	// hide when zero left
@@ -844,8 +884,9 @@ function open_settings() {
 function updateSettings() {
 	var startup = document.getElementById("settings_startup").checked;
 	var showOverlay = document.getElementById("settings_showoverlay").checked;
+	var closeToTray = document.getElementById("settings_closetotray").checked;
 
-	var settings = {show_overlay: showOverlay, startup: startup};
+	var settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray};
 
 	ipc.send('save_settings', settings);
 }
@@ -881,9 +922,13 @@ function open_about() {
 	aboutStr += '	<img class="git_link"></img>'
 	aboutStr += '</div>'
 	$("#ux_0").html(aboutStr);
-	var div = $();
 
-	$("#ux_0").append(div);
+	$(".top_logo_about").click(function() {
+		shell.openExternal('https://mtgatool.com');
+	});
+
+	//var div = $();
+	//$("#ux_0").append(div);
 }
 
 //

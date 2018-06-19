@@ -146,6 +146,8 @@ function compare_cards(a, b) {
 }
 
 
+var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria"];
+
 //
 function get_set_scryfall(set) {
 	switch (set) {

@@ -13,7 +13,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true, startup: true},
+		settings: {show_overlay: true, startup: true, close_to_tray: true},
         matches_index:[],
 	}
 });
@@ -115,7 +115,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {show_overlay: true, startup: true},
+            settings: {show_overlay: true, startup: true, close_to_tray: true},
             matches_index:[],
         }
     });
@@ -157,7 +157,13 @@ ipc.on('request_explore', function (event, state) {
 
 // Events
 ipc.on('window_close', function (event, state) {
-    hideWindow();
+    var settings = store.get("settings");
+    if (settings.close_to_tray) {
+        hideWindow();
+    }
+    else {
+        quit();
+    }
 });
 
 ipc.on('window_minimize', function (event, state) {
