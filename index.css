@@ -342,6 +342,10 @@ label {
     width: 200px;
 }
 
+.exportDeck {
+    margin: 16px auto !important;
+}
+
 .list_deck {
     cursor: pointer;
     justify-content: space-between;

@@ -467,9 +467,9 @@ function setExplore(arg) {
 		    $('.'+index+'t').css('width', '128px');
 		});
 
+		deck.mainDeck.sort(compare_cards);
+		deck.sideboard.sort(compare_cards);
 		$('.'+index).on('click', function(e) {
-			deck.mainDeck.sort(compare_cards);
-			deck.sideboard.sort(compare_cards);
 			open_deck(index, 1);
 		    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
 		});
@@ -486,10 +486,6 @@ function open_deck(i, type) {
 	if (type == 1) {
 		_deck = explore[i].deck;
 	}
-
-	// woot this wasnt suposed to be here
-	//let clip = get_deck_export(_deck);
-	//ipc.send('set_clipboard', clip);
 
 	$("#ux_1").html('');
 
@@ -532,6 +528,8 @@ function open_deck(i, type) {
 
 
 	var stats = $('<div class="stats"></div>');
+
+	$('<div class="button_simple exportDeck">Copy to clipboard</div>').appendTo(stats);
 
 	var curvediv = $('<div class="mana_curve"></div>');
 	var curve = get_deck_curve(_deck);
@@ -616,6 +614,11 @@ function open_deck(i, type) {
 	stats.appendTo(fld);
 	$("#ux_1").append(top);
 	$("#ux_1").append(fld);
+	//
+	$(".exportDeck").click(function () {
+	    var list = get_deck_export(deck);
+	    ipc.send('set_clipboard', list);
+	});
 	//
 	$(".back").click(function () {
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
@@ -745,6 +748,7 @@ function open_match(id) {
 	});
 }
 
+//
 function open_cards() {
 	$("#ux_0").html('');
 	$("#ux_1").html('');
