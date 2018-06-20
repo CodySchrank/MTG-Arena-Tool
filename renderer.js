@@ -1053,12 +1053,21 @@ function open_about() {
 		aboutStr += '	<div class="button_simple" onClick="installUpdate()">Install</div>'
 	}
 
-	aboutStr += '	<img class="git_link"></img>'
-	aboutStr += '</div>'
+	aboutStr += '<div class="flex_item" style="width: 240px; margin: 64px auto 0px auto;"><div class="twitter_link"></div><div class="git_link"></div></div>';
+	aboutStr += '</div>';
+
 	$("#ux_0").html(aboutStr);
 
 	$(".top_logo_about").click(function() {
 		shell.openExternal('https://mtgatool.com');
+	});
+
+	$(".twitter_link").click(function() {
+		shell.openExternal('https://twitter.com/MEtchegaray7');
+	});
+
+	$(".git_link").click(function() {
+		shell.openExternal('https://github.com/Manuel-777/MTG-Arena-Tool');
 	});
 
 	//var div = $();
@@ -1084,12 +1093,12 @@ function getDeckWinrate(deckid, lastEdit) {
 				loss++;
 			}
 			if (match.date > lastEdit) {
-			if (match.player.win > match.opponent.win) {
-				winsLastEdit++;
-			}
-			else {
-				lossLastEdit++;
-			}
+				if (match.player.win > match.opponent.win) {
+					winsLastEdit++;
+				}
+				else {
+					lossLastEdit++;
+				}
 			}
 		}
 	});

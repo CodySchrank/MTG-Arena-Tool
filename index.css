@@ -124,6 +124,26 @@ label {
     background-image: url(images/logo_big.png);
 }
 
+.twitter_link {
+    cursor: pointer;
+    align-self: center;
+    margin: 0 auto;
+    width: 32px;
+    height: 32px;
+    background: url(images/twitter_logo.png) no-repeat center;
+    background-size: contain;
+}
+
+.git_link {
+    cursor: pointer;
+    align-self: center;
+    margin: 0 auto;
+    width: 32px;
+    height: 32px;
+    background: url(images/github_logo.png) no-repeat center;
+    background-size: contain;
+}
+
 .notification {
     -webkit-app-region: no-drag;
     display: none;
