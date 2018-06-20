@@ -363,6 +363,7 @@ function setDecks(arg) {
 		var flc = $('<div class="flex_item"></div>');
 		var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
 		var flr = $('<div class="flex_item"></div>');
+		flr.css("flex-direction","column")
 		flc.css("flex-direction","column")
 
 		var flt = $('<div class="flex_top"></div>');
@@ -373,9 +374,10 @@ function setDecks(arg) {
 			$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
 		});
 
-		var wr = getDeckWinrate(deck.id);
+		var wr = getDeckWinrate(deck.id, deck.lastUpdated);
 		if (wr != 0) {
-			$('<div class="list_deck_winrate">Winrate: '+wr*100+'%</div>').appendTo(flr);
+			$('<div class="list_deck_winrate">Winrate: '+wr.total*100+'%</div>').appendTo(flr);
+			$('<div class="list_deck_winrate">Since last edit: '+wr.lastEdit*100+'%</div>').appendTo(flr);
 		}
 
 		fll.appendTo(div);
@@ -1064,9 +1066,11 @@ function open_about() {
 }
 
 //
-function getDeckWinrate(deckid) {
+function getDeckWinrate(deckid, lastEdit) {
 	var wins = 0;
 	var loss = 0;
+	var winsLastEdit = 0;
+	var lossLastEdit = 0;
 	if (matchesHistory == undefined) {
 		return 0;
 	}
@@ -1079,13 +1083,24 @@ function getDeckWinrate(deckid) {
 			else {
 				loss++;
 			}
+			if (match.date > lastEdit) {
+			if (match.player.win > match.opponent.win) {
+				winsLastEdit++;
+			}
+			else {
+				lossLastEdit++;
+			}
+			}
 		}
 	});
 
 	if (wins == 0) {
 		return 0;
 	}
-	return Math.round((1/(wins+loss)*wins) * 100) / 100
+	var winrate = Math.round((1/(wins+loss)*wins) * 100) / 100;
+	var winrateLastEdit = Math.round((1/(winsLastEdit+lossLastEdit)*winsLastEdit) * 100) / 100;
+	if (winsLastEdit == 0)	winrateLastEdit = 0;
+	return {total: winrate, lastEdit: winrateLastEdit};
 }
 
 //
