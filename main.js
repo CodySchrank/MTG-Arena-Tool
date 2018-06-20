@@ -18,7 +18,7 @@ var store = new Store({
 	}
 });
 
-const serverAddress = '168.181.184.14';
+const serverAddress = 'mtgatool.com';
 const Database = require('./database.js');
 const cardsDb = new Database();
 
@@ -1017,8 +1017,8 @@ function httpBasic(_headers) {
 		_headers.token = tokenAuth;
 	}
 	
-	var http = require('http');
-	var options = { hostname: serverAddress, path: '/api.php', method: 'POST', headers: _headers };
+	var http = require('https');
+	var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/api.php', method: 'POST', headers: _headers };
 
 	var results = ''; 
 	var req = http.request(options, function(res) {

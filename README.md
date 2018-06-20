@@ -6,6 +6,7 @@ An MTG Arena deck tracker and collection manager.
 ## Current features
 - In-game overlay, showing cards left in decks.
 - Track your games and get historic data of all your matches.
+- Collection browser (filter by set, show newly acquired cards)
 - Individual deck statistics (color pie, mana curve, win/loss ratio, wildcards needed).
 - Support for all game modes (flash events/ quick draft / quick constructed/ ranked)
 - Online decklists, see what decks are being used on events and how they perform.
@@ -14,7 +15,7 @@ An MTG Arena deck tracker and collection manager.
 `These are some features I would like to include, not ordered in any way`
 - Log of events (Player X casts Y spell, This targetted that, etc), save the log too
 - Metagame / Arquetypes on decks explorer `this requires more data to be able to play with`
-- Deck editor, for adding things like specific basic lands and then importing them to MTG Arena.
+- Deck editor/modifier, for adding things like specific basic lands and then importing them to MTG Arena.
 - Draft tracker / replayer
 
 ### Compiling / Run from source
