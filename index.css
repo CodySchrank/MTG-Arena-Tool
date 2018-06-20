@@ -11,14 +11,14 @@ body {
     margin: 0px;
     padding: 0px;
     height: 100%;
-	background-color: #33281E;
+	background-color: black;
     overflow: hidden;
 }
 
 label {
     font-family: "Mplantin";
     color: #FAE5D2;
-    margin-top: 8px;
+    margin-top: 2px;
 }
 
 @font-face {
@@ -86,11 +86,11 @@ label {
     height: 100%;
     overflow: hidden;
     background: url(images/Mox-Amber-Dominaria-MtG-Art.jpg);
-    background-color: rgba(115, 93, 73, 1);
+    background-color: #917961;
     background-size: cover;
     background-blend-mode: luminosity;
     background-position: center;
-    opacity: 0.25;
+    opacity: 0.4;
     z-index: -1;
 }
 
@@ -152,6 +152,15 @@ label {
     background-color: rgb(195, 172, 130);
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.5);
     -webkit-transition: all .1s ease-in;
+}
+
+.button_thin {
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+    width: 160px !important;
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 16px !important;
 }
 
 .button_simple:hover {
@@ -956,12 +965,102 @@ span {
     background: center no-repeat url('images/quantity_gray.png');
 }
 
+.main_stats {
+    margin: 16px;
+    width: 50%;
+    display: block;
+    text-align: center;
+}
+
+.stats_set_completion {
+    max-width: 240px;
+    margin: 0 auto;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stats_set_icon {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 6px;
+    background-size: contain;
+    opacity: 0.7;
+    -webkit-transition: all .2s ease-in;
+}
+
+.stats_set_icon:hover {
+    opacity: 1;
+}
+
+
+.stats_set_icon span {
+    cursor: pointer;
+    line-height: 24px;
+    font-size: 15px;
+    position: absolute;
+    margin-left: 20px;
+    color: #fae5d2;
+    opacity: 0.8;
+    -webkit-transition: all .2s ease-in;
+}
+.stats_set_icon span:hover {
+    margin-left: 30px;
+    opacity: 1;
+}
+
+.stats_rarity_icon {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 6px;
+    background-size: contain;
+}
+
+.stats_rarity_icon span {
+    cursor: pointer;
+    line-height: 24px;
+    font-size: 15px;
+    position: absolute;
+    margin-left: 20px;
+    color: #fae5d2;
+}
+
+.stats_set_bar {
+    position: relative;
+    background-color: rgba(183, 200, 158, 1);
+    height: 2px;
+}
+.stats_set_bar:after {
+    content: '';
+    left: 0;
+    width: 240px;
+    background-color: rgb(99, 79, 53);
+    height: 2px;
+    position: absolute;
+    z-index: -1;
+}
+
 .sets_container {
     padding-top: 12px;
     margin-left: 16px;
-    margin-right: 32px;
+    margin-right: 16px;
     display: flex;
-    width: 100%;
+    width: calc(100% - 32px);
+}
+
+.buttons_container {
+    padding-top: 8px;
+    margin-left: 16px;
+    margin-right: 16px;
+    display: flex;
+    justify-content: space-around;
+    width: calc(100% - 32px);
 }
 
 .set_filter {
@@ -972,12 +1071,11 @@ span {
     height: 26px;
     cursor: pointer;
     background-size: contain;
-    filter: invert(1);
     -webkit-transition: all .3s ease-in-out;
 }
 
 .set_filter:hover {
-    opacity: 0.6;
+    opacity: 0.9;
 }
 
 .set_filter_on {
