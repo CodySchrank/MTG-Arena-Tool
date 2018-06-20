@@ -60,6 +60,11 @@ label {
     opacity: 0;
 }
 
+.main_wrapper {
+    padding: 2px;
+    height: calc(100% - 4px);
+}
+
 .wrapper {
     position: relative;
     opacity: 1;
@@ -117,6 +122,17 @@ label {
     background-size: contain;
     background-position: center;
     background-image: url(images/logo_big.png);
+}
+
+.notification {
+    -webkit-app-region: no-drag;
+    display: none;
+    background: url(images/alert.png) no-repeat center;
+    width: 24px;
+    height: 24px;
+    align-self: center;
+    position: relative;
+    margin-right: 16px;
 }
 
 
@@ -675,7 +691,7 @@ label {
 .mana_16.mana_g20      { background: url(16sh/20.png) center;}
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -964,8 +980,8 @@ span {
     opacity: 0.6;
 }
 
-.set_filter_off {
-    opacity: 0.3 !important;
+.set_filter_on {
+    opacity: 0.3;
 }
 
 

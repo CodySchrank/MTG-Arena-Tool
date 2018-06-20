@@ -84,8 +84,31 @@ ipc.on('set_update', function (event, arg) {
 });
 
 //
+ipc.on('show_notification', function (event, arg) {
+    $('.notification').show();
+    $('.notification').attr("title", arg);
+
+    if (arg == "Update available" || arg == "Update downloaded") {
+	    $('.notification').click(function() {
+	        force_open_about();
+	    });
+	}
+});
+
+//
+ipc.on('hide_notification', function (event, arg) {
+    $('.notification').hide();
+    $('.notification').attr("title", "");
+});
+
+//
 ipc.on('force_open_settings', function (event, arg) {
 	force_open_settings();
+});
+
+//
+ipc.on('force_open_about', function (event, arg) {
+	force_open_about();
 });
 
 //
@@ -127,6 +150,18 @@ function force_open_settings() {
 	});
 	$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	open_settings();
+}
+
+function force_open_about() {
+	sidebarActive = 4;
+	$(".sidebar_item").each(function(index) {
+		$(this).removeClass("item_selected");
+		if ($(this).hasClass("it5")) {
+			$(this).addClass("item_selected");
+		}
+	});
+	$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
+	open_about();
 }
 
 function arenaCheckLoop() {
@@ -717,19 +752,19 @@ function open_cards() {
 
 	var sets = $('<div class="sets_container"><label>Filter by set:</label></div>');
 	setsList.forEach(function(set) {
-		var setbutton = $('<div class="set_filter" style="background-image: url(sets/'+get_set_scryfall(set)+'.svg)" title="'+set+'"></div>');
+		var setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(sets/'+get_set_scryfall(set)+'.svg)" title="'+set+'"></div>');
 		setbutton.appendTo(sets);
 		setbutton.click(function() {
-			if (setbutton.hasClass('set_filter_off')) {
-				setbutton.removeClass('set_filter_off');
+			if (setbutton.hasClass('set_filter_on')) {
+				setbutton.removeClass('set_filter_on');
+				filteredSets.push(set);
+			}
+			else {
+				setbutton.addClass('set_filter_on');
 				let n = filteredSets.indexOf(set);
 				if (n > -1) {
 					filteredSets.splice(n, 1);
 				}
-			}
-			else {
-				setbutton.addClass('set_filter_off');
-				filteredSets.push(set);
 			}
 			printCards();
 		});
@@ -785,8 +820,10 @@ function printCards() {
     		doDraw = false;
     	}
 
-    	if (filteredSets.includes(set)) {
-    		doDraw = false;
+    	if (filteredSets.length > 0) {
+	    	if (!filteredSets.includes(set)) {
+	    		doDraw = false;
+	    	}
     	}
 
     	if (doDraw) {

@@ -208,6 +208,7 @@ autoUpdater.on('update-available', (info) => {
     updateAvailable = true;
     sendUpdateState();
     console.log('Auto updater:', 'Update available.');
+    mainWindow.webContents.send("show_notification", "Update available");
 })
 
 autoUpdater.on('update-not-available', (info) => {
@@ -238,6 +239,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 autoUpdater.on('update-downloaded', (info) => {
     updateState = 3;
     sendUpdateState();
+    mainWindow.webContents.send("show_notification", "Update downloaded");
     console.log('Auto updater:', 'Update downloaded');
 });
 

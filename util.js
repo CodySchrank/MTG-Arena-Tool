@@ -178,6 +178,15 @@ function get_set_code(set) {
 	}
 }
 
+//
+/*
+function get_set_completion(set) {
+	
+	cardsDb.cards.{
+		
+	}
+}
+*/
 
 //
 function get_deck_colors(deck) {
