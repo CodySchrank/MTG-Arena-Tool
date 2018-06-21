@@ -999,6 +999,7 @@ function open_settings() {
 	var span = $('<span class="checkmark"></span>');
 	span.appendTo(label);
 
+
 	// Close button behaviour
 	var label = $('<label class="check_container">Close to tray</label>');
 	label.appendTo(div);
@@ -1024,7 +1025,7 @@ function updateSettings() {
 	var showOverlay = document.getElementById("settings_showoverlay").checked;
 	var closeToTray = document.getElementById("settings_closetotray").checked;
 
-	var settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray};
+	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray};
 
 	ipc.send('save_settings', settings);
 }
@@ -1060,7 +1061,7 @@ function open_about() {
 		aboutStr += '	<div class="button_simple" onClick="installUpdate()">Install</div>'
 	}
 
-	aboutStr += '<div class="flex_item" style="width: 240px; margin: 64px auto 0px auto;"><div class="twitter_link"></div><div class="git_link"></div></div>';
+	aboutStr += '<div class="flex_item" style="width: 160px; margin: 64px auto 0px auto;"><div class="twitter_link"></div><div class="git_link"></div></div>';
 	aboutStr += '</div>';
 
 	$("#ux_0").html(aboutStr);
