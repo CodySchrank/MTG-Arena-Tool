@@ -1036,12 +1036,14 @@ function open_about() {
 	aboutStr += '	<div class="top_logo_about"></div>'
 	aboutStr += '	<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>'
 	aboutStr += '	<div class="message_sub_15 white">Version '+window.electron.remote.app.getVersion()+'</div>'
+		aboutStr += '	<a href="https://mtgatool.com/release-notes/">Release Notes</a>'
 
 	if (updateState.state == 0) {
 		aboutStr += '	<div class="message_updates white">Checking for updates..</div>'
 	}
 	if (updateState.state == 1) {
 		aboutStr += '	<div class="message_updates green">Update available.</div>'
+		aboutStr += '	<a class="release_notes_link" href="https://mtgatool.com/release-notes/">Release Notes</a>'
 	}
 	if (updateState.state == -1) {
 		aboutStr += '	<div class="message_updates green">Client is up to date.</div>'
@@ -1051,9 +1053,11 @@ function open_about() {
 	}
 	if (updateState.state == 2) {
 		aboutStr += '	<div class="message_updates green">Donwloading ('+updateState.progress+'%)</div>'
+		aboutStr += '	<a class="release_notes_link" href="https://mtgatool.com/release-notes/">Release Notes</a>'
 	}
 	if (updateState.state == 3) {
 		aboutStr += '	<div class="message_updates green">Download complete.</div>'
+		aboutStr += '	<a class="release_notes_link" href="https://mtgatool.com/release-notes/">Release Notes</a>'
 		aboutStr += '	<div class="button_simple" onClick="installUpdate()">Install</div>'
 	}
 
@@ -1074,8 +1078,9 @@ function open_about() {
 		shell.openExternal('https://github.com/Manuel-777/MTG-Arena-Tool');
 	});
 
-	//var div = $();
-	//$("#ux_0").append(div);
+	$(".release_notes_link").click(function() {
+		shell.openExternal('https://mtgatool.com/release-notes/');
+	});
 }
 
 //

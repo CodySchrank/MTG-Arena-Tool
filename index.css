@@ -446,6 +446,12 @@ label {
     justify-content: center;
 }
 
+.about a {
+    text-align: center;
+    margin: 4px;
+    color: rgb(220, 195, 150);
+}
+
 .message_center {
     position: absolute;
     width: 100%;
@@ -1060,6 +1066,7 @@ span {
     background-color: rgba(183, 200, 158, 1);
     height: 2px;
 }
+
 .stats_set_bar:after {
     content: '';
     left: 0;
