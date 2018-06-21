@@ -793,7 +793,10 @@ function open_cards() {
 	span.appendTo(label);
 
 	// Stats
+	var exp   = $('<div class="button_simple button_thin" onClick="exportCollection()">Copy to Clipboard</div>');
 	var stats = $('<div class="button_simple button_thin stats_button" onClick="printStats()">Collection Stats</div>');
+
+	exp.appendTo(cont);
 	stats.appendTo(cont);
 	cont.appendTo(filters);
 
@@ -805,6 +808,12 @@ function open_cards() {
 	$("#ux_0").append(div);
 
 	printCards();
+}
+
+//
+function exportCollection() {
+	var str = get_collection_export();
+	ipc.send('set_clipboard', str);
 }
 
 //

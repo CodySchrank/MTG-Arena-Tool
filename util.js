@@ -237,6 +237,21 @@ function get_collection_stats() {
     return stats;
 }
 
+//
+function get_collection_export() {
+	var str = "";
+
+    Object.keys(cards).forEach(function(key) {
+
+    	let quantity = cards[key];
+    	let name = cardsDb.get(key).name;
+    	name = replaceAll(name, '///', '//');
+
+		str += quantity+" "+name+"\r\n";
+    });
+
+    return str;
+}
 
 //
 function get_deck_colors(deck) {
@@ -516,4 +531,9 @@ function timeSince(date) {
     return interval + " minutes";
   }
   return Math.floor(seconds) + " seconds";
+}
+
+//
+function replaceAll(str, find, replace) {
+    return str.replace(new RegExp(find, 'g'), replace);
 }
