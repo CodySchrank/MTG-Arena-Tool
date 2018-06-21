@@ -12,6 +12,7 @@ var updateState =  {state: -1, available: false, progress: 0, speed: 0};
 var sidebarActive = 0;
 var arenaRunning = false;
 var renderer = 0;
+var collectionPage = 0;
 
 var filteredSets = [];
 //var initialized = false;
@@ -908,11 +909,15 @@ function printCards() {
 	var div = $(".inventory");
 	div.html('');
 
+	var paging = $('<div class="paging_container"></div>');
+	div.append(paging);
+
 	filterName = document.getElementById("query_name").value.toLowerCase();
 	filterNew  = document.getElementById("query_new");
 	console.log("filter", filterNew.checked);
-
-    Object.keys(cards).forEach(function(key) {
+	var totalCards = 0;
+    for (n=0; n<Object.keys(cards).length; n++) {
+    	key = Object.keys(cards)[n];
     	let grpId = key;
     	let doDraw = true;
 
@@ -932,6 +937,14 @@ function printCards() {
 	    	if (!filteredSets.includes(set)) {
 	    		doDraw = false;
 	    	}
+    	}
+
+    	if (doDraw) {
+    		totalCards++;
+    	}
+
+    	if (totalCards < collectionPage*100 || totalCards > collectionPage*100+99) {
+    		doDraw = false;
     	}
 
     	if (doDraw) {
@@ -979,7 +992,37 @@ function printCards() {
 
 			d.appendTo(div);
 		}
-    });
+    }
+
+	if (collectionPage <= 0) {
+		but = $('<div class="paging_button_disabled"> \< </div>');
+	}
+	else {
+		but = $('<div class="paging_button" onClick="setCollectionPage('+(collectionPage-1)+')"> \< </div>');
+	}
+	paging.append(but);
+	var totalPages = Math.ceil(totalCards / 100);
+	for (var n=0; n<totalPages; n++) {
+		but = $('<div class="paging_button" onClick="setCollectionPage('+(n)+')">'+n+'</div>');
+		if (collectionPage == n) {
+			but.addClass("paging_active");
+		}
+		paging.append(but);
+	}
+	if (collectionPage >= totalPages-1) {
+		but = $('<div class="paging_button_disabled"> \> </div>');
+	}
+	else {
+		but = $('<div class="paging_button" onClick="setCollectionPage('+(collectionPage+1)+')"> \> </div>');
+	}
+	paging.append(but);
+}
+
+
+//
+function setCollectionPage(page) {
+	collectionPage = page;
+	printCards();
 }
 
 //
