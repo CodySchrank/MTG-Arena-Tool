@@ -1036,7 +1036,6 @@ function open_about() {
 	aboutStr += '	<div class="top_logo_about"></div>'
 	aboutStr += '	<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>'
 	aboutStr += '	<div class="message_sub_15 white">Version '+window.electron.remote.app.getVersion()+'</div>'
-		aboutStr += '	<a href="https://mtgatool.com/release-notes/">Release Notes</a>'
 
 	if (updateState.state == 0) {
 		aboutStr += '	<div class="message_updates white">Checking for updates..</div>'
