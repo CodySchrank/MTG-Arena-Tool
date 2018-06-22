@@ -1044,7 +1044,7 @@ span {
 }
 
 .stats_set_completion {
-    max-width: 240px;
+    max-width: 320px;
     margin: 0 auto;
     height: 40px;
     display: flex;
@@ -1111,7 +1111,7 @@ span {
 .stats_set_bar:after {
     content: '';
     left: 0;
-    width: 240px;
+    width: 320px;
     background-color: rgb(99, 79, 53);
     height: 2px;
     position: absolute;

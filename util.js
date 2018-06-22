@@ -191,7 +191,18 @@ function get_collection_stats() {
 		totalRare: 0,
 		totalMythic: 0,
 		totalCards: 0,
-		ownedCards: 0
+		ownedCards: 0,
+
+		ownedSinglesCommon: 0,
+		ownedSinglesUncommon: 0,
+		ownedSinglesRare: 0,
+		ownedSinglesMythic: 0,
+		totalSinglesCommon: 0,
+		totalSinglesUncommon: 0,
+		totalSinglesRare: 0,
+		totalSinglesMythic: 0,
+		totalSingles: 0,
+		ownedSingles: 0
 	};
 
 	setsList.forEach(function(set) {
@@ -216,20 +227,22 @@ function get_collection_stats() {
 			// add to totals
 			stats[card.set].totalCards += 4;
 			stats.totalCards += 4;
-			if (card.rarity == 'common')	{ stats.totalCommon 	+= 4; stats[card.set].totalCommon 	+= 4; }
-			if (card.rarity == 'uncommon')	{ stats.totalUncommon 	+= 4; stats[card.set].totalUncommon += 4; }
-			if (card.rarity == 'rare')		{ stats.totalRare 		+= 4; stats[card.set].totalRare 	+= 4; }
-			if (card.rarity == 'mythic')	{ stats.totalMythic	 	+= 4; stats[card.set].totalMythic 	+= 4; }
+			stats.totalSingles += 1;
+			if (card.rarity == 'common')	{ stats.totalCommon 	+= 4; stats.totalSinglesCommon 	 += 1; stats[card.set].totalCommon 	+= 4; }
+			if (card.rarity == 'uncommon')	{ stats.totalUncommon 	+= 4; stats.totalSinglesUncommon += 1; stats[card.set].totalUncommon += 4; }
+			if (card.rarity == 'rare')		{ stats.totalRare 		+= 4; stats.totalSinglesRare 	 += 1; stats[card.set].totalRare 	+= 4; }
+			if (card.rarity == 'mythic')	{ stats.totalMythic	 	+= 4; stats.totalSinglesMythic   += 1; stats[card.set].totalMythic 	+= 4; }
 
     		// add cards we own
 			if (cards[grpId] !== undefined) {
 				var add = cards[grpId];
 				stats[card.set].ownedCards += add;
 				stats.ownedCards += add;
-				if (card.rarity == 'common')	{ stats.ownedCommon 	+= add; stats[card.set].ownedCommon 	+= add; }
-				if (card.rarity == 'uncommon')	{ stats.ownedUncommon 	+= add; stats[card.set].ownedUncommon 	+= add; }
-				if (card.rarity == 'rare')		{ stats.ownedRare 		+= add; stats[card.set].ownedRare 		+= add; }
-				if (card.rarity == 'mythic')	{ stats.ownedMythic 	+= add; stats[card.set].ownedMythic 	+= add; }
+				stats.ownedSingles += 1;
+				if (card.rarity == 'common')	{ stats.ownedCommon 	+= add; stats.ownedSinglesCommon 	+= 1; stats[card.set].ownedCommon 	+= add; }
+				if (card.rarity == 'uncommon')	{ stats.ownedUncommon 	+= add; stats.ownedSinglesUncommon 	+= 1; stats[card.set].ownedUncommon 	+= add; }
+				if (card.rarity == 'rare')		{ stats.ownedRare 		+= add; stats.ownedSinglesRare 		+= 1; stats[card.set].ownedRare 		+= add; }
+				if (card.rarity == 'mythic')	{ stats.ownedMythic 	+= add; stats.ownedSinglesMythic 	+= 1; stats[card.set].ownedMythic 	+= add; }
 			}
     	}
     });
