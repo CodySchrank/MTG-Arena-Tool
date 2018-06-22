@@ -71,6 +71,19 @@ ipc.on('set_explore', function (event, arg) {
 });
 
 //
+ipc.on('open_course_deck', function (event, arg) {
+	$('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic');
+	arg = arg.CourseDeck;
+	arg.colors = get_deck_colors(arg);
+	arg.mainDeck.sort(compare_cards);
+	arg.sideboard.sort(compare_cards);
+	console.log(arg);
+	open_deck(arg, 1);
+});
+
+
+
+//
 ipc.on('set_settings', function (event, arg) {
 	settings = arg;
 });
@@ -419,9 +432,15 @@ function setExplore(arg) {
 	$("#ux_0").html('');
 	$("#ux_0").append('<div class="list_fill"></div>');
 	explore.forEach(function(_deck, index) {
-		deck = _deck.deck;
+		if (_deck.deck_colors == undefined) {
+			_deck.deck_colors = [];
+		}
+		if (_deck.wins == undefined) {
+			_deck.wins = 0;
+			_deck.losses = 0;
+		}
 
-		var tileGrpid = deck.deckTileId;
+		var tileGrpid = _deck.deck_tile;
 		var tile = $('<div class="'+index+'t deck_tile"></div>');
 		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 
@@ -431,20 +450,20 @@ function setExplore(arg) {
 		var flc = $('<div class="flex_item"></div>');
 		var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
 		var flr = $('<div class="flex_item"></div>');
-		flc.css("flex-direction","column")
-		flr.css("flex-direction","column")
+		flc.css("flex-direction","column");
+		flr.css("flex-direction","column");
 
 		var flt = $('<div class="flex_top"></div>');
 		var flb = $('<div class="flex_bottom"></div>');
 
-		$('<div class="list_deck_name">'+deck.name+'</div>').appendTo(flt);
-		$('<div class="list_deck_name_it">by '+_deck.playername+'</div>').appendTo(flt);
-		deck.colors = get_deck_colors(deck);
-		deck.colors.forEach(function(color) {
+		$('<div class="list_deck_name">'+_deck.deck_name+'</div>').appendTo(flt);
+		$('<div class="list_deck_name_it">by '+_deck.player_name+'</div>').appendTo(flt);
+		
+		_deck.deck_colors.forEach(function(color) {
 			$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
 		});
 
-		$('<div class="list_deck_record">'+_deck.record.CurrentWins+' - '+_deck.record.CurrentLosses+'</div>').appendTo(flr);
+		$('<div class="list_deck_record">'+_deck.wins+' - '+_deck.losses+'</div>').appendTo(flr);
 		$('<div class="list_deck_name_it">'+_deck.event.replace(/_/g, " ")+'</div>').appendTo(flr);
 
 
@@ -468,15 +487,18 @@ function setExplore(arg) {
 		    $('.'+index+'t').css('width', '128px');
 		});
 
-		deck.mainDeck.sort(compare_cards);
-		deck.sideboard.sort(compare_cards);
 		$('.'+index).on('click', function(e) {
-			open_deck(index, 1);
-		    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
+			open_course_request(_deck.id);
+		    //$('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
 		});
 
 	});
 	$("#ux_0").append('<div class="list_fill"></div>');
+}
+
+//
+function open_course_request(courseId) {
+	ipc.send('request_course', courseId);
 }
 
 // 
@@ -485,7 +507,7 @@ function open_deck(i, type) {
 		_deck = decks[i];
 	}
 	if (type == 1) {
-		_deck = explore[i].deck;
+		_deck = i;
 	}
 
 	$("#ux_1").html('');
@@ -606,10 +628,7 @@ function open_deck(i, type) {
 	_m.appendTo(cost);
 	_m.attr("title", "Mythic Rare");
 
-
 	cost.appendTo(stats);
-
-
 
 	dl.appendTo(fld);
 	stats.appendTo(fld);

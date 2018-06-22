@@ -154,6 +154,10 @@ ipc.on('request_explore', function (event, state) {
     httpGetTopDecks();
 });
 
+ipc.on('request_course', function (event, arg) {
+    httpGetCourse(arg);
+});
+
 
 // Events
 ipc.on('window_close', function (event, state) {
@@ -652,11 +656,8 @@ function processLogData(data) {
             delete json.Id;
 
             select_deck(json);
-
-            if (coursesToSubmit[json._id] == undefined) {
-                httpSubmitCourse(json._id, json);
-            }
-            coursesToSubmit[json._id] = json;
+            json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
+            httpSubmitCourse(json._id, json);
         }
     }
 
@@ -1020,7 +1021,7 @@ function httpBasic(_headers) {
 	}
 	
 	var http = require('https');
-	var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/api.php', method: 'POST', headers: _headers };
+	var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv2.php', method: 'POST', headers: _headers };
 
 	var results = ''; 
 	var req = http.request(options, function(res) {
@@ -1042,6 +1043,10 @@ function httpBasic(_headers) {
                     // Remove course from list
                     if (_headers.method == 'submit_course') {
                         //coursesToSubmit[_headers.courseid] = undefined;
+                    }
+                    // Remove course from list
+                    if (_headers.method == 'get_course') {
+                        mainWindow.webContents.send("open_course_deck", parsedResult.result);
                     }
 				}
 				else if (parsedResult.error = "error 003") {
@@ -1079,4 +1084,35 @@ function httpSetPlayer(name, rank, tier) {
 
 function httpGetTopDecks() {
 	httpBasic({ 'method': 'get_top_decks', 'uid': playerId});
+}
+
+function httpGetCourse(courseId) {
+    httpBasic({ 'method': 'get_course', 'uid': playerId, 'courseid': courseId});
+}
+
+//
+function get_deck_colors(deck) {
+    deck.colors = [];
+    deck.mainDeck.forEach(function(card) {
+        var grpid = card.id;
+        var card_name = cardsDb.get(grpid).name;
+        var card_cost = cardsDb.get(grpid).cost;
+        card_cost.forEach(function(c) {
+            if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
+                deck.colors.push(c.color);
+            }
+        });
+    });
+
+    deck.sideboard.forEach(function(card) {
+        var grpid = card.id;
+        var card_name = cardsDb.get(grpid).name;
+        var card_cost = cardsDb.get(grpid).cost;
+        card_cost.forEach(function(c) {
+            if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
+                deck.colors.push(c.color);
+            }
+        });
+    });
+    return deck.colors;
 }
