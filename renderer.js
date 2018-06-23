@@ -390,8 +390,8 @@ function setDecks(arg) {
 
 		var wr = getDeckWinrate(deck.id, deck.lastUpdated);
 		if (wr != 0) {
-			$('<div class="list_deck_winrate">Winrate: '+wr.total*100+'%</div>').appendTo(flr);
-			$('<div class="list_deck_winrate">Since last edit: '+wr.lastEdit*100+'%</div>').appendTo(flr);
+			$('<div class="list_deck_winrate">Winrate: '+(wr.total*100).toFixed(2)+'%</div>').appendTo(flr);
+			$('<div class="list_deck_winrate">Since last edit: '+(wr.lastEdit*100).toFixed(2)+'%</div>').appendTo(flr);
 		}
 
 		fll.appendTo(div);
@@ -1122,9 +1122,9 @@ function open_settings() {
 
 
 	// Erase data
-	var label = $('<label class="check_container"></label>');
+	var label = $('<label class="check_container_but"></label>');
 	label.appendTo(div);
-	var button = $('<div class="button_simple" onclick="eraseData()"">Erase my shared data</div>');
+	var button = $('<div class="button_simple button_long" onclick="eraseData()"">Erase my shared data</div>');
 	button.appendTo(label);
 
 

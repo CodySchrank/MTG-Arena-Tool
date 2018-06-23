@@ -407,17 +407,16 @@ console.log(logUri);
 var file;
 fs.open(logUri, 'r', function(err, fd) {
     file = fd;
-
-	if (err) {
+    if (err) {
         setTimeout( function() {
             mainWindow.webContents.send("no_log", logUri);
         }, 1000);
         console.log("No log file found");
-        
-	} else {
-		readLog();
-	}
+    } else {
+        readLog();
+    }
 });
+
 
 function readLog() {
     if (renderer_state == 1) {
@@ -425,16 +424,12 @@ function readLog() {
         var logSize = stats.size;
         var logDiff = logSize - prevLogSize;
 
-        if (logSize < prevLogSize+1) {
-            setTimeout(readLog, 1000);
-        }
-        else {
+        if (logSize > prevLogSize+1) {
             fs.read(file, new Buffer(logDiff), 0, logDiff, prevLogSize, processLog);
         }
     }
-    else {
-        setTimeout(readLog, 1000);
-    }
+
+    setTimeout(readLog, 1000);
 }
 
 function processLog(err, bytecount, buff) {
@@ -446,8 +441,7 @@ function processLog(err, bytecount, buff) {
     var str;
     for (var i=0; i<splitString.length; i++) {
     	str = splitString[i];
-    	//processLogData(str);
-    	
+        // iterate trough all 
 		(function(i, str){
 			setTimeout(function(){
 				processLogData(str);
@@ -514,6 +508,14 @@ function checkJsonWithStart(str, check, chop, start) {
 function processLogData(data) {
 	currentChunk = data;
     var strCheck, json;
+
+    //This checks time, use with caution!
+    strCheck = '[UnityCrossThreadLogger]';
+    if (data.indexOf(strCheck) > -1) {
+        var str = dataChop(data, strCheck, 'M')+'M';
+        var logTime = new Date(str);
+        //console.log(logTime, Date.now() - logTime, (Date.now() - logTime) / 1000 / 60);
+    }
 
     // Get player Id
     strCheck = '"PlayerId":"';
@@ -595,8 +597,14 @@ function processLogData(data) {
 
     // Match created
     strCheck = ' Event.MatchCreated ';
-		json = checkJson(data, strCheck, '');
+	json = checkJson(data, strCheck, '');
 	if (json != false) {
+        strCheck = '[UnityCrossThreadLogger]';
+        if (data.indexOf(strCheck) > -1) {
+            var logTime = dataChop(data, strCheck, ' (');
+            var date = new Date(logTime);
+            console.log(date, Date.now() - date, (Date.now() - date) / 60 / 60)
+        }
         createMatch(json);
     }
 
