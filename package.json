@@ -3,7 +3,7 @@
 	"description": "An MTG Arena deck tracker and statistics manager.",
 	"author": "Manuel-777",
 	"repository": "https://github.com/Manuel-777/MTG-Arena-Tool",
-	"version": "2.0.8",
+	"version": "2.0.9",
 	"main": "main.js",
 	"build": {
 		"appId": "com.github.manuel777.mtgatool",

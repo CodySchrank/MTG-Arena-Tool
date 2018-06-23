@@ -13,7 +13,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true, startup: true, close_to_tray: true},
+		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true},
         matches_index:[],
 	}
 });
@@ -100,6 +100,13 @@ ipc.on('save_settings', function (event, settings) {
 
     updateSettings(settings);
 });
+
+ipc.on('erase_data', function (event, settings) {
+    httpDeleteData();
+});
+
+
+
 
 ipc.on('update_install', function (event, settings) {
     if (updateState == 3) {
@@ -1011,6 +1018,9 @@ function finishLoading() {
 }
 
 function httpBasic(_headers) {
+    if (store.get("settings").send_data == false && _headers.method != 'delete_data') {
+        return;
+    }
     //console.log(_headers);
 	if (_headers.method == 'submit_course' || _headers.method == 'set_player') {
 		if (tokenAuth == undefined) {
@@ -1029,9 +1039,12 @@ function httpBasic(_headers) {
 			results = results + chunk;
 		}); 
 		res.on('end', function () {
+            if (_headers.method == 'delete_data') {
+                console.log("Data erased: ", results);
+            }
 		    console.log(_headers.method, _headers.token, results);
 			try {
-				const parsedResult = JSON.parse(results);
+				var parsedResult = JSON.parse(results);
 				if (parsedResult.ok) {
 					tokenAuth = parsedResult.token;
 
@@ -1088,6 +1101,10 @@ function httpGetTopDecks() {
 
 function httpGetCourse(courseId) {
     httpBasic({ 'method': 'get_course', 'uid': playerId, 'courseid': courseId});
+}
+
+function httpDeleteData(courseId) {
+    httpBasic({ 'method': 'delete_data', 'uid': playerId});
 }
 
 //

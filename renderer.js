@@ -1110,6 +1110,23 @@ function open_settings() {
 	span.appendTo(label);
 
 
+	// Send events data
+	var label = $('<label class="check_container">Online sharing <i>(when disabled, blocks any connections with our servers)</i></label>');
+	label.appendTo(div);
+	var check_new = $('<input type="checkbox" id="settings_senddata" onclick="updateSettings()" />');
+	check_new.appendTo(label);
+	check_new.prop('checked', settings.send_data);
+
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
+
+	// Erase data
+	var label = $('<label class="check_container"></label>');
+	label.appendTo(div);
+	var button = $('<div class="button_simple" onclick="eraseData()"">Erase my shared data</div>');
+	button.appendTo(label);
+
 
 	// overlay transparency
 	// hover timeout
@@ -1119,12 +1136,22 @@ function open_settings() {
 }
 
 //
+function eraseData() {
+	if (confirm('This will erase all of your decks and events shared online, are you sure?')) {
+		ipc.send('erase_data', true);
+	} else {
+		return;
+	}
+}
+
+//
 function updateSettings() {
 	var startup = document.getElementById("settings_startup").checked;
 	var showOverlay = document.getElementById("settings_showoverlay").checked;
 	var closeToTray = document.getElementById("settings_closetotray").checked;
+	var sendData = document.getElementById("settings_senddata").checked;
 
-	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray};
+	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray, send_data: sendData};
 
 	ipc.send('save_settings', settings);
 }
