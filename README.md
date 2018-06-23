@@ -40,6 +40,8 @@ It is not stated if it is legal or allowed by Wizards of the Coast to use Deck T
 
 MtG Arena Tool is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
 
+Please read about (our Privacy Policy and How we use your data here)[https://github.com/Manuel-777/MTG-Arena-Tool/blob/master/PRIVACY.md]
+
 ### Credits
 [Electron](https://electronjs.org/)
 
