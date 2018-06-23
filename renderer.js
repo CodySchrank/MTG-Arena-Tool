@@ -13,7 +13,7 @@ var sidebarActive = 0;
 var arenaRunning = false;
 var renderer = 0;
 var collectionPage = 0;
-
+var filterEvent = '';
 var filteredSets = [];
 //var initialized = false;
 
@@ -255,7 +255,7 @@ $(document).ready(function() {
 			if ($(this).hasClass("it2")) {
 				sidebarActive = 2;
 				$("#ux_0").html('');
-				ipc.send('request_explore', 1);
+				ipc.send('request_explore', filterEvent);
 			}
 			if ($(this).hasClass("it3")) {
 				sidebarActive = 3;
@@ -424,6 +424,13 @@ function setDecks(arg) {
 }
 
 //
+function updateExplore() {
+	filterEvent = document.getElementById("query_explore").value;
+	ipc.send('request_explore', filterEvent);
+}
+
+
+//
 function setExplore(arg) {
 	if (arg != null) {
 		explore = arg;
@@ -431,6 +438,22 @@ function setExplore(arg) {
 
 	$("#ux_0").html('');
 	$("#ux_0").append('<div class="list_fill"></div>');
+
+	// Search box
+	var label = $('<label class="input_container">Filter by event</label>');
+	var input = $('<input type="search" id="query_explore" autocomplete="off" autofocus value="'+filterEvent+'" />');
+	input.appendTo(label);
+	label.appendTo($("#ux_0"));
+	input.focus();
+	input[0].setSelectionRange(filterEvent.length, filterEvent.length);
+
+	input.on('input', function() {
+		updateExplore();
+	});
+
+	$("#ux_0").append('<div class="list_fill"></div>');
+	$("#ux_0").append('<div class="list_fill"></div>');
+
 	explore.forEach(function(_deck, index) {
 		if (_deck.deck_colors == undefined) {
 			_deck.deck_colors = [];

@@ -157,8 +157,8 @@ ipc.on('request_history', function (event, state) {
 
 });
 
-ipc.on('request_explore', function (event, state) {
-    httpGetTopDecks();
+ipc.on('request_explore', function (event, arg) {
+    httpGetTopDecks(arg);
 });
 
 ipc.on('request_course', function (event, arg) {
@@ -1103,8 +1103,8 @@ function httpSetPlayer(name, rank, tier) {
 	httpBasic({ 'method': 'set_player', 'uid': playerId, 'name': name, 'rank': rank, 'tier': tier});
 }
 
-function httpGetTopDecks() {
-	httpBasic({ 'method': 'get_top_decks', 'uid': playerId});
+function httpGetTopDecks(query) {
+	httpBasic({ 'method': 'get_top_decks', 'uid': playerId, 'query': query});
 }
 
 function httpGetCourse(courseId) {
