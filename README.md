@@ -53,3 +53,4 @@ MtG Arena Tool is unofficial Fan Content permitted under the Fan Content Policy.
 
 ### Questions?
 You can find me on [Twitter](https://twitter.com/MEtchegaray7)
+or by email at [mtgatool@gmail.com](mailto:mtgatool@gmail.com)
