@@ -1,6 +1,7 @@
 var electron = require('electron');
 window.ipc = electron.ipcRenderer;
 var renderer = 1;
+var matchBeginTime = Date.now();
 
 const Database = require('./database.js');
 const cardsDb = new Database();
@@ -10,6 +11,31 @@ var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "
 ipc_log = function (str, arg) {
     ipc.send('ipc_log', arg);
 };
+
+updateClock();
+
+function updateClock() {
+	var diff = Math.floor((Date.now() - matchBeginTime)/1000);
+	var hh = Math.floor(diff / 216000);
+	var mm = Math.floor(diff % (3600) / 60);
+	var ss = Math.floor(diff % 60);
+
+	hh = ('0' + hh).slice(-2);
+	mm = ('0' + mm).slice(-2);
+	ss = ('0' + ss).slice(-2);
+
+	console.log(Date.now(), matchBeginTime);
+	$(".clock_elapsed").html(hh+":"+mm+":"+ss);
+	setTimeout(function () {
+		updateClock();
+	}, 250);
+}
+
+//
+ipc.on('set_timer', function (event, arg) {
+	matchBeginTime = Date.parse(arg);
+	console.log("set time", arg);
+});
 
 
 ipc.on('ping', function (event, arg) {

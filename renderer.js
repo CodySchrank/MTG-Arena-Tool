@@ -146,6 +146,7 @@ ipc.on('no_log', function (event, arg) {
 	$('.message_center').html('<div class="message_big red">No Log found</div><div class="message_sub_16 white">check if it exists at '+arg+'</div><div class="message_sub_16 white">if it does, try closing MTG Arena and deleting it.</div>');
 });
 
+
 $(".list_deck").on('mouseenter mouseleave', function(e) {
     $(".deck_tile").trigger(e.type);
 });

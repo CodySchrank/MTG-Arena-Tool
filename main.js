@@ -22,13 +22,14 @@ const serverAddress = 'mtgatool.com';
 const Database = require('./database.js');
 const cardsDb = new Database();
 
-const debugLog = false;
-const debugLogSpeed = 0.1;
+const debugLogSpeed = 30.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 
-var tokenAuth = undefined;
+var debugLog = true;
 var firstPass = true;
+var tokenAuth = undefined;
+
 var renderer_state = 0;
 var currentChunk = "";
 var currentDeck = {};
@@ -36,6 +37,7 @@ var currentDeckUpdated = {};
 var currentMatchId = null;
 var matchWincon = "";
 var duringMatch = false;
+var matchBeginTime = 0;
 
 var playerName = null;
 var playerRank = null;
@@ -88,11 +90,13 @@ ipc.on('renderer_state', function (event, state) {
     renderer_state = state;
     console.log("Renderer state: ", state);
     showWindow();
-
     var settings = store.get("settings");
     mainWindow.webContents.send("set_settings", settings);
 
     updateSettings(settings);
+    if (debugLog) {
+        finishLoading()
+    }
 });
 
 ipc.on('save_settings', function (event, settings) {
@@ -104,8 +108,6 @@ ipc.on('save_settings', function (event, settings) {
 ipc.on('erase_data', function (event, settings) {
     httpDeleteData();
 });
-
-
 
 
 ipc.on('update_install', function (event, settings) {
@@ -419,6 +421,9 @@ fs.open(logUri, 'r', function(err, fd) {
 
 
 function readLog() {
+    if (debugLog) {
+        firstPass = false;
+    }
     if (renderer_state == 1) {
         var stats = fs.fstatSync(file);
         var logSize = stats.size;
@@ -455,7 +460,7 @@ function processLog(err, bytecount, buff) {
 	}
 
     prevLogSize+=bytecount;
-    process.nextTick(readLog);
+    //process.nextTick(readLog);
 }
 
 function checkJson(str, check, chop) {
@@ -602,8 +607,7 @@ function processLogData(data) {
         strCheck = '[UnityCrossThreadLogger]';
         if (data.indexOf(strCheck) > -1) {
             var logTime = dataChop(data, strCheck, ' (');
-            var date = new Date(logTime);
-            console.log(date, Date.now() - date, (Date.now() - date) / 60 / 60)
+            matchBeginTime = parseWotcTime(logTime);
         }
         createMatch(json);
     }
@@ -869,6 +873,7 @@ function createMatch(arg) {
 	playerWin = 0;
 	oppWin = 0;
 
+    overlay.webContents.send("set_timer", matchBeginTime);
     overlay.webContents.send("set_opponent", oppName);
     overlay.webContents.send("set_opponent_rank", get_rank_index(oppRank, oppTier), oppRank+" "+oppTier);
 }
@@ -1140,4 +1145,25 @@ function get_deck_colors(deck) {
         });
     });
     return deck.colors;
+}
+
+//
+function parseWotcTime(str) {
+    let datePart = str.split(" ")[0];
+    let timePart = str.split(" ")[1];
+    let midnight = str.split(" ")[2];
+
+    datePart = datePart.split("/");
+    timePart = timePart.split(":");
+
+    timePart.forEach(function(s, index) {timePart[index] = parseInt(s)});
+    datePart.forEach(function(s, index) {datePart[index] = parseInt(s)});
+
+    if (midnight == "PM" && timePart[0] != 12) {
+        timePart[0] += 12;
+    }
+
+    var date = new Date(datePart[2], datePart[0]-1, datePart[1], timePart[0], timePart[1], timePart[2]);
+    console.log(str, date.toString(), date.getMonth(), date)
+    return date;
 }
