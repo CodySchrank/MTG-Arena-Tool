@@ -759,7 +759,7 @@ label {
 
 .overlay_decklist {
     /*padding-right: 12px;*/
-    height: calc(100% - 128px);
+    height: calc(100% - 210px);
     overflow: overlay;
 }
 
@@ -805,8 +805,8 @@ label {
 }
 
 .overlay_clock_container {
-    pointer-events: none;
     position: absolute;
+    display: flex;
     bottom: 0;
     float: center;
     width: 100%;
@@ -820,28 +820,33 @@ label {
     width: 100%;
     text-align: center;
     line-height: 64px;
-    font-size: 20px;
+    font-size: 25px;
     color: rgba(255, 255, 255, 0.8);
     z-index: 50;
 }
 
-.clock_total {
-    height: 64px;
-    width: 100%;
-    text-align: center;
-    line-height: 64px;
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.8);
+.clock_prev {
+    cursor: pointer;
+    background: url(images/prev.png) no-repeat center;
     z-index: 51;
+    opacity: 0.5;
+    width: 32px;
+    height: 100%;
+    -webkit-transition: all .2s ease-in;
 }
 
-.clock_now {
-    height: 64px;
-    width: 100%;
-    text-align: center;
-    line-height: 64px;
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.8);
+.clock_next {
+    cursor: pointer;
+    background: url(images/next.png) no-repeat center;
+    z-index: 51;
+    opacity: 0.5;
+    width: 32px;
+    height: 100%;
+    -webkit-transition: all .2s ease-in;
+}
+
+.clock_prev:hover, .clock_next:hover {
+    opacity: 1;
 }
 
 

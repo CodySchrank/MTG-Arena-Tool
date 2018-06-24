@@ -2,6 +2,7 @@ var electron = require('electron');
 window.ipc = electron.ipcRenderer;
 var renderer = 1;
 var matchBeginTime = Date.now();
+var clockMode = 0;
 
 const Database = require('./database.js');
 const cardsDb = new Database();
@@ -15,16 +16,23 @@ ipc_log = function (str, arg) {
 updateClock();
 
 function updateClock() {
-	var diff = Math.floor((Date.now() - matchBeginTime)/1000);
-	var hh = Math.floor(diff / 216000);
-	var mm = Math.floor(diff % (3600) / 60);
-	var ss = Math.floor(diff % 60);
+	if (clockMode == 0) {
+		var diff = Math.floor((Date.now() - matchBeginTime)/1000);
+		var hh = Math.floor(diff / 3600);
+		var mm = Math.floor(diff % (3600) / 60);
+		var ss = Math.floor(diff % 60);
+		console.log(diff, Date.now(), matchBeginTime);
+	}
+	if (clockMode == 1) {
+		var d = new Date();
+		var hh = d.getHours();
+		var mm = d.getMinutes();
+		var ss = d.getSeconds();
+	}
 
 	hh = ('0' + hh).slice(-2);
 	mm = ('0' + mm).slice(-2);
 	ss = ('0' + ss).slice(-2);
-
-	console.log(Date.now(), matchBeginTime);
 	$(".clock_elapsed").html(hh+":"+mm+":"+ss);
 	setTimeout(function () {
 		updateClock();
@@ -112,6 +120,21 @@ function hoverCard(grpId) {
 
 
 $(document).ready(function() {
+	//
+	$(".clock_prev").click(function () {
+	    clockMode -= 1;
+	    if (clockMode < 0) {
+	    	clockMode = 1;
+	    }
+	});
+	//
+	$(".clock_next").click(function () {
+	    clockMode += 1;
+	    if (clockMode > 1) {
+	    	clockMode = 0;
+	    }
+
+	});
 	//
 	$(".close").click(function () {
 	    ipc.send('overlay_close', 1);
