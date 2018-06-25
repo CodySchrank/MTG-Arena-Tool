@@ -146,6 +146,41 @@ function compare_cards(a, b) {
 	return 0;
 }
 
+//
+function compare_draft_cards(a, b) {
+	// Yeah this is lazy.. I know
+	a = cardsDb.get(a);
+	b = cardsDb.get(b);
+	var as = get_card_type_sort(a.type);
+	var bs = get_card_type_sort(b.type);
+
+	// Order by type?
+	if (as < bs) {
+		return -1;
+	}
+	if (as > bs) {
+		return 1;
+	}
+
+	// by cmc
+	if (a.cmc < b.cmc) {
+		return -1;
+	}
+	if (a.cmc > b.cmc) {
+		return 1;
+	}
+
+	// then by name
+	if (a.name < b.name) {
+		return -1;
+	}
+	if (a.name > b.name) {
+		return 1;
+	}
+
+	return 0;
+}
+
 
 var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria"];
 
@@ -291,6 +326,22 @@ function get_deck_colors(deck) {
 		});
 	});
 	return deck.colors;
+}
+
+//
+function get_ids_colors(list) {
+	var colors = [];
+	list.forEach(function(grpid) {
+		var card_name = cardsDb.get(grpid).name;
+		var card_cost = cardsDb.get(grpid).cost;
+		card_cost.forEach(function(c) {
+			if (!colors.includes(c.color) && c.color != 0 && c.color < 7) {
+				colors.push(c.color);
+			}
+		});
+	});
+
+	return colors;
 }
 
 //

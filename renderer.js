@@ -1193,7 +1193,7 @@ function open_about() {
 	}
 	if (updateState.state == 1) {
 		aboutStr += '	<div class="message_updates green">Update available.</div>'
-		aboutStr += '	<a class="release_notes_link" href="https://mtgatool.com/release-notes/">Release Notes</a>'
+		aboutStr += '	<a class="release_notes_link">Release Notes</a>'
 	}
 	if (updateState.state == -1) {
 		aboutStr += '	<div class="message_updates green">Client is up to date.</div>'
@@ -1203,11 +1203,11 @@ function open_about() {
 	}
 	if (updateState.state == 2) {
 		aboutStr += '	<div class="message_updates green">Donwloading ('+updateState.progress+'%)</div>'
-		aboutStr += '	<a class="release_notes_link" href="https://mtgatool.com/release-notes/">Release Notes</a>'
+		aboutStr += '	<a class="release_notes_link">Release Notes</a>'
 	}
 	if (updateState.state == 3) {
 		aboutStr += '	<div class="message_updates green">Download complete.</div>'
-		aboutStr += '	<a class="release_notes_link" href="https://mtgatool.com/release-notes/">Release Notes</a>'
+		aboutStr += '	<a class="release_notes_link">Release Notes</a>'
 		aboutStr += '	<div class="button_simple" onClick="installUpdate()">Install</div>'
 	}
 

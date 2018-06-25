@@ -124,6 +124,11 @@ label {
     background-image: url(images/logo_big.png);
 }
 
+.release_notes_link {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .twitter_link {
     cursor: pointer;
     align-self: center;

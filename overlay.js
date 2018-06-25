@@ -21,7 +21,7 @@ function updateClock() {
 		var hh = Math.floor(diff / 3600);
 		var mm = Math.floor(diff % (3600) / 60);
 		var ss = Math.floor(diff % 60);
-		console.log(diff, Date.now(), matchBeginTime);
+		//console.log(diff, Date.now(), matchBeginTime);
 	}
 	if (clockMode == 1) {
 		var d = new Date();
@@ -41,8 +41,14 @@ function updateClock() {
 
 //
 ipc.on('set_timer', function (event, arg) {
-	matchBeginTime = Date.parse(arg);
-	console.log("set time", arg);
+	if (arg == -1) {
+		$(".overlay_clock_container").hide();
+		matchBeginTime = Date.now();
+	}
+	else {
+		matchBeginTime = Date.parse(arg);
+	}
+	//console.log("set time", arg);
 });
 
 
@@ -98,6 +104,25 @@ ipc.on('set_deck', function (event, arg) {
 
 		addCardTile(grpId, 'a', card.quantity, $(".overlay_decklist"));
 		prevIndex = grpId;
+	});
+});
+
+//
+ipc.on('set_draft_cards', function (event, pack, picks, packn, pickn) {
+	$(".overlay_decklist").html('');
+	$(".overlay_deckcolors").html('');
+	$(".overlay_deckname").html("Pack "+packn+" - Pick "+pickn);
+
+	var colors = get_ids_colors(picks);
+	colors.forEach(function(color) {
+		$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
+	});
+
+	picks.sort(compare_draft_cards); 
+
+	var prevIndex = 0;
+	picks.forEach(function(grpId) {
+		addCardTile(grpId, 'a', 1, $(".overlay_decklist"));
 	});
 });
 

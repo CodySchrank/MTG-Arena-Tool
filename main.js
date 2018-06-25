@@ -22,11 +22,11 @@ const serverAddress = 'mtgatool.com';
 const Database = require('./database.js');
 const cardsDb = new Database();
 
-const debugLogSpeed = 30.1;
+const debugLog = false;
+const debugLogSpeed = 0.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 
-var debugLog = true;
 var firstPass = true;
 var tokenAuth = undefined;
 
@@ -73,6 +73,7 @@ var updateAvailable = false;
 var updateState = -1;
 var updateProgress = -1;
 var updateSpeed = 0;
+var draftReplay = undefined;
 
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
@@ -602,14 +603,50 @@ function processLogData(data) {
 
     // Match created
     strCheck = ' Event.MatchCreated ';
-	json = checkJson(data, strCheck, '');
-	if (json != false) {
+    json = checkJson(data, strCheck, '');
+    if (json != false) {
         strCheck = '[UnityCrossThreadLogger]';
         if (data.indexOf(strCheck) > -1) {
             var logTime = dataChop(data, strCheck, ' (');
             matchBeginTime = parseWotcTime(logTime);
         }
         createMatch(json);
+    }
+
+    // Draft status / draft start
+    strCheck = '<== Draft.DraftStatus(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        console.log("Draft status")
+        if (json.draftStatus != undefined) {
+            createDraft();
+            overlay.webContents.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
+        }
+    }
+
+    // make pick (get the whole action)
+    strCheck = '<== Draft.MakePick(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        // store pack in recording
+        overlay.webContents.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
+    }
+
+    // make pick (get just what we picked)
+    strCheck = '==> Draft.MakePick(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        // store pick in recording
+        let grpId = json.params.cardId;
+    }
+
+    //end draft
+    strCheck = '<== Event.CompleteDraft(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        saveOverlayPos();
+        overlay.hide();
+        mainWindow.show();
     }
 
     // Game Room State Changed
@@ -854,26 +891,54 @@ function gre_to_client(data) {
 }
 
 function createMatch(arg) {
-	var obj = store.get('overlayBounds');
-	annotationsRead = [];
+    var obj = store.get('overlayBounds');
+    annotationsRead = [];
     zones = {};
     gameObjs = {};
 
     if (!firstPass && store.get("settings").show_overlay == true) {
-	    hideWindow();
-	    overlay.show();
-	    overlay.focus();
-	    overlay.setBounds(obj);
+        hideWindow();
+        overlay.show();
+        overlay.focus();
+        overlay.setBounds(obj);
     }
 
     oppName = arg.opponentScreenName;
     oppRank = arg.opponentRankingClass;
     oppTier = arg.opponentRankingTier;
     currentMatchId = null;
-	playerWin = 0;
-	oppWin = 0;
+    playerWin = 0;
+    oppWin = 0;
 
     overlay.webContents.send("set_timer", matchBeginTime);
+    overlay.webContents.send("set_opponent", oppName);
+    overlay.webContents.send("set_opponent_rank", get_rank_index(oppRank, oppTier), oppRank+" "+oppTier);
+}
+
+function createDraft() {
+    var obj = store.get('overlayBounds');
+    annotationsRead = [];
+    zones = {};
+    gameObjs = {};
+
+    if (!firstPass && store.get("settings").show_overlay == true) {
+        hideWindow();
+        overlay.show();
+        overlay.focus();
+        overlay.setBounds(obj);
+    }
+
+    draftReplay = [];
+
+    oppName = "";
+    oppRank = "";
+    oppTier = -1;
+    currentMatchId = null;
+    playerWin = 0;
+    oppWin = 0;
+
+    overlay.webContents.send("set_draft", true);
+    overlay.webContents.send("set_timer", -1);
     overlay.webContents.send("set_opponent", oppName);
     overlay.webContents.send("set_opponent_rank", get_rank_index(oppRank, oppTier), oppRank+" "+oppTier);
 }
@@ -1161,6 +1226,9 @@ function parseWotcTime(str) {
 
     if (midnight == "PM" && timePart[0] != 12) {
         timePart[0] += 12;
+    }
+    if (midnight == "AM" && timePart[0] == 12) {
+        timePart[0] = 0;
     }
 
     var date = new Date(datePart[2], datePart[0]-1, datePart[1], timePart[0], timePart[1], timePart[2]);
