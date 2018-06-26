@@ -3,6 +3,8 @@ window.ipc = electron.ipcRenderer;
 var renderer = 1;
 var matchBeginTime = Date.now();
 var clockMode = 0;
+var draftMode = 0;
+var overlayMode = 0;
 
 const Database = require('./database.js');
 const cardsDb = new Database();
@@ -43,6 +45,10 @@ function updateClock() {
 ipc.on('set_timer', function (event, arg) {
 	if (arg == -1) {
 		$(".overlay_clock_container").hide();
+		$(".overlay_draft_container").show();
+		$(".overlay_draft_container").css("display", "flex");
+		$(".overlay_decklist").css("height", "100%").css("height", "-=146px");
+		overlayMode = 1;
 		matchBeginTime = Date.now();
 	}
 	else {
@@ -50,6 +56,13 @@ ipc.on('set_timer', function (event, arg) {
 	}
 	//console.log("set time", arg);
 });
+
+$( window ).resize(function() {
+	if (overlayMode == 1) {
+		$(".overlay_decklist").css("height", "100%").css("height", "-=146px");
+	}
+});
+
 
 
 ipc.on('ping', function (event, arg) {
@@ -107,24 +120,48 @@ ipc.on('set_deck', function (event, arg) {
 	});
 });
 
+var draftPack, draftPick, packN, pickN;
 //
 ipc.on('set_draft_cards', function (event, pack, picks, packn, pickn) {
+	draftPack = pack;
+	draftPick = picks;
+	packN = packn;
+	pickN = pickn;
+	setDraft();
+});
+
+function setDraft() {
 	$(".overlay_decklist").html('');
 	$(".overlay_deckcolors").html('');
-	$(".overlay_deckname").html("Pack "+packn+" - Pick "+pickn);
+	$(".overlay_deckname").html("Pack "+packN+" - Pick "+pickN);
 
-	var colors = get_ids_colors(picks);
-	colors.forEach(function(color) {
-		$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
-	});
+	if (draftMode == 0) {
+		var colors = get_ids_colors(draftPick);
+		colors.forEach(function(color) {
+			$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
+		});
 
-	picks.sort(compare_draft_cards); 
+		draftPick.sort(compare_draft_cards); 
 
-	var prevIndex = 0;
-	picks.forEach(function(grpId) {
-		addCardTile(grpId, 'a', 1, $(".overlay_decklist"));
-	});
-});
+		var prevIndex = 0;
+		draftPick.forEach(function(grpId) {
+			addCardTile(grpId, 'a', 1, $(".overlay_decklist"));
+		});
+	}
+	else if (draftMode == 1) {
+		var colors = get_ids_colors(draftPack);
+		colors.forEach(function(color) {
+			$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
+		});
+
+		draftPack.sort(compare_draft_cards); 
+
+		var prevIndex = 0;
+		draftPack.forEach(function(grpId) {
+			addCardTile(grpId, 'a', 1, $(".overlay_decklist"));
+		});
+	}
+}
 
 function hoverCard(grpId) {
 	if (grpId == undefined) {
@@ -160,6 +197,23 @@ $(document).ready(function() {
 	    }
 
 	});
+	//
+	$(".draft_prev").click(function () {
+	    draftMode -= 1;
+	    if (draftMode < 0) {
+	    	draftMode = 1;
+	    }
+	    setDraft();
+	});
+	//
+	$(".draft_next").click(function () {
+	    draftMode += 1;
+	    if (draftMode > 1) {
+	    	draftMode = 0;
+	    }
+	    setDraft();
+	});
+
 	//
 	$(".close").click(function () {
 	    ipc.send('overlay_close', 1);

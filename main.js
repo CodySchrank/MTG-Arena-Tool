@@ -4,6 +4,7 @@ const electron = require('electron');
 const {app, Menu, Tray, net, clipboard} = require('electron');
 const path  = require('path');
 const Store = require('./store.js');
+const async = require("async");
 
 const {autoUpdater} = require("electron-updater");
 
@@ -15,6 +16,7 @@ var store = new Store({
         cards: { cards_time: 0, cards_before:[], cards:[] },
 		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true},
         matches_index:[],
+        draft_index:[],
 	}
 });
 
@@ -35,6 +37,7 @@ var currentChunk = "";
 var currentDeck = {};
 var currentDeckUpdated = {};
 var currentMatchId = null;
+var currentEventId = null;
 var matchWincon = "";
 var duringMatch = false;
 var matchBeginTime = 0;
@@ -526,8 +529,11 @@ function processLogData(data) {
     // Get player Id
     strCheck = '"PlayerId":"';
     if (data.indexOf(strCheck) > -1) {
-        playerId = dataChop(data, strCheck, '"');
-        loadPlayerConfig(playerId);
+        if (playerId == null) {
+            playerId = dataChop(data, strCheck, '"');
+            httpAuth();
+            loadPlayerConfig(playerId);
+        }
     }
 
     // Get User name
@@ -634,7 +640,7 @@ function processLogData(data) {
 
     // make pick (get just what we picked)
     strCheck = '==> Draft.MakePick(';
-    json = checkJsonWithStart(data, strCheck, '', ')');
+    json = checkJsonWithStart(data, strCheck, '', '):');
     if (json != false) {
         // store pick in recording
         let grpId = json.params.cardId;
@@ -846,6 +852,7 @@ function gre_to_client(data) {
                         let affector = obj.affectorId;
                         let affected = obj.affectedIds;
                         //if (annotationsRead[obj.id] == undefined) {
+                        if (affected != undefined) {
                             affected.forEach(function(aff) {
                                 if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
                                     if (gameObjs[aff] !== undefined) {
@@ -858,7 +865,7 @@ function gre_to_client(data) {
                                 //if (obj.type.includes("AnnotationType_WinTheGame")) {
                                 //}
                             });
-                        //}
+                        }
                     });
                 }
 
@@ -906,6 +913,7 @@ function createMatch(arg) {
     oppName = arg.opponentScreenName;
     oppRank = arg.opponentRankingClass;
     oppTier = arg.opponentRankingTier;
+    currentEventId = arg.eventId;
     currentMatchId = null;
     playerWin = 0;
     oppWin = 0;
@@ -1050,6 +1058,7 @@ function saveMatch() {
 		seat: playerSeat, 
 		win: playerWin
 	}
+    match.eventId = currentEventId;
 	match.playerDeck = currentDeck;
 	match.oppDeck = getOppDeck();
 	match.date = new Date();
@@ -1065,6 +1074,7 @@ function saveMatch() {
 
 	store.set('matches_index', matches);
 	store.set(currentMatchId, match);
+    httpSetMatch(match);
 }
 
 function finishLoading() {
@@ -1091,98 +1101,131 @@ function finishLoading() {
     var obj = store.get('windowBounds');
     mainWindow.setBounds(obj);
 
-	httpAuth();
 	httpSetPlayer(playerName, playerRank, playerTier);	
 }
 
-function httpBasic(_headers) {
-    if (store.get("settings").send_data == false && _headers.method != 'delete_data') {
-        return;
-    }
-    //console.log(_headers);
-	if (_headers.method == 'submit_course' || _headers.method == 'set_player') {
-		if (tokenAuth == undefined) {
-		    setTimeout( function() { httpBasic(_headers); }, 500);
-			return;
-		}
-		_headers.token = tokenAuth;
-	}
-	
-	var http = require('https');
-	var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv2.php', method: 'POST', headers: _headers };
 
-	var results = ''; 
-	var req = http.request(options, function(res) {
-		res.on('data', function (chunk) {
-			results = results + chunk;
-		}); 
-		res.on('end', function () {
-            if (_headers.method == 'delete_data') {
-                console.log("Data erased: ", results);
+var httpAsync = [];
+httpBasic();
+
+function httpBasic() {
+    var httpAsyncNew = httpAsync.slice(0);
+    //var str = ""; httpAsync.forEach( function(h) {str += h.reqId+", "; }); console.log("httpAsync: ", str);
+    async.forEachOfSeries(httpAsyncNew, function (value, index, callback) {
+        var _headers = value;
+
+        if (store.get("settings").send_data == false && _headers.method != 'delete_data') {
+            callback({message: "Settings dont allow sending data!"});
+            removeFromHttp(_headers.reqId);
+        }
+        if (_headers.method != 'auth') {
+            if (tokenAuth == undefined) {
+                callback({message: "Undefined token"});
+                removeFromHttp(_headers.reqId);             
+                _headers.token = "";
             }
-		    console.log(_headers.method, _headers.token, results);
-			try {
-				var parsedResult = JSON.parse(results);
-				if (parsedResult.ok) {
-					tokenAuth = parsedResult.token;
+            else {
+                _headers.token = tokenAuth;
+            }
+        }
+        
+        var http = require('https');
+        var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv3.php', method: 'POST', headers: _headers };
+        //console.log("SEND >> "+index, _headers.method, _headers.reqId, _headers.token);
 
-                    // set explore
-					if (_headers.method == 'get_top_decks') {
-						mainWindow.webContents.send("set_explore", parsedResult.result);
-					}
-
-                    // Remove course from list
-                    if (_headers.method == 'submit_course') {
-                        //coursesToSubmit[_headers.courseid] = undefined;
+        var results = ''; 
+        var req = http.request(options, function(res) {
+            res.on('data', function (chunk) {
+                results = results + chunk;
+            }); 
+            res.on('end', function () {
+                //console.log("RECV << "+index, _headers.method, _headers.reqId, _headers.token);
+                try {
+                    var parsedResult = JSON.parse(results);
+                    if (parsedResult.ok) {
+                        if (_headers.method == 'auth') {
+                            tokenAuth = parsedResult.token;
+                        }
+                        //
+                        if (_headers.method == 'get_top_decks') {
+                            mainWindow.webContents.send("set_explore", parsedResult.result);
+                        }
+                        //
+                        if (_headers.method == 'get_course') {
+                            mainWindow.webContents.send("open_course_deck", parsedResult.result);
+                        }
                     }
-                    // Remove course from list
-                    if (_headers.method == 'get_course') {
-                        mainWindow.webContents.send("open_course_deck", parsedResult.result);
-                    }
-				}
-				else if (parsedResult.error = "error 003") {
-					setTimeout( function() { httpBasic(_headers); }, 500);
-				}
-			} catch (e) {
-				console.error(e.message);
-			}
-		}); 
-	});
+                } catch (e) {
+                    console.error(e.message);
+                }
+                callback();
+                removeFromHttp(_headers.reqId);
+                //var str = ""; httpAsync.forEach( function(h) { str += h.reqId+", "; }); console.log("httpAsync: ", str);
+            }); 
+        });
 
-	req.on('error', function(e) {
-		console.error(e.message);
-	});
+        req.on('error', function(e) {
+            callback(e);
+            removeFromHttp(_headers.reqId);
+            console.error(e.message);
+        });
 
-	req.end();
+        req.end();
+
+    }, function (err) {
+        if (err) {
+            console.log("httpBasic() Error", err.message);
+        }
+        // do it again
+        setTimeout( function() {
+            httpBasic();
+        }, 250);
+    });
+}
+
+function removeFromHttp(req) {
+    httpAsync.forEach( function(h, i) {
+        if (h.reqId == req) {
+            httpAsync.splice(i, 1);
+        }
+    });
 }
 
 function httpAuth() {
-	httpBasic({ 'method': 'auth', 'uid': playerId });
+    var _id = makeId(6);
+	httpAsync.push({'reqId': _id, 'method': 'auth', 'uid': playerId});
 }
 
 function httpSubmitCourse(_courseId, _course) {
+    var _id = makeId(6);
     _course = JSON.stringify(_course);
-	httpBasic({ 'method': 'submit_course', 'uid': playerId, 'course': _course, 'courseid': _courseId });
-}
-
-function httpGetVersion() {
-	httpBasic({ 'method': 'get_version', 'uid': playerId, });
+	httpAsync.push({'reqId': _id, 'method': 'submit_course', 'uid': playerId, 'course': _course, 'courseid': _courseId});
 }
 
 function httpSetPlayer(name, rank, tier) {
-	httpBasic({ 'method': 'set_player', 'uid': playerId, 'name': name, 'rank': rank, 'tier': tier});
+    var _id = makeId(6);
+	httpAsync.push({'reqId': _id, 'method': 'set_player', 'uid': playerId, 'name': name, 'rank': rank, 'tier': tier});
 }
 
 function httpGetTopDecks(query) {
-	httpBasic({ 'method': 'get_top_decks', 'uid': playerId, 'query': query});
+    var _id = makeId(6);
+	httpAsync.push({'reqId': _id, 'method': 'get_top_decks', 'uid': playerId, 'query': query});
 }
 
 function httpGetCourse(courseId) {
-    httpBasic({ 'method': 'get_course', 'uid': playerId, 'courseid': courseId});
+    var _id = makeId(6);
+    httpAsync.push({'reqId': _id, 'method': 'get_course', 'uid': playerId, 'courseid': courseId});
+}
+
+function httpSetMatch(match) {
+    var _id = makeId(6);
+    match = JSON.stringify(match);
+    httpAsync.push({'reqId': _id, 'method': 'set_match', 'uid': playerId, 'match': match});
 }
 
 function httpDeleteData(courseId) {
-    httpBasic({ 'method': 'delete_data', 'uid': playerId});
+    var _id = makeId(6);
+    httpAsync.push({'reqId': _id, 'method': 'delete_data', 'uid': playerId});
 }
 
 //
@@ -1232,6 +1275,15 @@ function parseWotcTime(str) {
     }
 
     var date = new Date(datePart[2], datePart[0]-1, datePart[1], timePart[0], timePart[1], timePart[2]);
-    console.log(str, date.toString(), date.getMonth(), date)
+    //console.log(str, date.toString(), date.getMonth(), date)
     return date;
+}
+
+function makeId(length) {
+    var ret = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < length; i++)
+    ret += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return ret;
 }
