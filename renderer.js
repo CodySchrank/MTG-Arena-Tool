@@ -15,6 +15,8 @@ var renderer = 0;
 var collectionPage = 0;
 var filterEvent = '';
 var filteredSets = [];
+
+var inputTimer = undefined;
 //var initialized = false;
 
 const Database = require('./database.js');
@@ -845,7 +847,14 @@ function open_cards() {
 	cont.appendTo(filters);
 
 	input.on('input', function() {
-		printCards();
+		if (inputTimer != undefined) {
+			clearTimeout(inputTimer);
+		}
+		console.log("print cards in a second..")
+		inputTimer = setTimeout(function(){
+			console.log("printed")
+			printCards();
+		}, 500);
 	});
 
 	$("#ux_0").append(filters);

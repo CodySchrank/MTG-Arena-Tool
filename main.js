@@ -411,18 +411,23 @@ logUri = logUri.replace('Roaming','LocalLow\\Wizards Of The Coast\\MTGA\\output_
 console.log(logUri);
 
 var file;
-fs.open(logUri, 'r', function(err, fd) {
-    file = fd;
-    if (err) {
-        setTimeout( function() {
-            mainWindow.webContents.send("no_log", logUri);
-        }, 1000);
-        console.log("No log file found");
-    } else {
-        readLog();
-    }
-});
+logLoop();
 
+function logLoop() {
+    //console.log("logLoop() start")
+    fs.open(logUri, 'r', function(err, fd) {
+        file = fd;
+        if (err) {
+            setTimeout( function() {
+                mainWindow.webContents.send("no_log", logUri);
+            }, 1000);
+            setTimeout(logLoop, 5000);
+            console.log("No log file found");
+        } else {
+            readLog();
+        }
+    });
+}
 
 function readLog() {
     if (debugLog) {
@@ -436,9 +441,16 @@ function readLog() {
         if (logSize > prevLogSize+1) {
             fs.read(file, new Buffer(logDiff), 0, logDiff, prevLogSize, processLog);
         }
+        else {
+            //console.log("fs.close(file) readLog")
+            fs.close(file);
+            setTimeout(logLoop, 1000);
+        }
     }
-
-    setTimeout(readLog, 1000);
+    else {
+        fs.close(file);
+        setTimeout(logLoop, 1000);
+    }
 }
 
 function processLog(err, bytecount, buff) {
@@ -458,10 +470,15 @@ function processLog(err, bytecount, buff) {
 		}(i, str));
     }
     if (firstPass) {
-		setTimeout(function(){
-			finishLoading();
-		}, (splitString.length + 2) * debugLogSpeed);
-	}
+        setTimeout(function(){
+            finishLoading();
+        }, (splitString.length + 2) * debugLogSpeed);
+    }
+    setTimeout(function(){
+        fs.close(file);
+        //console.log("fs.close(file) processLog")
+        setTimeout(logLoop, 1000);
+    }, (splitString.length + 5) * debugLogSpeed);
 
     prevLogSize+=bytecount;
     //process.nextTick(readLog);
@@ -519,12 +536,14 @@ function processLogData(data) {
     var strCheck, json;
 
     //This checks time, use with caution!
+    /*
     strCheck = '[UnityCrossThreadLogger]';
     if (data.indexOf(strCheck) > -1) {
         var str = dataChop(data, strCheck, 'M')+'M';
         var logTime = new Date(str);
         //console.log(logTime, Date.now() - logTime, (Date.now() - logTime) / 1000 / 60);
     }
+    */
 
     // Get player Id
     strCheck = '"PlayerId":"';
@@ -763,8 +782,8 @@ function processLogData(data) {
             currentDeck.sideboard.push(c);
         });
 
-        console.log(JSON.stringify(currentDeck));
-        console.log(currentDeck);
+        //console.log(JSON.stringify(currentDeck));
+        //console.log(currentDeck);
     }
 }
 
@@ -1139,7 +1158,7 @@ function httpBasic() {
                 results = results + chunk;
             }); 
             res.on('end', function () {
-                //console.log("RECV << "+index, _headers.method, _headers.reqId, _headers.token);
+               //console.log("RECV << "+index, _headers.method, _headers.reqId, _headers.token);
                 try {
                     var parsedResult = JSON.parse(results);
                     if (parsedResult.ok) {
@@ -1158,7 +1177,9 @@ function httpBasic() {
                 } catch (e) {
                     console.error(e.message);
                 }
-                callback();
+                if (_headers.token != "") {
+                    callback();
+                }
                 removeFromHttp(_headers.reqId);
                 //var str = ""; httpAsync.forEach( function(h) { str += h.reqId+", "; }); console.log("httpAsync: ", str);
             }); 
