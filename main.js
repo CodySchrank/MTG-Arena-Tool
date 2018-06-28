@@ -16,7 +16,7 @@ var store = new Store({
         cards: { cards_time: 0, cards_before:[], cards:[] },
 		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true},
         matches_index:[],
-        draft_index:[],
+        draft_index:[]
 	}
 });
 
@@ -76,7 +76,10 @@ var updateAvailable = false;
 var updateState = -1;
 var updateProgress = -1;
 var updateSpeed = 0;
-var draftReplay = undefined;
+var currentDraft = undefined;
+var currentDraftPack = undefined;
+var draftSet = "";
+var draftId = undefined;
 
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
@@ -130,6 +133,7 @@ function loadPlayerConfig(playerId) {
             cards: { cards_time: 0, cards_before:[], cards:[] },
             settings: {show_overlay: true, startup: true, close_to_tray: true},
             matches_index:[],
+            draft_index:[]
         }
     });
 
@@ -152,8 +156,17 @@ ipc.on('request_history', function (event, state) {
 	history.matches = store.get('matches_index');
 	history.matches.forEach(function(id) {
 		history[id] = store.get(id);
+        history[id].type = "match";
 	});
 	
+    var drafts = {};
+    drafts.matches = store.get('draft_index');
+    drafts.matches.forEach(function(id) {
+        history.matches.push(id);
+        history[id] = store.get(id);
+        history[id].type = "draft";
+    });
+
 	if (state == 1) {
 	    mainWindow.webContents.send("set_history", history);
 	}
@@ -639,13 +652,32 @@ function processLogData(data) {
     }
 
     // Draft status / draft start
+    strCheck = '<== Event.Draft(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        console.log("Draft start")
+        draftId = json.Id;
+    }
+
+    //   
     strCheck = '<== Draft.DraftStatus(';
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
-        console.log("Draft status")
+        console.log("Draft status");
+        if (json.eventName != undefined) {
+            if (json.eventName.indexOf("M19") !== -1)   draftSet = "Magic 2019";
+            if (json.eventName.indexOf("DOM") !== -1)   draftSet = "Dominaria";
+            if (json.eventName.indexOf("HOU") !== -1)   draftSet = "Hour of Devastation";
+            if (json.eventName.indexOf("AKH") !== -1)   draftSet = "Amonketh";
+            if (json.eventName.indexOf("XLN") !== -1)   draftSet = "Ixalan";
+            if (json.eventName.indexOf("RIX") !== -1)   draftSet = "Rivals of Ixalan";
+            if (json.eventName.indexOf("KLD") !== -1)   draftSet = "Kaladesh";
+            if (json.eventName.indexOf("AER") !== -1)   draftSet = "Aether Revolt";
+        }
         if (json.draftStatus != undefined) {
             createDraft();
             overlay.webContents.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
+            currentDraftPack = json.draftPack.slice(0);
         }
     }
 
@@ -654,7 +686,10 @@ function processLogData(data) {
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
         // store pack in recording
-        overlay.webContents.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
+        if (json.draftPack != undefined) {
+            overlay.webContents.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
+            currentDraftPack = json.draftPack.slice(0);
+        }
     }
 
     // make pick (get just what we picked)
@@ -662,7 +697,11 @@ function processLogData(data) {
     json = checkJsonWithStart(data, strCheck, '', '):');
     if (json != false) {
         // store pick in recording
-        let grpId = json.params.cardId;
+        var value = {};
+        value.pick = json.params.cardId;
+        value.pack = currentDraftPack;
+        var key = "pack_"+json.params.packNumber+"pick_"+json.params.pickNumber;
+        currentDraft[key] = value;
     }
 
     //end draft
@@ -672,6 +711,7 @@ function processLogData(data) {
         saveOverlayPos();
         overlay.hide();
         mainWindow.show();
+        saveDraft();
     }
 
     // Game Room State Changed
@@ -955,7 +995,7 @@ function createDraft() {
         overlay.setBounds(obj);
     }
 
-    draftReplay = [];
+    currentDraft = {};
 
     oppName = "";
     oppRank = "";
@@ -1059,42 +1099,64 @@ function getOppDeck() {
 }
 
 function saveMatch() {
-	var match = {};
-	match.id = currentMatchId;
-	match.opponent = {
-		name: oppName,
-		rank: oppRank,
-		tier: oppTier,
-		userid: oppId,
-		seat: oppSeat,
-		win: oppWin
-	}
-	match.player = {
-		name: playerName,
-		rank: playerRank,
-		tier: playerTier,
-		userid: playerId,
-		seat: playerSeat, 
-		win: playerWin
-	}
+    var match = {};
+    match.id = currentMatchId;
+    match.opponent = {
+        name: oppName,
+        rank: oppRank,
+        tier: oppTier,
+        userid: oppId,
+        seat: oppSeat,
+        win: oppWin
+    }
+    match.player = {
+        name: playerName,
+        rank: playerRank,
+        tier: playerTier,
+        userid: playerId,
+        seat: playerSeat, 
+        win: playerWin
+    }
     match.eventId = currentEventId;
-	match.playerDeck = currentDeck;
-	match.oppDeck = getOppDeck();
-	match.date = new Date();
+    match.playerDeck = currentDeck;
+    match.oppDeck = getOppDeck();
+    match.date = new Date();
 
-	console.log("Save match:", match.id);
-	var matches = store.get('matches_index');
-	if (!matches.includes(currentMatchId)) {
-		matches.push(currentMatchId);
-	}
-	else {
-		match.date = store.get(currentMatchId).date;
-	}
+    console.log("Save match:", match.id);
+    var matches = store.get('matches_index');
+    if (!matches.includes(currentMatchId)) {
+        matches.push(currentMatchId);
+    }
+    else {
+        match.date = store.get(currentMatchId).date;
+    }
 
-	store.set('matches_index', matches);
-	store.set(currentMatchId, match);
+    store.set('matches_index', matches);
+    store.set(currentMatchId, match);
     httpSetMatch(match);
 }
+
+
+function saveDraft() {
+    var draft = currentDraft;
+    draft.id = draftId;
+    draft.date = new Date();
+    draft.set = draftSet;
+
+    console.log("Save draft:", draftId);
+    var drafts = store.get('draft_index');
+    if (!drafts.includes(draftId)) {
+        drafts.push(draftId);
+    }
+    else {
+        draft.date = store.get(draftId).date;
+    }
+
+    store.set('draft_index', drafts);
+    store.set(draftId, draft);
+    httpSetMatch(draft);
+}
+
 
 function finishLoading() {
 	firstPass = false;
@@ -1109,10 +1171,19 @@ function finishLoading() {
         update_deck();
     }
 
-	history.matches = store.get('matches_index');
-	history.matches.forEach(function(id) {
-		history[id] = store.get(id);
-	});
+    history.matches = store.get('matches_index');
+    history.matches.forEach(function(id) {
+        history[id] = store.get(id);
+        history[id].type = "match";
+    });
+
+    var drafts = {};
+    drafts.matches = store.get('draft_index');
+    drafts.matches.forEach(function(id) {
+        history.matches.push(id);
+        history[id] = store.get(id);
+        history[id].type = "draft";
+    });
 
 	mainWindow.webContents.send("set_history_data", history);
 	mainWindow.webContents.send("initialize", 1);
