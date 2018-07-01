@@ -1220,7 +1220,7 @@ function httpBasic() {
         }
         
         var http = require('https');
-        var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv3.php', method: 'POST', headers: _headers };
+        var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv4.php', method: 'POST', headers: _headers };
         //console.log("SEND >> "+index, _headers.method, _headers.reqId, _headers.token);
 
         var results = ''; 
@@ -1230,11 +1230,13 @@ function httpBasic() {
             }); 
             res.on('end', function () {
                //console.log("RECV << "+index, _headers.method, _headers.reqId, _headers.token);
+               console.log("RECV << "+index, _headers.method, results);
                 try {
                     var parsedResult = JSON.parse(results);
                     if (parsedResult.ok) {
                         if (_headers.method == 'auth') {
                             tokenAuth = parsedResult.token;
+                            httpGetMeta();
                         }
                         //
                         if (_headers.method == 'get_top_decks') {
@@ -1318,6 +1320,11 @@ function httpSetMatch(match) {
 function httpDeleteData(courseId) {
     var _id = makeId(6);
     httpAsync.push({'reqId': _id, 'method': 'delete_data', 'uid': playerId});
+}
+
+function httpGetMeta() {
+    var _id = makeId(6);
+    httpAsync.push({'reqId': _id, 'method': 'get_meta', 'uid': playerId});
 }
 
 //

@@ -4,13 +4,14 @@ An MTG Arena deck tracker and collection manager.
 ![History Screen](/Readme/screenshot_0.png)
 
 ## Current features
-- In-game overlay, showing cards left in decks.
+- In-game overlay, showing cards left in decks and time elapsed.
 - Track your games and get historic data of all your matches.
 - Collection browser (filter by set, show newly acquired cards, collection statistics, completion %)
 - Individual deck statistics (color pie, mana curve, win/loss ratio, wildcards needed).
 - Support for all game modes (flash events/ draft / constructed / ranked / etc)
 - Online decklists, see what decks are being used on events and how they perform.
-- Draft tracker `draft replays WIP`
+- Draft tracker
+- Draft replayer
 
 ## Roadmap
 `These are some features I would like to include, not ordered in any way`

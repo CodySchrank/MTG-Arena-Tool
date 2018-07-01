@@ -91,6 +91,7 @@ function addCardSeparator(i, element) {
 		case 5: str = "Artifact"; break;
 		case 6: str = "Enchantment"; break;
 		case 7: str = "Land"; break;
+		case 99: str = "Sideboard"; break;
 		default: str = ""; break;
 	}
 

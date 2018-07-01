@@ -611,6 +611,17 @@ function open_deck(i, type) {
 		prevIndex = grpId;
 	});
 
+	addCardSeparator(99, dl);
+
+	var prevIndex = 0;
+	deck.sideboard.forEach(function(card) {
+		var grpId = card.id;
+		var type = cardsDb.get(grpId).type;
+		if (card.quantity > 0) {
+			addCardTile(grpId, 'a', card.quantity, dl);
+		}
+	});
+
 
 	var stats = $('<div class="stats"></div>');
 
@@ -878,6 +889,17 @@ function open_match(id) {
 		}
 		
 		prevIndex = grpId;
+	});
+
+	addCardSeparator(99, dl);
+
+	var prevIndex = 0;
+	deck.sideboard.forEach(function(card) {
+		var grpId = card.id;
+		var type = cardsDb.get(grpId).type;
+		if (card.quantity > 0) {
+			addCardTile(grpId, 'a', card.quantity, dl);
+		}
 	});
 
 	var flt = $('<div class="flex_item" style="flex-direction: row-reverse;"></div>')
@@ -1396,19 +1418,21 @@ function getDeckWinrate(deckid, lastEdit) {
 	}
 	matchesHistory.matches.forEach(function(match, index) {
 		match = matchesHistory[match];
-		if (match.playerDeck.id == deckid) {
-			if (match.player.win > match.opponent.win) {
-				wins++;
-			}
-			else {
-				loss++;
-			}
-			if (match.date > lastEdit) {
+		if (match.type == "match") {
+			if (match.playerDeck.id == deckid) {
 				if (match.player.win > match.opponent.win) {
-					winsLastEdit++;
+					wins++;
 				}
 				else {
-					lossLastEdit++;
+					loss++;
+				}
+				if (match.date > lastEdit) {
+					if (match.player.win > match.opponent.win) {
+						winsLastEdit++;
+					}
+					else {
+						lossLastEdit++;
+					}
 				}
 			}
 		}
