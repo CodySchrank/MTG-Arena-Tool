@@ -844,6 +844,18 @@ label {
     z-index: 40;
 }
 
+.overlay_deck_container {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    bottom: 0;
+    float: center;
+    width: 100%;
+    height: 64px;
+    top: 64px;
+    z-index: 40;
+}
+
 .clock_elapsed {
     height: 64px;
     width: 100%;
@@ -854,7 +866,7 @@ label {
     z-index: 50;
 }
 
-.clock_prev, .draft_prev {
+.clock_prev, .draft_prev, .deck_prev {
     cursor: pointer;
     background: url(images/prev.png) no-repeat center;
     z-index: 51;
@@ -864,7 +876,7 @@ label {
     -webkit-transition: all .2s ease-in;
 }
 
-.clock_next, .draft_next {
+.clock_next, .draft_next, .deck_next {
     cursor: pointer;
     background: url(images/next.png) no-repeat center;
     z-index: 51;
@@ -874,7 +886,7 @@ label {
     -webkit-transition: all .2s ease-in;
 }
 
-.clock_prev:hover, .clock_next:hover, .draft_prev:hover, .draft_next:hover {
+.clock_prev:hover, .clock_next:hover, .draft_prev:hover, .draft_next:hover, .deck_prev:hover, .deck_next:hover {
     opacity: 1;
 }
 

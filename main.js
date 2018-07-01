@@ -80,6 +80,7 @@ var currentDraft = undefined;
 var currentDraftPack = undefined;
 var draftSet = "";
 var draftId = undefined;
+var overlayDeckMode = 0;
 
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
@@ -206,6 +207,11 @@ ipc.on('overlay_close', function (event, state) {
 
 ipc.on('overlay_minimize', function (event, state) {
     overlay.minimize();
+});
+
+ipc.on('set_deck_mode', function (event, state) {
+    overlayDeckMode = state;
+    update_deck();
 });
 
 ipc.on('force_open_settings', function (event, state) {
@@ -1018,7 +1024,12 @@ function select_deck(arg) {
 }
 
 function update_deck() {
-    overlay.webContents.send("set_deck", currentDeckUpdated);
+    if (overlayDeckMode == 0) {
+        overlay.webContents.send("set_deck", currentDeckUpdated);
+    }
+    if (overlayDeckMode == 1) {
+        overlay.webContents.send("set_deck", currentDeck);
+    }
 }
 
 function debug_overlay_show() {

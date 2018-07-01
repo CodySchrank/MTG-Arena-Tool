@@ -4,6 +4,7 @@ var renderer = 1;
 var matchBeginTime = Date.now();
 var clockMode = 0;
 var draftMode = 0;
+var deckMode = 0;
 var overlayMode = 0;
 
 const Database = require('./database.js');
@@ -45,6 +46,7 @@ function updateClock() {
 ipc.on('set_timer', function (event, arg) {
 	if (arg == -1) {
 		$(".overlay_clock_container").hide();
+		$(".overlay_deck_container").hide();
 		$(".overlay_draft_container").show();
 		$(".overlay_draft_container").css("display", "flex");
 		$(".overlay_decklist").css("height", "100%").css("height", "-=146px");
@@ -212,6 +214,22 @@ $(document).ready(function() {
 	    	draftMode = 0;
 	    }
 	    setDraft();
+	});
+	//
+	$(".deck_prev").click(function () {
+	    deckMode -= 1;
+	    if (deckMode < 0) {
+	    	deckMode = 1;
+	    }
+	    ipc.send('set_deck_mode', deckMode);
+	});
+	//
+	$(".deck_next").click(function () {
+	    deckMode += 1;
+	    if (deckMode > 1) {
+	    	deckMode = 0;
+	    }
+	    ipc.send('set_deck_mode', deckMode);
 	});
 
 	//
