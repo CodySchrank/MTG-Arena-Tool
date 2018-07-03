@@ -16,7 +16,10 @@ var store = new Store({
         cards: { cards_time: 0, cards_before:[], cards:[] },
 		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true},
         matches_index:[],
-        draft_index:[]
+        draft_index:[],
+        vault_history:[],
+        gold_history:[],
+        wildcards_history:[]
 	}
 });
 
@@ -82,6 +85,10 @@ var draftSet = "";
 var draftId = undefined;
 var overlayDeckMode = 0;
 
+var goldHistory = [];
+var vaultHistory = [];
+var wilcardsHistory = [];
+
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
 
@@ -134,9 +141,16 @@ function loadPlayerConfig(playerId) {
             cards: { cards_time: 0, cards_before:[], cards:[] },
             settings: {show_overlay: true, startup: true, close_to_tray: true},
             matches_index:[],
-            draft_index:[]
+            draft_index:[],
+            vault_history:[],
+            gold_history:[],
+            wildcards_history:[]
         }
     });
+
+    goldHistory = store.get("gold_history");
+    vaultHistory = store.get("vault_history");
+    wilcardsHistory = store.get("wildcards_history");
 
     var settings = store.get("settings");
     mainWindow.webContents.send("set_settings", settings);
@@ -554,16 +568,6 @@ function processLogData(data) {
 	currentChunk = data;
     var strCheck, json;
 
-    //This checks time, use with caution!
-    /*
-    strCheck = '[UnityCrossThreadLogger]';
-    if (data.indexOf(strCheck) > -1) {
-        var str = dataChop(data, strCheck, 'M')+'M';
-        var logTime = new Date(str);
-        //console.log(logTime, Date.now() - logTime, (Date.now() - logTime) / 1000 / 60);
-    }
-    */
-
     // Get player Id
     strCheck = '"PlayerId":"';
     if (data.indexOf(strCheck) > -1) {
@@ -598,6 +602,49 @@ function processLogData(data) {
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
         mainWindow.webContents.send("set_decks", json);
+    }
+
+    // Get inventory
+    strCheck = '<== PlayerInventory.GetPlayerInventory(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        //This checks time, use with caution!
+        strCheck = '[UnityCrossThreadLogger]';
+        if (data.indexOf(strCheck) > -1) {
+            var str = dataChop(data, strCheck, 'M')+'M';
+            var logTime = parseWotcTime(str);
+        }
+
+        var gold = json.gold;
+        var vault = json.vaultProgress;
+
+        goldHistory = store.get("gold_history");
+        var lastDate  = 0;
+        var lastValue = -1;
+        goldHistory.forEach(function(data) {
+            if (data.date > lastDate) {
+                lastDate = data.date;
+                lastValue = data.value;
+            }
+        });
+        if (gold != lastValue && lastDate < logTime.getTime()) {
+            goldHistory.push({date: logTime.getTime(), value: gold});
+            store.set("gold_history", goldHistory);
+        }
+
+        vaultHistory = store.get("vault_history");
+        var lastDate  = 0;
+        var lastValue = -1;
+        vaultHistory.forEach(function(data) {
+            if (data.date > lastDate) {
+                lastDate = data.date;
+                lastValue = data.value;
+            }
+        });
+        if (vault != lastValue && lastDate < logTime.getTime()) {
+            vaultHistory.push({date: logTime.getTime(), value: vault});
+            store.set("vault_history", vaultHistory);
+        }
     }
 
     // Get Cards
@@ -1385,7 +1432,7 @@ function parseWotcTime(str) {
     }
 
     var date = new Date(datePart[2], datePart[0]-1, datePart[1], timePart[0], timePart[1], timePart[2]);
-    //console.log(str, date.toString(), date.getMonth(), date)
+    //console.log(str, date.toString(), date.getTime(), date)
     return date;
 }
 
