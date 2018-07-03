@@ -273,6 +273,9 @@ $(document).ready(function() {
 				open_about();
 			}
 		}
+		else {
+			$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
+		}
 	});
 });
 
