@@ -10,8 +10,7 @@ An MTG Arena deck tracker and collection manager.
 - Individual deck statistics (color pie, mana curve, win/loss ratio, wildcards needed).
 - Support for all game modes (flash events/ draft / constructed / ranked / etc)
 - Online decklists, see what decks are being used on events and how they perform.
-- Draft tracker
-- Draft replayer
+- Draft tracker and replayer
 
 ## Roadmap
 `These are some features I would like to include, not ordered in any way`
@@ -29,7 +28,7 @@ npm start
 ```
 
 ### Download
-Currently, we live [here at GitHub](https://github.com/Manuel-777/MTG-Arena-Tool/releases). You will find all stable and pre-production releases right here.
+Currently, our releases are hosted [here at GitHub](https://github.com/Manuel-777/MTG-Arena-Tool/releases). You will find all stable and pre-production releases right here.
 
 Once downloaded the installer should simply install and run immediately. The app will read your user data and warn you if anything goes wrong.
 
@@ -55,5 +54,7 @@ Please read about [our Privacy Policy and How we use your data here](https://git
 [Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse.
 
 ### Questions?
-You can find me on [Twitter](https://twitter.com/MEtchegaray7)
-or by email at [mtgatool@gmail.com](mailto:mtgatool@gmail.com)
+You can find me at any of these;
+[Twitter](https://twitter.com/MEtchegaray7)
+[Discord](https://discord.gg/K9bPkJy)
+[mtgatool@gmail.com](mailto:mtgatool@gmail.com)
