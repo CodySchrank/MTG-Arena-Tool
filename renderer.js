@@ -1289,12 +1289,23 @@ function open_settings() {
 	span.appendTo(label);
 
 
-	// Newly added only
+	// Show overlay
 	var label = $('<label class="check_container">Show in-game overlay</label>');
 	label.appendTo(div);
 	var check_new = $('<input type="checkbox" id="settings_showoverlay" onclick="updateSettings()" />');
 	check_new.appendTo(label);
 	check_new.prop('checked', settings.show_overlay);
+
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
+
+	// Close on new
+	var label = $('<label class="check_container">Close main window on match found</label>');
+	label.appendTo(div);
+	var check_new = $('<input type="checkbox" id="settings_closeonmatch" onclick="updateSettings()" />');
+	check_new.appendTo(label);
+	check_new.prop('checked', settings.close_on_match);
 
 	var span = $('<span class="checkmark"></span>');
 	span.appendTo(label);
@@ -1351,8 +1362,9 @@ function updateSettings() {
 	var showOverlay = document.getElementById("settings_showoverlay").checked;
 	var closeToTray = document.getElementById("settings_closetotray").checked;
 	var sendData = document.getElementById("settings_senddata").checked;
+	var closeOnMatch = document.getElementById("settings_closeonmatch").checked;
 
-	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray, send_data: sendData};
+	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray, send_data: sendData, close_on_match: closeOnMatch};
 
 	ipc.send('save_settings', settings);
 }

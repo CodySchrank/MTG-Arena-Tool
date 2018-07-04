@@ -14,7 +14,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true},
+		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true},
         matches_index:[],
         draft_index:[],
         vault_history:[],
@@ -139,7 +139,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {show_overlay: true, startup: true, close_to_tray: true},
+            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true},
             matches_index:[],
             draft_index:[],
             vault_history:[],
@@ -202,8 +202,7 @@ ipc.on('request_course', function (event, arg) {
 
 // Events
 ipc.on('window_close', function (event, state) {
-    var settings = store.get("settings");
-    if (settings.close_to_tray) {
+    if (store.get("settings").close_to_tray) {
         hideWindow();
     }
     else {
@@ -1016,7 +1015,10 @@ function createMatch(arg) {
     gameObjs = {};
 
     if (!firstPass && store.get("settings").show_overlay == true) {
-        hideWindow();
+        if (store.get("settings").close_on_match) {
+            hideWindow();
+        }
+
         overlay.show();
         overlay.focus();
         overlay.setBounds(obj);
@@ -1042,7 +1044,10 @@ function createDraft() {
     gameObjs = {};
 
     if (!firstPass && store.get("settings").show_overlay == true) {
-        hideWindow();
+        if (store.get("settings").close_on_match) {
+            hideWindow();
+        }
+
         overlay.show();
         overlay.focus();
         overlay.setBounds(obj);
