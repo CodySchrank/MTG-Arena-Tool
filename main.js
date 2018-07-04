@@ -14,7 +14,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true},
+		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140},
         matches_index:[],
         draft_index:[],
         vault_history:[],
@@ -116,7 +116,6 @@ ipc.on('renderer_state', function (event, state) {
 
 ipc.on('save_settings', function (event, settings) {
     store.set('settings', settings);
-
     updateSettings(settings);
 });
 
@@ -139,7 +138,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true},
+            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140},
             matches_index:[],
             draft_index:[],
             vault_history:[],
@@ -501,11 +500,13 @@ function processLog(err, bytecount, buff) {
 			}, i * debugLogSpeed);
 		}(i, str));
     }
+
     if (firstPass) {
         setTimeout(function(){
             finishLoading();
         }, (splitString.length + 2) * debugLogSpeed);
     }
+
     setTimeout(function(){
         fs.close(file);
         //console.log("fs.close(file) processLog")
@@ -557,11 +558,9 @@ function checkJsonWithStart(str, check, chop, start) {
 }
 
 
-/**
-***
-***
-***
-**/
+/*
+    unnecessarily long text to mark a point in the code that is fairly important because I cant remember the line number \^.^/
+*/
 
 function processLogData(data) {
 	currentChunk = data;
@@ -1180,6 +1179,7 @@ function saveMatch() {
         seat: playerSeat, 
         win: playerWin
     }
+
     match.eventId = currentEventId;
     match.playerDeck = currentDeck;
     match.oppDeck = getOppDeck();

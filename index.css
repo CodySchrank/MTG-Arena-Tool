@@ -1037,7 +1037,7 @@ span {
 }
 
 .inventory_card {
-    max-width: 140px;
+    width: 140px;
     display: inline-block;
     margin: 6px;
 }
@@ -1380,13 +1380,13 @@ span {
 }
 
 .draft_card {
-    max-width: 120px;
+    width: 120px;
     display: inline-block;
     margin: 4px;
 }
 
 .draft_card_img {
-    max-width: 120px;
+    width: 120px;
     cursor: pointer;
     -webkit-border-radius: 7% / 6%;
 }
@@ -1399,6 +1399,12 @@ span {
 .draft_card_picked {
     border: 4px solid rgba(220, 20, 20, 0.66);
     margin: -4px 0 -4px -4px;
+}
+
+.slidecontainer_settings {
+    overflow: unset;
+    display: flex;
+    margin: 10px 100px 10px 50px;
 }
 
 .slidecontainer {

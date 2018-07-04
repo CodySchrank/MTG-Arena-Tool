@@ -16,6 +16,8 @@ var collectionPage = 0;
 var filterEvent = '';
 var filteredSets = [];
 var draftPosition = 1;
+var cardSizePos = 4;
+var cardSize = 140;
 var inputTimer = undefined;
 //var initialized = false;
 
@@ -88,6 +90,8 @@ ipc.on('open_course_deck', function (event, arg) {
 //
 ipc.on('set_settings', function (event, arg) {
 	settings = arg;
+	cardSizePos = settings.cards_size;
+	cardSize = 100+(cardSizePos*10);
 });
 
 //
@@ -137,7 +141,6 @@ ipc.on('initialize', function (event, arg) {
 	//arenaCheckLoop();
 	//$('.wrapper').css('left', '100%');
 });
-
 
 //
 ipc.on('no_log', function (event, arg) {
@@ -761,8 +764,8 @@ function open_draft(id, tileGrpid, set) {
 		if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
 		if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
 		if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
-        var d = $('<div class="draft_card"></div>');
-        var img = $('<img class="draft_card_img"></img>');
+        var d = $('<div style="width: '+cardSize+'px !important;" class="draft_card"></div>');
+        var img = $('<img style="width: '+cardSize+'px !important;" class="draft_card_img"></img>');
         if (grpId == pick && draftPosition % 2 == 0) {
         	img.addClass('draft_card_picked');
         }
@@ -1201,21 +1204,21 @@ function printCards() {
 			if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
 			if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
 
-	        var d = $('<div class="inventory_card"></div>');
+	        var d = $('<div style="width: '+cardSize+'px !important;" class="inventory_card"></div>');
 
 	        for (let i=0; i<4; i++) {
 	        	if (cardsNew[key] != undefined && i < cardsNew[key]) {
-				    $('<div class="inventory_card_quantity_blue"></div>').appendTo(d);
+				    $('<div style="width: '+cardSize/4+'px;" class="inventory_card_quantity_blue"></div>').appendTo(d);
 	        	}
 	        	else if (i < cards[key]) {
-			        $('<div class="inventory_card_quantity_green"></div>').appendTo(d);
+			        $('<div style="width: '+cardSize/4+'px;" class="inventory_card_quantity_green"></div>').appendTo(d);
 	        	}
 	        	else {
-			        $('<div class="inventory_card_quantity_gray"></div>').appendTo(d);
+			        $('<div style="width: '+cardSize/4+'px;" class="inventory_card_quantity_gray"></div>').appendTo(d);
 	        	}
 	        }
 
-	        var img = $('<img class="inventory_card_img"></img>');
+	        var img = $('<img style="width: '+cardSize+'px !important;" class="inventory_card_img"></img>');
 			img.attr("src", "https://img.scryfall.com/cards/small/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
 			img.appendTo(d);
 
@@ -1322,6 +1325,13 @@ function open_settings() {
 	span.appendTo(label);
 
 
+	var slider = $('<div class="slidecontainer_settings"></div>');
+	slider.appendTo(div);
+	var sliderlabel = $('<label style="width: 200px; !important" class="card_size_container">Cards size: '+cardSize+'px</label>');
+	sliderlabel.appendTo(slider);
+	var sliderInput = $('<input type="range" min="0" max="20" value="'+cardSizePos+'" class="slider" id="myRange">');
+	sliderInput.appendTo(slider);
+
 	// Send events data
 	var label = $('<label class="check_container">Online sharing <i>(when disabled, blocks any connections with our servers)</i></label>');
 	label.appendTo(div);
@@ -1345,6 +1355,24 @@ function open_settings() {
 	// hide when zero left
 
 	$("#ux_0").append(div);
+
+
+	var qSel = document.querySelector("input");
+	$(".slider").off();
+
+	$(".slider").on('click mousemove', function() {
+		console.log("SLIDER MOVE", this.value);
+		cardSizePos = Math.round(parseInt(this.value));
+		cardSize = 100+(cardSizePos*10);
+		sliderlabel.html('Cards size: '+cardSize+'px');
+	});
+
+	$(".slider").on('click mouseup', function() {
+		console.log("SLIDER UP")
+		cardSizePos = Math.round(parseInt(this.value));
+		updateSettings();
+	});
+
 }
 
 //
@@ -1364,7 +1392,8 @@ function updateSettings() {
 	var sendData = document.getElementById("settings_senddata").checked;
 	var closeOnMatch = document.getElementById("settings_closeonmatch").checked;
 
-	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray, send_data: sendData, close_on_match: closeOnMatch};
+	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray, send_data: sendData, close_on_match: closeOnMatch, cards_size: cardSizePos};
+	cardSize = 100+(cardSizePos*10);
 
 	ipc.send('save_settings', settings);
 }
