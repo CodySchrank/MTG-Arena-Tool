@@ -11,7 +11,7 @@ body {
     margin: 0px;
     padding: 0px;
     height: 100%;
-	background-color: black;
+	background-color: rgba(0,0,0,1);
     overflow: hidden;
 }
 
@@ -1258,6 +1258,15 @@ span {
 
 .settings_page {
     margin: 32px 16px 32px 16px;
+}
+
+.settings_title {
+    font-family: "Mplantin";
+    font-size: 20px;
+    border-bottom: solid rgba(250, 229, 210, 0.28) 2px;
+    color: #fae5d2;
+    margin: 24px 64px 14px 12px;
+    padding-bottom: 2px;
 }
 
 .check_container {

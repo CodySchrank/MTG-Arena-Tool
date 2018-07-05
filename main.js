@@ -14,7 +14,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140},
+		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140, overlay_alpha: 1},
         matches_index:[],
         draft_index:[],
         vault_history:[],
@@ -117,6 +117,13 @@ ipc.on('renderer_state', function (event, state) {
 ipc.on('save_settings', function (event, settings) {
     store.set('settings', settings);
     updateSettings(settings);
+    /*
+    over.setIgnoreMouseEvents(false);
+    if (settings.overlay_alpha < 0.5) {
+        over.setIgnoreMouseEvents(true);
+    }
+    overlay.webContents.send("alpha", settings.overlay_alpha);
+    */
 });
 
 ipc.on('erase_data', function (event, settings) {
@@ -138,7 +145,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140},
+            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140, overlay_alpha: 1},
             matches_index:[],
             draft_index:[],
             vault_history:[],
@@ -360,6 +367,7 @@ function createMainWindow() {
 	var obj = store.get('windowBounds');
 
     const win = new electron.BrowserWindow({
+        /*transparent: true,*/
         frame: false,
         show: false,
         width: obj.width,
@@ -392,6 +400,7 @@ function createOverlay() {
 	var obj = store.get('overlayBounds');
 
     const over = new electron.BrowserWindow({
+        /*transparent: true,*/
         frame: false,
         alwaysOnTop: true,
         x: obj.x,
@@ -409,8 +418,13 @@ function createOverlay() {
 		saveOverlayPos();
 	});
 
+    if (settings.overlay_alpha < 0.5) {
+        over.setIgnoreMouseEvents(true);
+    }
+
     setTimeout( function() {
         overlay.webContents.send("set_deck", currentDeck);
+        overlay.webContents.send("alpha", settings.overlay_alpha);
     	//debug_overlay_show();
     }, 1000);
 

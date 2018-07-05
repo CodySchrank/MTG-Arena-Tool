@@ -16,6 +16,7 @@ var collectionPage = 0;
 var filterEvent = '';
 var filteredSets = [];
 var draftPosition = 1;
+var overlayAlpha = 1;
 var cardSizePos = 4;
 var cardSize = 140;
 var inputTimer = undefined;
@@ -91,6 +92,7 @@ ipc.on('open_course_deck', function (event, arg) {
 ipc.on('set_settings', function (event, arg) {
 	settings = arg;
 	cardSizePos = settings.cards_size;
+	overlayAlpha = settings.overlay_alpha;
 	cardSize = 100+(cardSizePos*10);
 });
 
@@ -1277,71 +1279,51 @@ function setCollectionPage(page) {
 }
 
 //
+function add_checkbox(div, label, iid, def) {
+	var label = $('<label class="check_container">'+label+'</label>');
+	label.appendTo(div);
+	var check_new = $('<input type="checkbox" id="'+iid+'" onclick="updateSettings()" />');
+	check_new.appendTo(label);
+	check_new.prop('checked', def);
+
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+}
+
+//
 function open_settings() {
 	$("#ux_0").html('');
 	var div = $('<div class="settings_page"></div>');
 
 	// Launch on startup
-	var label = $('<label class="check_container">Launch on startup</label>');
-	label.appendTo(div);
-	var check_new = $('<input type="checkbox" id="settings_startup" onclick="updateSettings()" />');
-	check_new.appendTo(label);
-	check_new.prop('checked', settings.startup);
+	div.append('<div class="settings_title">Behaviour</div>');
 
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
+	add_checkbox(div, 'Launch on startup', 'settings_startup', settings.startup);
+	add_checkbox(div, 'Close main window on match found', 'settings_closeonmatch', settings.close_on_match);
+	add_checkbox(div, 'Close to tray', 'settings_closetotray', settings.close_to_tray);
 
+	div.append('<div class="settings_title">Visual</div>');
 
-	// Show overlay
-	var label = $('<label class="check_container">Show in-game overlay</label>');
-	label.appendTo(div);
-	var check_new = $('<input type="checkbox" id="settings_showoverlay" onclick="updateSettings()" />');
-	check_new.appendTo(label);
-	check_new.prop('checked', settings.show_overlay);
-
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
-
-
-	// Close on new
-	var label = $('<label class="check_container">Close main window on match found</label>');
-	label.appendTo(div);
-	var check_new = $('<input type="checkbox" id="settings_closeonmatch" onclick="updateSettings()" />');
-	check_new.appendTo(label);
-	check_new.prop('checked', settings.close_on_match);
-
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
-
-
-	// Close button behaviour
-	var label = $('<label class="check_container">Close to tray</label>');
-	label.appendTo(div);
-	var check_new = $('<input type="checkbox" id="settings_closetotray" onclick="updateSettings()" />');
-	check_new.appendTo(label);
-	check_new.prop('checked', settings.close_to_tray);
-
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
-
+	add_checkbox(div, 'Show in-game overlay', 'settings_showoverlay', settings.show_overlay);
 
 	var slider = $('<div class="slidecontainer_settings"></div>');
 	slider.appendTo(div);
-	var sliderlabel = $('<label style="width: 200px; !important" class="card_size_container">Cards size: '+cardSize+'px</label>');
+	var sliderlabel = $('<label style="width: 400px; !important" class="card_size_container">Cards size: '+cardSize+'px</label>');
 	sliderlabel.appendTo(slider);
-	var sliderInput = $('<input type="range" min="0" max="20" value="'+cardSizePos+'" class="slider" id="myRange">');
+	var sliderInput = $('<input type="range" min="0" max="20" value="'+cardSizePos+'" class="slider sliderA" id="myRange">');
 	sliderInput.appendTo(slider);
 
-	// Send events data
-	var label = $('<label class="check_container">Online sharing <i>(when disabled, blocks any connections with our servers)</i></label>');
-	label.appendTo(div);
-	var check_new = $('<input type="checkbox" id="settings_senddata" onclick="updateSettings()" />');
-	check_new.appendTo(label);
-	check_new.prop('checked', settings.send_data);
-
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
-
+	/*
+	var alphaSlider = $('<div class="slidecontainer_settings"></div>');
+	alphaSlider.appendTo(div);
+	var alphasliderlabel = $('<label style="width: 400px; !important" class="card_size_container">Overlay transparency: '+overlayAlpha+'</label>');
+	alphasliderlabel.appendTo(alphaSlider);
+	var sliderInput = $('<input type="range" min="0" max="10" value="'+overlayAlpha*10+'" class="slider sliderB" id="myRange">');
+	sliderInput.appendTo(alphaSlider);
+	*/
+	
+	div.append('<div class="settings_title">Privacy</div>');
+	add_checkbox(div, 'Online sharing <i>(when disabled, blocks any connections with our servers)</i>', 'settings_senddata', settings.send_data);
 
 	// Erase data
 	var label = $('<label class="check_container_but"></label>');
@@ -1357,19 +1339,28 @@ function open_settings() {
 	$("#ux_0").append(div);
 
 
-	var qSel = document.querySelector("input");
-	$(".slider").off();
+	$(".sliderA").off();
 
-	$(".slider").on('click mousemove', function() {
-		console.log("SLIDER MOVE", this.value);
+	$(".sliderA").on('click mousemove', function() {
 		cardSizePos = Math.round(parseInt(this.value));
 		cardSize = 100+(cardSizePos*10);
 		sliderlabel.html('Cards size: '+cardSize+'px');
 	});
 
-	$(".slider").on('click mouseup', function() {
-		console.log("SLIDER UP")
+	$(".sliderA").on('click mouseup', function() {
 		cardSizePos = Math.round(parseInt(this.value));
+		updateSettings();
+	});
+
+	$(".sliderB").off();
+
+	$(".sliderB").on('click mousemove', function() {
+		overlayAlpha = parseInt(this.value)/10;
+		alphasliderlabel.html('Overlay transparency: '+overlayAlpha);
+	});
+
+	$(".sliderB").on('click mouseup', function() {
+		overlayAlpha = parseInt(this.value)/10;
 		updateSettings();
 	});
 
@@ -1392,9 +1383,16 @@ function updateSettings() {
 	var sendData = document.getElementById("settings_senddata").checked;
 	var closeOnMatch = document.getElementById("settings_closeonmatch").checked;
 
-	settings = {show_overlay: showOverlay, startup: startup, close_to_tray: closeToTray, send_data: sendData, close_on_match: closeOnMatch, cards_size: cardSizePos};
+	settings = {
+		show_overlay: showOverlay,
+		startup: startup,
+		close_to_tray: closeToTray,
+		send_data: sendData,
+		close_on_match: closeOnMatch,
+		cards_size: cardSizePos,
+		overlay_alpha: overlayAlpha
+	};
 	cardSize = 100+(cardSizePos*10);
-
 	ipc.send('save_settings', settings);
 }
 

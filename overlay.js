@@ -66,6 +66,12 @@ $( window ).resize(function() {
 });
 
 
+ipc.on('alpha', function (event, arg) {
+	$('body').css("background-color", "rgba(0,0,0,"+arg+")");
+	$('.overlay_wrapper:before').css("opacity", 0.4*arg);
+	$('.overlay_wrapper').css("opacity", arg);
+});
+
 
 ipc.on('ping', function (event, arg) {
 });
