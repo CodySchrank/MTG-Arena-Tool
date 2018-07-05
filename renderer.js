@@ -15,6 +15,7 @@ var renderer = 0;
 var collectionPage = 0;
 var filterEvent = '';
 var filteredSets = [];
+var filteredMana = [];
 var draftPosition = 1;
 var overlayAlpha = 1;
 var cardSizePos = 4;
@@ -995,6 +996,29 @@ function open_cards() {
 	});
 	sets.appendTo(filters);
 
+	var manas = $('<div class="sets_container"><label>Filter by color:</label></div>');
+	var ms = ["w", "u", "b", "r", "g"];
+	ms.forEach(function(s, i) {
+		var mi = [1, 2, 3, 4, 5];
+		var manabutton = $('<div class="mana_filter mana_filter_on" style="background-image: url(images/'+s+'20.png)"></div>');
+		manabutton.appendTo(manas);
+		manabutton.click(function() {
+			if (manabutton.hasClass('mana_filter_on')) {
+				manabutton.removeClass('mana_filter_on');
+				filteredMana.push(mi[i]);
+			}
+			else {
+				manabutton.addClass('mana_filter_on');
+				let n = filteredMana.indexOf(mi[i]);
+				if (n > -1) {
+					filteredMana.splice(n, 1);
+				}
+			}
+			printCards();
+		});
+	});
+	manas.appendTo(filters);
+
 	// Search box
 	var label = $('<label class="input_container">Search</label>');
 	label.appendTo(filters);
@@ -1008,6 +1032,22 @@ function open_cards() {
 	label.appendTo(cont);
 	var check_new = $('<input type="checkbox" id="query_new" onclick="printCards()" />');
 	check_new.appendTo(label);
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
+	// Require multicolored
+	var label = $('<label class="check_container">Require multicolored</label>');
+	label.appendTo(cont);
+	var check_multi = $('<input type="checkbox" id="query_multicolor" onclick="printCards()" />');
+	check_multi.appendTo(label);
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+
+	// Exclude unselected
+	var label = $('<label class="check_container">Exclude unselected</label>');
+	label.appendTo(cont);
+	var check_exclude = $('<input type="checkbox" id="query_exclude" onclick="printCards()" />');
+	check_exclude.appendTo(label);
 	var span = $('<span class="checkmark"></span>');
 	span.appendTo(label);
 
@@ -1165,8 +1205,11 @@ function printCards() {
 	var paging = $('<div class="paging_container"></div>');
 	div.append(paging);
 
-	filterName = document.getElementById("query_name").value.toLowerCase();
-	filterNew  = document.getElementById("query_new");
+	filterName  = document.getElementById("query_name").value.toLowerCase();
+	filterNew   = document.getElementById("query_new");
+	filterMulti = document.getElementById("query_multicolor");
+	filterExclude = document.getElementById("query_exclude");
+
 	console.log("filter", filterNew.checked);
 	var totalCards = 0;
     for (n=0; n<Object.keys(cards).length; n++) {
@@ -1176,6 +1219,7 @@ function printCards() {
 
     	let name = cardsDb.get(key).name.toLowerCase();
     	let type = cardsDb.get(key).type.toLowerCase();
+    	let cost = cardsDb.get(key).cost;
     	let set  = cardsDb.get(key).set;
 
 		if (name.indexOf(filterName) == -1 && type.indexOf(filterName) == -1) {
@@ -1191,6 +1235,43 @@ function printCards() {
 	    		doDraw = false;
 	    	}
     	}
+
+		if (filterExclude.checked && cost.length == 0) {
+			doDraw = false;
+		}
+		else {
+			let s = [];
+			let generic = false;
+			cost.forEach(function(m) {
+				if (m.color < 6 && m.color > 0) {
+					s[m.color] = 1;
+					if (filterExclude.checked && !filteredMana.includes(m.color)) {
+						doDraw = false;
+					}
+				}
+				if (m.color > 6) {
+					generic = true;
+				}
+			});
+			let ms = s.reduce((a, b) => a + b, 0);
+			if ((generic && ms == 0) && filterExclude.checked) {
+				doDraw = false;
+			}
+			if (filteredMana.length > 0) {
+				let su = 0;
+				filteredMana.forEach( function(m) {
+					if (s[m] == 1) {
+						su ++;
+					}
+				});
+				if (su == 0) {
+					doDraw = false;
+				}
+			}
+			if (filterMulti.checked && ms < 2) {
+				doDraw = false;
+			}
+		}
 
     	if (doDraw) {
     		totalCards++;
@@ -1321,7 +1402,7 @@ function open_settings() {
 	var sliderInput = $('<input type="range" min="0" max="10" value="'+overlayAlpha*10+'" class="slider sliderB" id="myRange">');
 	sliderInput.appendTo(alphaSlider);
 	*/
-	
+
 	div.append('<div class="settings_title">Privacy</div>');
 	add_checkbox(div, 'Online sharing <i>(when disabled, blocks any connections with our servers)</i>', 'settings_senddata', settings.send_data);
 

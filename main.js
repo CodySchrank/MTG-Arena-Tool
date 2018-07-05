@@ -418,13 +418,8 @@ function createOverlay() {
 		saveOverlayPos();
 	});
 
-    if (settings.overlay_alpha < 0.5) {
-        over.setIgnoreMouseEvents(true);
-    }
-
     setTimeout( function() {
         overlay.webContents.send("set_deck", currentDeck);
-        overlay.webContents.send("alpha", settings.overlay_alpha);
     	//debug_overlay_show();
     }, 1000);
 
