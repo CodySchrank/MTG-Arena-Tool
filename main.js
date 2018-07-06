@@ -242,6 +242,13 @@ ipc.on('set_clipboard', function (event, arg) {
     clipboard.writeText(arg);
 });
 
+ipc.on('get_economy', function (event, state) {
+    goldHistory = store.get("gold_history");
+    vaultHistory = store.get("vault_history");
+    var economy = {gold: goldHistory, vault: vaultHistory};
+    mainWindow.webContents.send("set_economy", economy);
+});
+
 // Catch exceptions
 process.on('uncaughtException', function (err) {
     console.log('Uncaught exception;');

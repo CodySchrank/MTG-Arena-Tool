@@ -20,6 +20,7 @@
 	},
 	"dependencies": {
 		"async": "^2.6.1",
+		"chart.js": "^2.7.2",
 		"conf": "^2.0.0",
 		"electron-debug": "^1.5.0",
 		"electron-updater": "^2.21.10"

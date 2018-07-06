@@ -21,8 +21,12 @@ var overlayAlpha = 1;
 var cardSizePos = 4;
 var cardSize = 140;
 var inputTimer = undefined;
+
+var goldHistory = null;
+var vaultHistory = null;
 //var initialized = false;
 
+const chartjs = require('chart.js');
 const Database = require('./database.js');
 const cardsDb = new Database();
 
@@ -132,6 +136,13 @@ ipc.on('force_open_settings', function (event, arg) {
 //
 ipc.on('force_open_about', function (event, arg) {
 	force_open_about();
+});
+
+//
+ipc.on('set_economy', function (event, arg) {
+	goldHistory = arg.gold;
+	vaultHistory = arg.vault;
+	open_economy();
 });
 
 //
@@ -268,14 +279,18 @@ $(document).ready(function() {
 			}
 			if ($(this).hasClass("it3")) {
 				sidebarActive = 3;
-				open_cards();
+				open_economy_ipc();
 			}
 			if ($(this).hasClass("it4")) {
 				sidebarActive = 4;
-				open_settings();
+				open_cards();
 			}
 			if ($(this).hasClass("it5")) {
 				sidebarActive = 5;
+				open_settings();
+			}
+			if ($(this).hasClass("it6")) {
+				sidebarActive = 6;
 				open_about();
 			}
 		}
@@ -284,6 +299,11 @@ $(document).ready(function() {
 		}
 	});
 });
+
+//
+function open_economy_ipc() {
+	ipc.send('get_economy', 1);
+}
 
 //
 function setHistory(arg) {
@@ -965,6 +985,111 @@ function open_match(id) {
 	
 	$(".back").click(function () {
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
+	});
+}
+
+//
+function open_economy() {
+	$("#ux_0").html('');
+	$("#ux_1").html('');
+	var div = $('<div class="economy"></div>');
+	$('<div class="chart_container"><canvas id="goldChart"></canvas></div>').appendTo(div);
+	$('<div class="chart_container"><canvas id="vaultChart"></canvas></div>').appendTo(div);
+
+	$("#ux_0").append(div);
+
+	// Set gold chart
+	var labels = [];
+	var data = [];
+
+	goldHistory.forEach(function(item) {
+		var date = new Date(item.date);
+		labels.push(date);
+		data.push(item.value);
+	});
+
+ 	var ctx = document.getElementById("goldChart").getContext('2d');
+	var myChart = new Chart(ctx, {
+	    type: 'bar',
+	    data: {
+	        labels: labels,
+	        datasets: [{
+	            label: 'Gold',
+				data: data,
+				type: 'line',
+	            backgroundColor: [
+	                'rgba(221, 130, 99, 0.5)',
+	            ],
+	            borderColor: [
+	                'rgba(221, 130, 99, 0.5)',
+	            ]
+	        }]
+	    },
+	    options: {
+	    	responsive: true,
+			scales: {
+				xAxes: [{
+					type: 'time',
+					distribution: 'series',
+					display: true,
+	                time: {
+	                    unit: 'day'
+	                },
+					ticks: {
+						source: 'labels'
+					}
+				}],
+				yAxes: [{
+					display: true
+				}]
+			}
+	    }
+	});
+
+	// Set vault chart
+	labels = [];
+	data = [];
+	vaultHistory.forEach(function(item) {
+		var date = new Date(item.date);
+		labels.push(date);
+		data.push(item.value);
+	});
+
+	var ctx = document.getElementById("vaultChart").getContext('2d');
+	var myChart = new Chart(ctx, {
+	    type: 'bar',
+	    data: {
+	        labels: labels,
+	        datasets: [{
+	            label: 'Vault',
+				data: data,
+				type: 'line',
+	            backgroundColor: [
+	                'rgba(183, 200, 158, 0.5)',
+	            ],
+	            borderColor: [
+	                'rgba(183, 200, 158, 0.5)',
+	            ]
+	        }]
+	    },
+	    options: {
+	    	responsive: true,
+			scales: {
+				xAxes: [{
+					type: 'time',
+					distribution: 'series',
+	                time: {
+	                    unit: 'day'
+	                },
+					ticks: {
+						source: 'labels'
+					}
+				}],
+				yAxes: [{
+					display: true
+				}]
+			}
+	    }
 	});
 }
 

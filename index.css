@@ -1505,6 +1505,21 @@ span {
     -webkit-transition: all .2s ease-in;
 }
 
+
 .draft_nav_prev:hover, .draft_nav_next:hover {
     opacity: 1;
+}
+
+.economy {
+    margin: 48px;
+    width: calc(100% - 96px);
+    height: calc(100% - 96px);
+}
+
+.chart_container {
+}
+
+#goldChart {
+}
+#vaultChart {
 }
