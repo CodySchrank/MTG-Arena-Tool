@@ -4,6 +4,38 @@
 		"selected_items":
 		[
 			[
+				"backg",
+				"backgroundColor"
+			],
+			[
+				"marg",
+				"margin-top\tproperty"
+			],
+			[
+				"gold",
+				"goldHistory"
+			],
+			[
+				"ge",
+				"generic"
+			],
+			[
+				"le",
+				"length"
+			],
+			[
+				"appe",
+				"appendTo"
+			],
+			[
+				"over",
+				"overlay_alpha"
+			],
+			[
+				"app",
+				"append"
+			],
+			[
 				"cards",
 				"cardSizePos"
 			],
@@ -16,10 +48,45 @@
 	"buffers":
 	[
 		{
+			"file": "/D/http/mtgatool/release-notes/releasenotes.txt",
+			"settings":
+			{
+				"buffer_size": 2853,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "main.js",
 			"settings":
 			{
-				"buffer_size": 43035,
+				"buffer_size": 43597,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "overlay.js",
+			"settings":
+			{
+				"buffer_size": 6023,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "overlay.html",
+			"settings":
+			{
+				"buffer_size": 1838,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 2573,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -28,7 +95,7 @@
 			"file": "renderer.js",
 			"settings":
 			{
-				"buffer_size": 50024,
+				"buffer_size": 54945,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -37,7 +104,7 @@
 			"file": "index.css",
 			"settings":
 			{
-				"buffer_size": 30437,
+				"buffer_size": 31097,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -75,10 +142,15 @@
 	},
 	"expanded_folders":
 	[
-		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool"
+		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool",
+		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool/dist"
 	],
 	"file_history":
 	[
+		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool/package.json",
+		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool/database.js",
+		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool/node_modules/uri-js/tests/qunit.js",
+		"/C/Users/Manuh/AppData/Roaming/mtg-arena-tool/BA263BD3A7D57B48.json",
 		"/C/Users/Manuh/AppData/LocalLow/Wizards Of The Coast/MTGA/output_log.txt",
 		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool/node_modules/parse-color/node_modules/color-convert/test/basic.js",
 		"/C/Users/Manuh/Desktop/MTG Arena Tool/MTG-Arena-Tool/node_modules/isarray/build/build.js",
@@ -106,6 +178,32 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"compare_explore",
+			"explore",
+			"compare_",
+			"setExplore",
+			"setHistory",
+			"Gold",
+			"goldHis",
+			"chart",
+			"open_e",
+			"econom",
+			"open_e",
+			"open_ca",
+			"filteredSets",
+			"setbutton",
+			"filters",
+			"set_filter_on",
+			"open_card",
+			"alpha",
+			"overlay",
+			",",
+			"settings",
+			"cards_size",
+			"input",
+			"slider",
+			"label",
+			"sett",
 			"_card",
 			"max",
 			"settings =",
@@ -138,24 +236,52 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 5,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "main.js",
+					"file": "/D/http/mtgatool/release-notes/releasenotes.txt",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 43035,
+						"buffer_size": 2853,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4030,
-								4030
+								21,
+								21
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "main.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 43597,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4842,
+								4853
 							]
 						],
 						"settings":
@@ -166,27 +292,116 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1920.0,
+						"translation.y": 2388.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "renderer.js",
+					"buffer": 2,
+					"file": "overlay.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 50024,
+						"buffer_size": 6023,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								22221,
-								22221
+								688,
+								688
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 315.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "overlay.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1838,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								880,
+								880
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 135.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2573,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15,
+								15
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "renderer.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 54945,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								54897,
+								54897
 							]
 						],
 						"settings":
@@ -196,27 +411,27 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 11023.0,
+						"translation.y": 24840.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 6,
 					"file": "index.css",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 30437,
+						"buffer_size": 31097,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								21458,
-								21459
+								30932,
+								30932
 							]
 						],
 						"settings":
@@ -227,10 +442,10 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 15320.0,
+						"translation.y": 21674.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -289,6 +504,10 @@
 		"selected_items":
 		[
 			[
+				"ove",
+				"overlay.js"
+			],
+			[
 				"index",
 				"index.css"
 			],
@@ -337,7 +556,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 177.0,
+	"side_bar_width": 206.0,
 	"status_bar_visible": false,
 	"template_settings":
 	{

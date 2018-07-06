@@ -77,6 +77,8 @@ ipc.on('set_cards', function (event, _cards, _cardsnew) {
 
 //
 ipc.on('set_explore', function (event, arg) {
+	arg.sort(compare_explore);
+	//console.log(arg);
 	setExplore(arg);
 });
 
@@ -312,7 +314,6 @@ function setHistory(arg) {
 	}
 
 	sort_history();
-	console.log(matchesHistory);
 
 	$("#ux_0").html('');
 	$("#ux_0").append('<div class="list_fill"></div>');
@@ -1748,4 +1749,11 @@ function compare_matches(a, b) {
 	return 0;
 }
 
+function compare_explore(a, b) {
+	var awlrate = a.wins-a.losses;
+	var bwlrate = b.wins-b.losses;
 
+	if (awlrate > bwlrate)	return -1;
+	if (awlrate < bwlrate)	return 1;
+	return 0;
+}
