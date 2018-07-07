@@ -245,6 +245,34 @@ ipc.on('set_clipboard', function (event, arg) {
 ipc.on('get_economy', function (event, state) {
     goldHistory = store.get("gold_history");
     vaultHistory = store.get("vault_history");
+
+    for (let ii = 0; ii < goldHistory.length; ii++) {
+        if (ii > 0 ) {
+            let dataPrev = goldHistory[ii-1];
+            let data = goldHistory[ii];
+            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
+            console.log(data.date - dataPrev.date, diff);
+            for (let i = 0; i<diff; i++) {
+                goldHistory.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value});
+                ii++;
+            }
+        }
+    }
+
+    for (let ii = 0; ii < vaultHistory.length; ii++) {
+        if (ii > 0 ) {
+            let dataPrev = vaultHistory[ii-1];
+            let data = vaultHistory[ii];
+            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
+            console.log(data.date - dataPrev.date, diff);
+            for (let i = 0; i<diff; i++) {
+                vaultHistory.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value});
+                ii++;
+            }
+        }
+    }
+
+    
     var economy = {gold: goldHistory, vault: vaultHistory};
     mainWindow.webContents.send("set_economy", economy);
 });

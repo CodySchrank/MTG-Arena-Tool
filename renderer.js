@@ -1111,6 +1111,7 @@ function open_economy() {
 	            label: 'Gold',
 				data: data,
 				type: 'line',
+				fill: true,
 	            backgroundColor: [
 	                'rgba(221, 130, 99, 0.5)',
 	            ],
@@ -1121,6 +1122,11 @@ function open_economy() {
 	    },
 	    options: {
 	    	responsive: true,
+			elements: {
+				line: {
+					tension: 0.000001
+				}
+			},
 			scales: {
 				xAxes: [{
 					type: 'time',
@@ -1158,6 +1164,7 @@ function open_economy() {
 	            label: 'Vault',
 				data: data,
 				type: 'line',
+				fill: true,
 	            backgroundColor: [
 	                'rgba(183, 200, 158, 0.5)',
 	            ],
@@ -1168,6 +1175,11 @@ function open_economy() {
 	    },
 	    options: {
 	    	responsive: true,
+			elements: {
+				line: {
+					tension: 0.000001
+				}
+			},
 			scales: {
 				xAxes: [{
 					type: 'time',
