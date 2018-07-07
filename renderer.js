@@ -362,6 +362,9 @@ function setHistory(arg) {
 
 		if (match.type == "match") {
 			var tileGrpid = match.playerDeck.deckTileId;
+			if (!cardsDb.get(tileGrpid)) {
+				tileGrpid = 67003;
+			}
 
 			var tile = document.createElement("div");
 			tile.classList.add(match.id+"t");
@@ -589,6 +592,10 @@ function setExplore(arg) {
 		}
 
 		var tileGrpid = _deck.deck_tile;
+		if (!cardsDb.get(tileGrpid)) {
+			tileGrpid = 67003;
+		}
+
 		var tile = document.createElement("div");
 		tile.classList.add(index+"t");
 		tile.classList.add("deck_tile");

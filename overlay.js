@@ -3,8 +3,8 @@ window.ipc = electron.ipcRenderer;
 var renderer = 1;
 var matchBeginTime = Date.now();
 var clockMode = 0;
-var draftMode = 0;
-var deckMode = 1;
+var draftMode = 1;
+var deckMode = 0;
 var overlayMode = 0;
 
 const Database = require('./database.js');
@@ -157,7 +157,6 @@ function setDraft() {
 
 		draftPick.sort(compare_draft_cards); 
 
-		var prevIndex = 0;
 		draftPick.forEach(function(grpId) {
 			addCardTile(grpId, 'a', 1, $(".overlay_decklist"));
 		});
@@ -170,20 +169,19 @@ function setDraft() {
 
 		draftPack.sort(compare_draft_picks); 
 
-		var prevIndex = 0;
 		draftPack.forEach(function(grpId) {
-			var rank = 0;
+			var rank = 9;
 			if (picksRank[grpId] != undefined) {
-				rank = Math.round(picksRank[grpId].average/13*10);
+				rank = Math.round(picksRank[grpId].average/13*9);
 			}
-			addCardTile(grpId, 'a', rank, $(".overlay_decklist"));
+			addCardTile(grpId, 'a', rank+1, $(".overlay_decklist"));
 		});
 	}
 }
 
 function compare_draft_picks(a, b) {
-	var arank = 0;
-	var brank = 0;
+	var arank = 15;
+	var brank = 15;
 
 	if (picksRank[a] != undefined) {
 		arank = picksRank[a].average;
