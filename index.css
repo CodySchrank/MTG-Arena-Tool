@@ -1511,12 +1511,13 @@ span {
 }
 
 .economy {
-    margin: 48px;
-    width: calc(100% - 96px);
+    margin: 48px auto;
+    max-width: 480px;
     height: calc(100% - 96px);
 }
 
 .chart_container {
+    margin-top: 48px;
 }
 
 #goldChart {

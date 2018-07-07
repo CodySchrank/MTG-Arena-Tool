@@ -314,55 +314,94 @@ function setHistory(arg) {
 	}
 
 	sort_history();
+	var mainDiv = document.getElementById("ux_0");
+	mainDiv.innerHTML = '';
 
-	$("#ux_0").html('');
-	$("#ux_0").append('<div class="list_fill"></div>');
+	var d = document.createElement("div");
+	d.classList.add("list_fill");
+
+	mainDiv.appendChild(d);
 
 	matchesHistory.matches.forEach(function(match, index) {
 		match = matchesHistory[match];
 
-		var div = $('<div class="'+match.id+' list_match"></div>');
-		var fltl = $('<div class="flex_item"></div>');
+		var div = document.createElement("div");
+		div.classList.add(match.id);
+		div.classList.add("list_match");
 
-		var fll = $('<div class="flex_item"></div>');
-		fll.css("flex-direction","column");
-		var flt = $('<div class="flex_top"></div>');
-		var flb = $('<div class="flex_bottom"></div>');
-		flt.appendTo(fll); flb.appendTo(fll);
+		var fltl = document.createElement("div");
+		fltl.classList.add("flex_item");
 
-		var flc = $('<div class="flex_item"></div>');
-		flc.css("flex-direction","column");
-		flc.css("flex-grow", 2);
-		fct = $('<div class="flex_top"></div>');
-		fcb = $('<div class="flex_bottom"></div>');
-		fct.appendTo(flc); fcb.appendTo(flc);
+		var fll = document.createElement("div");
+		fll.classList.add("flex_item");
+		fll.style.flexDirection = "column";
 
-		var flr = $('<div class="flex_item"></div>');
+		var flt = document.createElement("div");
+		flt.classList.add("flex_top");
+		fll.appendChild(flt);
+
+		var flb = document.createElement("div");
+		flb.classList.add("flex_bottom");
+		fll.appendChild(flb);
+
+		var flc = document.createElement("div");
+		flc.classList.add("flex_item");
+		flc.style.flexDirection = "column";
+		flc.style.flexGrow = 2;
+
+		var fct = document.createElement("div");
+		fct.classList.add("flex_top");
+		flc.appendChild(fct);
+
+		var fcb = document.createElement("div");
+		fcb.classList.add("flex_bottom");
+		flc.appendChild(fcb);
+
+		var flr = document.createElement("div");
+		flr.classList.add("flex_item");
 
 		if (match.type == "match") {
 			var tileGrpid = match.playerDeck.deckTileId;
-			var tile = $('<div class="'+match.id+'t deck_tile"></div>');
-			tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
-			tile.appendTo(fltl);
 
-			var d = $('<div class="list_deck_name">'+match.playerDeck.name+'</div>');
-			d.appendTo(flt);
-			//match.playerDeck.colors = get_deck_colors(match.playerDeck);
+			var tile = document.createElement("div");
+			tile.classList.add(match.id+"t");
+			tile.classList.add("deck_tile");
+			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
+			fltl.appendChild(tile);
+
+			var d = document.createElement("div");
+			d.classList.add("list_deck_name");
+			d.innerHTML = match.playerDeck.name;
+			flt.appendChild(d);
 
 			match.playerDeck.colors.forEach(function(color) {
-				$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
+				var m = document.createElement("div");
+				m.classList.add("mana_20");
+				m.classList.add("mana_"+mana[color]);
+				flb.appendChild(m);
 			});
 
-			var d = $('<div class="list_match_title">vs '+match.opponent.name+'</div>');
-			d.appendTo(fct);
-			var d = $('<div class="list_match_time">'+timeSince(new Date(match.date))+' ago.</div>');
-			d.appendTo(fcb);
+			var d = document.createElement("div");
+			d.classList.add("list_match_title");
+			d.innerHTML = "vs "+match.opponent.name;
+			fct.appendChild(d);
+
+			var d = document.createElement("div");
+			d.classList.add("list_match_time");
+			d.innerHTML = timeSince(new Date(match.date))+' ago.';
+			fcb.appendChild(d);
 
 			if (match.player.win > match.opponent.win) {
-				var d = $('<div class="list_match_result_win">Win</div>'); d.appendTo(flr);
+				var d = document.createElement("div");
+				d.classList.add("list_match_result_win");
+				d.innerHTML = "Win";
+				flr.appendChild(d);
 			}
 			else {
-				var d = $('<div class="list_match_result_loss">Loss</div>'); d.appendTo(flr);
+				var d = document.createElement("div");
+				d.classList.add("list_match_result_loss");
+				d.innerHTML = "Loss";
+				flr.appendChild(d);
 			}
 		}
 		else {
@@ -375,30 +414,39 @@ function setHistory(arg) {
 			if (match.set == "Aether Revolt")		tileGrpid = 64647;// Tezzeret art
 			if (match.set == "Kaladesh")			tileGrpid = 63859;// Chandra art
 
-			
-			var tile = $('<div class="'+match.id+'t deck_tile"></div>');
-			tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
-			tile.appendTo(fltl);
+			var tile = document.createElement("div");
+			tile.classList.add(match.id+"t");
+			tile.classList.add("deck_tile");
+			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
+			fltl.appendChild(tile);
 
-			var d = $('<div class="list_deck_name">'+match.set+' draft</div>');
-			d.appendTo(flt);
+			var d = document.createElement("div");
+			d.classList.add("list_deck_name");
+			d.innerHTML = match.set+" draft";
+			flt.appendChild(d);
 
-			var d = $('<div class="list_match_time">'+timeSince(new Date(match.date))+' ago.</div>');
-			d.appendTo(fcb);
+			var d = document.createElement("div");
+			d.classList.add("list_match_time");
+			d.innerHTML = timeSince(new Date(match.date))+" ago.";
+			fcb.appendChild(d);
 
-			var d = $('<div class="list_match_replay">See replay</div>');
-			d.appendTo(fct);
+			var d = document.createElement("div");
+			d.classList.add("list_match_replay");
+			d.innerHTML = "See replay";
+			fct.appendChild(d);
 
-			var d = $('<div class="list_match_result_win"></div>');
-			d.appendTo(flr);
+			var d = document.createElement("div");
+			d.classList.add("list_match_result_win");
+			flr.appendChild(d);
+
 		}
 
+		div.appendChild(fltl);
+		div.appendChild(fll);
+		div.appendChild(flc);
+		div.appendChild(flr);
 
-		fltl.appendTo(div);
-		fll.appendTo(div);
-		flc.appendTo(div);
-		flr.appendTo(div);
-		$("#ux_0").append(div);
+		mainDiv.appendChild(div);
 
 		$('.'+match.id).on('mouseenter', function(e) {
 		    $('.'+match.id+'t').css('opacity', 1);
@@ -505,8 +553,12 @@ function setExplore(arg) {
 		explore = arg;
 	}
 
-	$("#ux_0").html('');
-	$("#ux_0").append('<div class="list_fill"></div>');
+	var mainDiv = document.getElementById("ux_0");
+	mainDiv.innerHTML = '';
+
+	var d = document.createElement("div");
+	d.classList.add("list_fill");
+	mainDiv.appendChild(d);// goes down
 
 	// Search box
 	var label = $('<label class="input_container">Filter by event</label>');
@@ -520,8 +572,12 @@ function setExplore(arg) {
 		updateExplore();
 	});
 
-	$("#ux_0").append('<div class="list_fill"></div>');
-	$("#ux_0").append('<div class="list_fill"></div>');
+	var d = document.createElement("div");
+	d.classList.add("list_fill");
+	mainDiv.appendChild(d);
+	var d = document.createElement("div");
+	d.classList.add("list_fill");
+	mainDiv.appendChild(d);
 
 	explore.forEach(function(_deck, index) {
 		if (_deck.deck_colors == undefined) {
@@ -533,41 +589,72 @@ function setExplore(arg) {
 		}
 
 		var tileGrpid = _deck.deck_tile;
-		var tile = $('<div class="'+index+'t deck_tile"></div>');
-		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
+		var tile = document.createElement("div");
+		tile.classList.add(index+"t");
+		tile.classList.add("deck_tile");
+		tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
 
-		var div = $('<div class="'+index+' list_deck"></div>');
+		var div = document.createElement("div");
+		div.classList.add(index);
+		div.classList.add("list_deck");
 
-		var fll = $('<div class="flex_item"></div>');
-		var flc = $('<div class="flex_item"></div>');
-		var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
-		var flr = $('<div class="flex_item"></div>');
-		flc.css("flex-direction","column");
-		flr.css("flex-direction","column");
+		var fll = document.createElement("div");
+		fll.classList.add("flex_item");
 
-		var flt = $('<div class="flex_top"></div>');
-		var flb = $('<div class="flex_bottom"></div>');
+		var flc = document.createElement("div");
+		flc.classList.add("flex_item");
+		flc.style.flexDirection = "column";
 
-		$('<div class="list_deck_name">'+_deck.deck_name+'</div>').appendTo(flt);
-		$('<div class="list_deck_name_it">by '+_deck.player_name+'</div>').appendTo(flt);
+		var flcf = document.createElement("div");
+		flcf.classList.add("flex_item");
+		flcf.style.flexGrow = 2;
+
+		var flr = document.createElement("div");
+		flr.classList.add("flex_item");
+		flr.style.flexDirection = "column";
+
+		var flt = document.createElement("div");
+		flt.classList.add("flex_top");
+
+		var flb = document.createElement("div");
+		flb.classList.add("flex_bottom");
+
+		var d = document.createElement("div");
+		d.classList.add("list_deck_name");
+		d.innerHTML = _deck.deck_name;
+		flt.appendChild(d);
+
+		var d = document.createElement("div");
+		d.classList.add("list_deck_name_it");
+		d.innerHTML = "by "+_deck.player_name;
+		flt.appendChild(d);
 		
 		_deck.deck_colors.forEach(function(color) {
-			$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
+			var d = document.createElement("div");
+			d.classList.add("mana_20");
+			d.classList.add("mana_"+mana[color]);
+			flb.appendChild(d);
 		});
 
-		$('<div class="list_deck_record">'+_deck.wins+' - '+_deck.losses+'</div>').appendTo(flr);
-		$('<div class="list_deck_name_it">'+_deck.event.replace(/_/g, " ")+'</div>').appendTo(flr);
+		var d = document.createElement("div");
+		d.classList.add("list_deck_record");
+		d.innerHTML = _deck.wins+' - '+_deck.losses;
+		flr.appendChild(d);
 
+		var d = document.createElement("div");
+		d.classList.add("list_deck_name_it");
+		d.innerHTML = _deck.event.replace(/_/g, " ");
+		flr.appendChild(d);
 
-		fll.appendTo(div);
-		tile.appendTo(fll);
+		div.appendChild(fll);
+		fll.appendChild(tile);
+		div.appendChild(flc);
+		div.appendChild(flcf);
+		flc.appendChild(flt);
+		flc.appendChild(flb);
+		div.appendChild(flr);
 
-		flc.appendTo(div);
-		flcf.appendTo(div);
-		flt.appendTo(flc);
-		flb.appendTo(flc);
-		flr.appendTo(div);
-		$("#ux_0").append(div);
+		mainDiv.appendChild(div);
 
 		$('.'+index).on('mouseenter', function(e) {
 		    $('.'+index+'t').css('opacity', 1);
@@ -581,7 +668,6 @@ function setExplore(arg) {
 
 		$('.'+index).on('click', function(e) {
 			open_course_request(_deck.id);
-		    //$('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
 		});
 
 	});
