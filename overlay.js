@@ -4,7 +4,7 @@ var renderer = 1;
 var matchBeginTime = Date.now();
 var clockMode = 0;
 var draftMode = 0;
-var deckMode = 0;
+var deckMode = 1;
 var overlayMode = 0;
 
 const Database = require('./database.js');
@@ -91,6 +91,12 @@ ipc.on('set_opponent_rank', function (event, rank, title) {
 	$(".top_rank").css("background-position", (rank*-48)+"px 0px").attr("title", title);
 });
 
+var picksRank = null;
+ipc.on('set_draft_picks', function (event, arg) {
+	picksRank = arg;
+	console.log(arg);
+});
+
 //
 ipc.on('set_deck', function (event, arg) {
 	$(".overlay_decklist").html('');
@@ -162,13 +168,33 @@ function setDraft() {
 			$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
 		});
 
-		draftPack.sort(compare_draft_cards); 
+		draftPack.sort(compare_draft_picks); 
 
 		var prevIndex = 0;
 		draftPack.forEach(function(grpId) {
-			addCardTile(grpId, 'a', 1, $(".overlay_decklist"));
+			var rank = 0;
+			if (picksRank[grpId] != undefined) {
+				rank = Math.round(picksRank[grpId].average/13*10);
+			}
+			addCardTile(grpId, 'a', rank, $(".overlay_decklist"));
 		});
 	}
+}
+
+function compare_draft_picks(a, b) {
+	var arank = 0;
+	var brank = 0;
+
+	if (picksRank[a] != undefined) {
+		arank = picksRank[a].average;
+	}
+	if (picksRank[b] != undefined) {
+		brank = picksRank[b].average;
+	}
+
+	if (arank < brank)	return -1;
+	if (arank > brank)	return 1;
+	return 0;
 }
 
 function hoverCard(grpId) {

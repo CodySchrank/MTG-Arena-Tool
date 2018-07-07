@@ -745,6 +745,7 @@ function processLogData(data) {
             createDraft();
             overlay.webContents.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
             currentDraftPack = json.draftPack.slice(0);
+            httpGetPicks(draftSet);
         }
     }
 
@@ -1284,7 +1285,7 @@ function httpBasic() {
         var _headers = value;
 
         if (store.get("settings").send_data == false && _headers.method != 'delete_data') {
-            callback({message: "Settings dont allow sending data!"});
+            callback({message: "Settings dont allow sending data! > "+_headers.method});
             removeFromHttp(_headers.reqId);
         }
         if (_headers.method != 'auth') {
@@ -1299,7 +1300,12 @@ function httpBasic() {
         }
         
         var http = require('https');
-        var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv4.php', method: 'POST', headers: _headers };
+        if (_headers.method == 'get_picks') {
+            var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/get_picks.php', method: 'POST', headers: _headers };
+        }
+        else {
+            var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv4.php', method: 'POST', headers: _headers };
+        }
         //console.log("SEND >> "+index, _headers.method, _headers.reqId, _headers.token);
 
         var results = ''; 
@@ -1325,6 +1331,9 @@ function httpBasic() {
                         if (_headers.method == 'get_course') {
                             mainWindow.webContents.send("open_course_deck", parsedResult.result);
                         }
+                    }
+                    if (_headers.method == 'get_picks') {
+                        overlay.webContents.send("set_draft_picks", parsedResult);
                     }
                 } catch (e) {
                     console.error(e.message);
@@ -1401,9 +1410,9 @@ function httpDeleteData(courseId) {
     httpAsync.push({'reqId': _id, 'method': 'delete_data', 'uid': playerId});
 }
 
-function httpGetMeta() {
+function httpGetPicks(set) {
     var _id = makeId(6);
-    httpAsync.push({'reqId': _id, 'method': 'get_meta', 'uid': playerId});
+    httpAsync.push({'reqId': _id, 'method': 'get_picks', 'uid': playerId, 'query': set});
 }
 
 //
