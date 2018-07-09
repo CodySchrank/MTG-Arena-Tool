@@ -911,7 +911,7 @@ label {
     margin-bottom: 24px;
     -webkit-border-radius: 4.75% / 3.5%;
     box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.5);
-    -webkit-transition: opacity .2s ease-in;
+    -webkit-transition: all .2s ease-in;
 }
 
 .loader {
@@ -924,7 +924,7 @@ label {
     margin-right: 24px;
     margin-bottom: 24px;
     -webkit-border-radius: 4.75% / 3.5%;
-    -webkit-transition: opacity .2s ease-in;
+    -webkit-transition: all .2s ease-in;
 }
 
 .card_tile {

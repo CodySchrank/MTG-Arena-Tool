@@ -21,6 +21,7 @@ var overlayAlpha = 1;
 var cardSizePos = 4;
 var cardSize = 140;
 var inputTimer = undefined;
+var loadHistory = 0;
 
 var goldHistory = null;
 var vaultHistory = null;
@@ -59,7 +60,7 @@ ipc.on('set_decks', function (event, arg) {
 
 //
 ipc.on('set_history', function (event, arg) {
-	setHistory(arg);
+	setHistory(arg, 0);
 });
 
 //
@@ -308,22 +309,29 @@ function open_economy_ipc() {
 }
 
 //
-function setHistory(arg) {
+function setHistory(arg, loadMore) {
 	if (arg != null) {
 		matchesHistory = arg;
 	}
 
-	sort_history();
 	var mainDiv = document.getElementById("ux_0");
-	mainDiv.innerHTML = '';
+	if (loadMore > 0) {
+	}
+	else {
+		loadMore = 25;
+		sort_history();		
+		mainDiv.innerHTML = '';
+		var d = document.createElement("div");
+		d.classList.add("list_fill");
+		mainDiv.appendChild(d);
+		loadHistory = 0;
+	}
 
-	var d = document.createElement("div");
-	d.classList.add("list_fill");
-
-	mainDiv.appendChild(d);
-
-	matchesHistory.matches.forEach(function(match, index) {
-		match = matchesHistory[match];
+	//matchesHistory.matches.forEach(function(match, index) {
+	//	match = matchesHistory[match];
+	for (var loadEnd = loadHistory + loadMore; loadHistory < loadEnd; loadHistory++) {
+		var match_id = matchesHistory.matches[loadHistory];
+		var match = matchesHistory[match_id];
 
 		var div = document.createElement("div");
 		div.classList.add(match.id);
@@ -451,29 +459,43 @@ function setHistory(arg) {
 
 		mainDiv.appendChild(div);
 
-		$('.'+match.id).on('mouseenter', function(e) {
-		    $('.'+match.id+'t').css('opacity', 1);
-		    $('.'+match.id+'t').css('width', '200px');
-		});
+		console.log(match.id);
+		addHover(match);
+	}
 
-		$('.'+match.id).on('mouseleave', function(e) {
-		    $('.'+match.id+'t').css('opacity', 0.66);
-		    $('.'+match.id+'t').css('width', '128px');
-		});
-
-		$('.'+match.id).on('click', function(e) {
-			if (match.type == "match") {
-				open_match(match.id);
+	jQuery(function($) {
+		$("#ux_0").on('scroll', function() {
+			if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+				setHistory(arg, 20);
 			}
-			else {
-				draftPosition = 1;
-				open_draft(match.id, tileGrpid, match.set);
-			}
-		    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
-		});
+		})
 	});
 
-	$("#ux_0").append('<div class="list_fill"></div>');
+	//$("#ux_0").append('<div class="list_fill"></div>');
+	loadHistory += 20;
+}
+
+function addHover(_match) {
+	$('.'+_match.id).on('mouseenter', function(e) {
+	    $('.'+_match.id+'t').css('opacity', 1);
+	    $('.'+_match.id+'t').css('width', '200px');
+	});
+
+	$('.'+_match.id).on('mouseleave', function(e) {
+	    $('.'+_match.id+'t').css('opacity', 0.66);
+	    $('.'+_match.id+'t').css('width', '128px');
+	});
+
+	$('.'+_match.id).on('click', function(e) {
+		if (_match.type == "match") {
+			open__match(_match.id);
+		}
+		else {
+			draftPosition = 1;
+			open_draft(_match.id, tileGrpid, _match.set);
+		}
+	    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
+	});
 }
 
 //
@@ -1538,7 +1560,6 @@ function printCards() {
 
 			img.on('mouseenter', function(e) {
 				$('.main_hover').css("opacity", 1);
-				$('.loader').css("opacity", 1);
 				let dfc = '';
 				if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
 				if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
@@ -1547,6 +1568,7 @@ function printCards() {
 
 				$('.main_hover').on('load', function(){
 					$('.loader').css("opacity", 0);
+					
 				});
 			});
 

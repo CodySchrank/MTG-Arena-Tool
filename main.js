@@ -14,7 +14,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140, overlay_alpha: 1},
+		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1},
         matches_index:[],
         draft_index:[],
         vault_history:[],
@@ -146,7 +146,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 140, overlay_alpha: 1},
+            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1},
             matches_index:[],
             draft_index:[],
             vault_history:[],
@@ -195,7 +195,6 @@ ipc.on('request_history', function (event, state) {
 	else {
 	    mainWindow.webContents.send("set_history_data", history);
 	}
-
 });
 
 ipc.on('request_explore', function (event, arg) {
@@ -205,7 +204,6 @@ ipc.on('request_explore', function (event, arg) {
 ipc.on('request_course', function (event, arg) {
     httpGetCourse(arg);
 });
-
 
 // Events
 ipc.on('window_close', function (event, state) {
