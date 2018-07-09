@@ -91,6 +91,7 @@ var wilcardsHistory = [];
 
 // Adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')({showDevTools: false});
+console.log(process.platform);
 
 var mainWindow;
 var overlay;
@@ -413,7 +414,10 @@ function createMainWindow() {
     win.loadURL(`file://${__dirname}/index.html`);
     win.on('closed', onClosed);
 
-    let iconPath = path.join(__dirname, 'icon.ico');
+    let iconPath = path.join(__dirname, 'icon.png');
+    if (process.platform == 'win32') {
+        iconPath = path.join(__dirname, 'icon.ico');
+    }
     tray = new Tray(iconPath);
 
     const contextMenu = Menu.buildFromTemplate([
@@ -481,8 +485,14 @@ app.on('ready', () => {
 
 // Read the log
 var prevLogSize = 0;
-var logUri = process.env.APPDATA;
-logUri = logUri.replace('Roaming','LocalLow\\Wizards Of The Coast\\MTGA\\output_log.txt');
+if (process.platform === 'win32') {
+    var logUri = process.env.APPDATA;
+    logUri = logUri.replace('Roaming','LocalLow\\Wizards Of The Coast\\MTGA\\output_log.txt');
+}
+else {
+    // Path for Wine, could change depending on installation method
+    var logUri = process.env.HOME+'/.wine/drive_c/user/'+process.env.USER+'/AppData/LocalLow/Wizards of the Coast/MTGA/output_log.txt';
+}
 console.log(logUri);
 
 var file;
