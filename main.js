@@ -27,8 +27,8 @@ const serverAddress = 'mtgatool.com';
 const Database = require('./database.js');
 const cardsDb = new Database();
 
-const debugLog = false;
-const debugLogSpeed = 0.1;
+const debugLog = true;
+const debugLogSpeed = 25.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 
@@ -1213,15 +1213,13 @@ function forceDeckUpdate() {
         card.chance = Math.round(hypergeometric(1, decksize, 1, card.quantity)*100);
     });
 
-    currentDeckUpdated.chanceCre = hypergeometric(1, decksize, 1, typeCre) * 100;
-    currentDeckUpdated.chanceIns = hypergeometric(1, decksize, 1, typeIns) * 100;
-    currentDeckUpdated.chanceSor = hypergeometric(1, decksize, 1, typeSor) * 100;
-    currentDeckUpdated.chancePla = hypergeometric(1, decksize, 1, typePla) * 100;
-    currentDeckUpdated.chanceArt = hypergeometric(1, decksize, 1, typeArt) * 100;
-    currentDeckUpdated.chanceEnc = hypergeometric(1, decksize, 1, typeEnc) * 100;
-    currentDeckUpdated.chanceLan = hypergeometric(1, decksize, 1, typeLan) * 100;
-    console.log("typeCre:", typeCre, "typeIns:", typeIns, "typeSor:", typeSor, "typePla:", typePla, "typeArt:", typeArt, "typeEnc:", typeEnc, "typeLan:", typeLan);
-    console.log("typeCre:", currentDeckUpdated.chanceCre, "typeIns:", currentDeckUpdated.chanceIns, "typeSor:", currentDeckUpdated.chanceSor, "typePla:", currentDeckUpdated.chancePla, "typeArt:", currentDeckUpdated.chanceArt, "typeEnc:", currentDeckUpdated.chanceEnc, "typeLan:", currentDeckUpdated.chanceLan);
+    currentDeckUpdated.chanceCre = Math.round(hypergeometric(1, decksize, 1, typeCre) * 1000)/10;
+    currentDeckUpdated.chanceIns = Math.round(hypergeometric(1, decksize, 1, typeIns) * 1000)/10;
+    currentDeckUpdated.chanceSor = Math.round(hypergeometric(1, decksize, 1, typeSor) * 1000)/10;
+    currentDeckUpdated.chancePla = Math.round(hypergeometric(1, decksize, 1, typePla) * 1000)/10;
+    currentDeckUpdated.chanceArt = Math.round(hypergeometric(1, decksize, 1, typeArt) * 1000)/10;
+    currentDeckUpdated.chanceEnc = Math.round(hypergeometric(1, decksize, 1, typeEnc) * 1000)/10;
+    currentDeckUpdated.chanceLan = Math.round(hypergeometric(1, decksize, 1, typeLan) * 1000)/10;
 }
 
 function getOppDeck() {

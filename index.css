@@ -857,12 +857,12 @@ label {
 }
 
 .chance_title {
-    font-size: 16px;
-    height: 24px;
-    line-height: 24px;
-    margin: 0px auto
+    font-size: 15px;
+    height: 20px;
+    line-height: 20px;
+    margin: 0px auto;
     text-align: center;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .clock_elapsed {

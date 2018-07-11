@@ -5,18 +5,22 @@ function addCardTile(grpId, indent, quantity, element) {
 	if (quantity !== 0) {
 		var cont = $('<div class="card_tile_container"></div>');
 		if ((quantity+" ").indexOf("%") != -1) {
+			var ww = 64;
+			var ll = 48;
 			cont.append('<div class="card_tile_odds"><span>'+quantity+'</span></div>');
 		}
 		else {
+			var ww = 56;
+			var ll = 40;
 			cont.append('<div class="card_tile_quantity"><span>'+quantity+'</span></div>');
 		}
 		element.append(cont);
 		
-		var div = $('<div id="t'+grpId+indent+'" class="card_tile '+get_frame_class(cardsDb.get(grpId).frame)+'"></div>');
+		var div = $('<div id="t'+grpId+indent+'" style="min-width: calc(100% - '+ww+'px) !important;" class="card_tile '+get_frame_class(cardsDb.get(grpId).frame)+'"></div>');
 		cont.append(div);
 
 		// Glow hover
-		var glow = $('<div id="t'+grpId+indent+'" class="card_tile_glow"></div>');
+		var glow = $('<div id="t'+grpId+indent+'" style="min-width: calc(100% - '+ww+'px) !important; left: calc(0px - 100% + '+ll+'px) !important" class="card_tile_glow"></div>');
 		cont.append(glow);
 		glow.on('mouseenter', function(e) {
 			var domid = $(this).attr('id');
@@ -346,6 +350,38 @@ function get_deck_colors(deck) {
 		});
 	});
 	return deck.colors;
+}
+
+//
+function get_ids_colors(list) {
+	var colors = [];
+	list.forEach(function(grpid) {
+		var card_name = cardsDb.get(grpid).name;
+		var card_cost = cardsDb.get(grpid).cost;
+		card_cost.forEach(function(c) {
+			if (!colors.includes(c.color) && c.color != 0 && c.color < 7) {
+				colors.push(c.color);
+			}
+		});
+	});
+
+	return colors;
+}
+
+//
+function add_deck_colors(colors, deck) {
+	deck.forEach(function(card) {
+		var grpid = card.id;
+		var card_name = cardsDb.get(grpid).name;
+		var card_cost = cardsDb.get(grpid).cost;
+		card_cost.forEach(function(c) {
+			if (!colors.includes(c.color) && c.color != 0 && c.color < 7) {
+				colors.push(c.color);
+			}
+		});
+	});
+
+	return colors;
 }
 
 //

@@ -1789,6 +1789,7 @@ function getDeckWinrate(deckid, lastEdit) {
 	var loss = 0;
 	var winsLastEdit = 0;
 	var lossLastEdit = 0;
+	var winColors = {};
 	if (matchesHistory == undefined) {
 		return 0;
 	}
@@ -1797,6 +1798,7 @@ function getDeckWinrate(deckid, lastEdit) {
 		if (match.type == "match") {
 			if (match.playerDeck.id == deckid) {
 				if (match.player.win > match.opponent.win) {
+					winColors = add_deck_colors(winColors, match.oppDeck.mainDeck);
 					wins++;
 				}
 				else {
@@ -1820,7 +1822,7 @@ function getDeckWinrate(deckid, lastEdit) {
 	var winrate = Math.round((1/(wins+loss)*wins) * 100) / 100;
 	var winrateLastEdit = Math.round((1/(winsLastEdit+lossLastEdit)*winsLastEdit) * 100) / 100;
 	if (winsLastEdit == 0)	winrateLastEdit = 0;
-	return {total: winrate, lastEdit: winrateLastEdit};
+	return {total: winrate, lastEdit: winrateLastEdit, colors: winColors};
 }
 
 //
