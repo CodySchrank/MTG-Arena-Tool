@@ -111,27 +111,29 @@ ipc.on('set_deck', function (event, arg) {
 	arg.mainDeck.sort(compare_cards); 
 	//arg.mainDeck.forEach(function(card) {
 	//	var grpId = card.id;
+	var deckListDiv = $(".overlay_decklist");
 
 	var prevIndex = 0;
 	arg.mainDeck.forEach(function(card) {
 		var grpId = card.id;
-		/*
-		// Print type separators on overlay
-		// It doesnt look good, but you can try..
-		var type = cardsDb.get(grpId).type;
-		if (prevIndex == 0) ;
-			addCardSeparator(get_card_type_sort(type), $(".overlay_decklist"));
+		if (deckMode == 2) {
+			addCardTile(grpId, 'a', card.chance+"%", deckListDiv);
 		}
-		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
-				addCardSeparator(get_card_type_sort(type), $(".overlay_decklist"));
-			}
+		else {
+			addCardTile(grpId, 'a', card.quantity, deckListDiv);
 		}
-		*/
-
-		addCardTile(grpId, 'a', card.quantity, $(".overlay_decklist"));
 		prevIndex = grpId;
 	});
+
+	if (deckMode == 2) {
+		deckListDiv.append('<div class="chance_title">Creature: '+arg.chanceCre+'%</div>');
+		deckListDiv.append('<div class="chance_title">Instant: '+arg.chanceIns+'%</div>');
+		deckListDiv.append('<div class="chance_title">Sorcery: '+arg.chanceSor+'%</div>');
+		deckListDiv.append('<div class="chance_title">Artifact: '+arg.chanceArt+'%</div>');
+		deckListDiv.append('<div class="chance_title">Enchantment: '+arg.chanceEnc+'%</div>');
+		deckListDiv.append('<div class="chance_title">Planeswalker: '+arg.chancePla+'%</div>');
+		deckListDiv.append('<div class="chance_title">Land: '+arg.chanceLan+'%</div>');
+	}
 });
 
 var draftPack, draftPick, packN, pickN;
@@ -249,14 +251,14 @@ $(document).ready(function() {
 	$(".deck_prev").click(function () {
 	    deckMode -= 1;
 	    if (deckMode < 0) {
-	    	deckMode = 1;
+	    	deckMode = 2;
 	    }
 	    ipc.send('set_deck_mode', deckMode);
 	});
 	//
 	$(".deck_next").click(function () {
 	    deckMode += 1;
-	    if (deckMode > 1) {
+	    if (deckMode > 2) {
 	    	deckMode = 0;
 	    }
 	    ipc.send('set_deck_mode', deckMode);

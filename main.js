@@ -426,7 +426,7 @@ function createMainWindow() {
     tray.setToolTip('MTG Arena Tool');
     tray.setContextMenu(contextMenu);
 
-	win.on('resize', () => {
+	win.on('resize', (e) => {
 		saveWindowPos();
 	});
 
@@ -1134,6 +1134,9 @@ function update_deck() {
     if (overlayDeckMode == 1) {
         overlay.webContents.send("set_deck", currentDeck);
     }
+    if (overlayDeckMode == 2) {
+        overlay.webContents.send("set_deck", currentDeckUpdated);
+    }
 }
 
 function debug_overlay_show() {
@@ -1166,6 +1169,19 @@ function get_rank_index(_rank, _tier) {
 }
 
 function forceDeckUpdate() {
+    var decksize = 0;
+    var typeCre = 0;
+    var typeIns = 0;
+    var typeSor = 0;
+    var typePla = 0;
+    var typeArt = 0;
+    var typeEnc = 0;
+    var typeLan = 0;
+    currentDeckUpdated.mainDeck.forEach(function(card) {
+        card.total = card.quantity;
+        decksize += card.quantity;
+    });
+
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
@@ -1182,6 +1198,30 @@ function forceDeckUpdate() {
             }
         }
     }); 
+
+    currentDeckUpdated.mainDeck.forEach(function(card) {
+        var c = cardsDb.get(card.id);
+        if (c) {
+            if (c.type.includes("Creature", 0))      typeCre += card.quantity;
+            if (c.type.includes("Planeswalker", 0))  typePla += card.quantity;
+            if (c.type.includes("Instant", 0))       typeIns += card.quantity;
+            if (c.type.includes("Sorcery", 0))       typeSor += card.quantity;
+            if (c.type.includes("Artifact", 0))      typeArt += card.quantity;
+            if (c.type.includes("Enchantment", 0))   typeEnc += card.quantity;
+            if (c.type.includes("Land", 0))          typeLan += card.quantity;
+        }
+        card.chance = Math.round(hypergeometric(1, decksize, 1, card.quantity)*100);
+    });
+
+    currentDeckUpdated.chanceCre = hypergeometric(1, decksize, 1, typeCre) * 100;
+    currentDeckUpdated.chanceIns = hypergeometric(1, decksize, 1, typeIns) * 100;
+    currentDeckUpdated.chanceSor = hypergeometric(1, decksize, 1, typeSor) * 100;
+    currentDeckUpdated.chancePla = hypergeometric(1, decksize, 1, typePla) * 100;
+    currentDeckUpdated.chanceArt = hypergeometric(1, decksize, 1, typeArt) * 100;
+    currentDeckUpdated.chanceEnc = hypergeometric(1, decksize, 1, typeEnc) * 100;
+    currentDeckUpdated.chanceLan = hypergeometric(1, decksize, 1, typeLan) * 100;
+    console.log("typeCre:", typeCre, "typeIns:", typeIns, "typeSor:", typeSor, "typePla:", typePla, "typeArt:", typeArt, "typeEnc:", typeEnc, "typeLan:", typeLan);
+    console.log("typeCre:", currentDeckUpdated.chanceCre, "typeIns:", currentDeckUpdated.chanceIns, "typeSor:", currentDeckUpdated.chanceSor, "typePla:", currentDeckUpdated.chancePla, "typeArt:", currentDeckUpdated.chanceArt, "typeEnc:", currentDeckUpdated.chanceEnc, "typeLan:", currentDeckUpdated.chanceLan);
 }
 
 function getOppDeck() {
@@ -1509,4 +1549,43 @@ function makeId(length) {
     ret += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return ret;
+}
+
+
+//
+function fact(arg0) {
+    let _f = 1;
+    let _i = 1;
+    for (_i=1; _i<=arg0; _i++) {
+        _f = _f * _i;
+    }
+
+    return _f;
+}
+
+//
+function comb(arg0, arg1) {
+    let ret = fact(arg0) / fact(arg0-arg1) / fact(arg1);
+    
+    return ret;
+}
+
+//
+function hypergeometric(arg0, arg1, arg2, arg3) {
+    if (arg0 > arg3) {
+        return 0;
+    }
+
+    let _x, _N, _n, _k;
+
+    _x = arg0;// Number of successes in sample (x) <= 
+    _N = arg1;// Population size
+    _n = arg2;// Sample size
+    _k = arg3;// Number of successes in population  
+
+    let _a = comb(_k, _x)
+    let _b = comb(_N-_k, _n-_x);
+    let _c = comb(_N, _n);
+
+    return _a * _b / _c;
 }

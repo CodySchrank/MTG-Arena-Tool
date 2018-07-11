@@ -856,6 +856,15 @@ label {
     z-index: 40;
 }
 
+.chance_title {
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    margin: 0px auto
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+}
+
 .clock_elapsed {
     height: 64px;
     width: 100%;
@@ -982,6 +991,23 @@ span {
     text-align: center;
     font-family: Mplantin;
     background: url(images/quantity.png);
+    background-size: cover;
+}
+
+.card_tile_odds {
+    text-indent: -3px;
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+    height: 24px;
+    min-width: 32px;
+    width: 32px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    text-align: center;
+    font-family: Mplantin;
+    background: url(images/odds.png);
     background-size: cover;
 }
 

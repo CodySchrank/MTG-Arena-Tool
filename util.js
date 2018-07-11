@@ -2,9 +2,14 @@ const emuns = {"Phase":{"0":"","1":"Beginning","2":"1st Main","3":"Combat","4":"
 
 //
 function addCardTile(grpId, indent, quantity, element) {
-	if (quantity > 0) {
+	if (quantity !== 0) {
 		var cont = $('<div class="card_tile_container"></div>');
-		cont.append('<div class="card_tile_quantity"><span>'+quantity+'</span></div>');
+		if ((quantity+" ").indexOf("%") != -1) {
+			cont.append('<div class="card_tile_odds"><span>'+quantity+'</span></div>');
+		}
+		else {
+			cont.append('<div class="card_tile_quantity"><span>'+quantity+'</span></div>');
+		}
 		element.append(cont);
 		
 		var div = $('<div id="t'+grpId+indent+'" class="card_tile '+get_frame_class(cardsDb.get(grpId).frame)+'"></div>');
@@ -182,12 +187,25 @@ function compare_draft_cards(a, b) {
 	return 0;
 }
 
-
-var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria"];
+/*
+var sets = {
+	"Kaladesh"
+	"Aether Revolt"
+	"Welcome Deck 2017"
+	"Amonkhet"
+	"Hour of Devastation"
+	"Ixalan"
+	"Rivals of Ixalan"
+	"Dominaria"
+	"Magic 2019"
+}
+*/
+var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria", "Magic 2019"];
 
 //
 function get_set_scryfall(set) {
 	switch (set) {
+	    case "Magic 2019": 			return "m19";
 	    case "Dominaria": 			return "dom";
 	    case "Rivals of Ixalan": 	return "rix";
 	    case "Ixalan": 				return "xln";
@@ -203,6 +221,7 @@ function get_set_scryfall(set) {
 //
 function get_set_code(set) {
 	switch (set) {
+	    case "Magic 2019": 			return "M19";
 	    case "Dominaria": 			return "DAR";
 	    case "Rivals of Ixalan": 	return "RIX";
 	    case "Ixalan": 				return "XLN";

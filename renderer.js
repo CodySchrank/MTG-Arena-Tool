@@ -488,7 +488,7 @@ function addHover(_match) {
 
 	$('.'+_match.id).on('click', function(e) {
 		if (_match.type == "match") {
-			open__match(_match.id);
+			open_match(_match.id);
 		}
 		else {
 			draftPosition = 1;
