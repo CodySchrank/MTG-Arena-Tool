@@ -666,6 +666,15 @@ label {
     height: 160px;
 }
 
+.pie_container_outer {
+    width: 100%;
+    display: flex;
+    flex-direction: initial;
+    align-items: center;
+    margin: 16px auto;
+    height: 160px;
+}
+
 .pie_container span, .wildcards_cost span {
     margin-bottom: 12px;
     font-family: 'Mplantin';
@@ -1013,7 +1022,7 @@ span {
 
 .card_tile_not_owned {
     min-width: 24px;
-    left: calc(0px - 100% + 57px);
+    left: calc(0px - 100% + 42px);
     position: relative;
     background: url(images/not_owned.png) center no-repeat;
 }
@@ -1026,7 +1035,7 @@ span {
     color: rgba(255, 255, 255, 0.8);
     height: 32px;
     vertical-align: middle;
-    line-height: 32px;
+    line-height: 32px;k,
     font-size: 15px;
     text-align: center;
     font-family: beleren;

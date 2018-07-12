@@ -370,16 +370,26 @@ function get_ids_colors(list) {
 
 //
 function add_deck_colors(colors, deck) {
+	var cols = [0,0,0,0,0,0];
 	deck.forEach(function(card) {
 		var grpid = card.id;
-		var card_name = cardsDb.get(grpid).name;
-		var card_cost = cardsDb.get(grpid).cost;
-		card_cost.forEach(function(c) {
-			if (!colors.includes(c.color) && c.color != 0 && c.color < 7) {
-				colors.push(c.color);
-			}
-		});
+		card = cardsDb.get(grpid);
+		if (card) {
+			var card_name = card.name;
+			var card_cost = card.cost;
+			card_cost.forEach(function(c) {
+				if (c.color != 0 && c.color < 6) {
+					cols[c.color] += 1;
+				}
+			});
+		}
 	});
+
+	colors.w += cols[1];
+	colors.u += cols[2];
+	colors.b += cols[3];
+	colors.r += cols[4];
+	colors.g += cols[5];
 
 	return colors;
 }
@@ -498,7 +508,7 @@ function get_deck_curve(deck) {
 		}
 	});
 	*/
-	console.log(curve);
+	//console.log(curve);
 	return curve;
 }
 

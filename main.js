@@ -27,8 +27,8 @@ const serverAddress = 'mtgatool.com';
 const Database = require('./database.js');
 const cardsDb = new Database();
 
-const debugLog = true;
-const debugLogSpeed = 25.1;
+const debugLog = false;
+const debugLogSpeed = 0.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 
