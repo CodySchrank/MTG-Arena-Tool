@@ -833,6 +833,7 @@ label {
 .overlay_clock_container {
     position: absolute;
     display: flex;
+    flex-direction: column;
     bottom: 0;
     float: center;
     width: 100%;
@@ -844,6 +845,7 @@ label {
 .overlay_draft_container {
     position: absolute;
     display: none;
+    flex-direction: column;
     justify-content: space-around;
     bottom: 0;
     float: center;
@@ -855,6 +857,7 @@ label {
 
 .overlay_deck_container {
     position: absolute;
+    flex-direction: column;
     display: flex;
     justify-content: space-between;
     bottom: 0;
@@ -875,32 +878,50 @@ label {
 }
 
 .clock_elapsed {
-    height: 64px;
+    height: 48px;
     width: 100%;
     text-align: center;
-    line-height: 64px;
+    line-height: 48px;
     font-size: 25px;
     color: rgba(255, 255, 255, 0.8);
     z-index: 50;
 }
 
+.clock_turn {
+    height: 16px;
+    position: relative;
+    top: 5px;
+    width: 100%;
+    text-align: center;
+    line-height: 16px;
+    font-size: 15px;
+    color: #d4c6af;
+    z-index: 50;
+}
+
 .clock_prev, .draft_prev, .deck_prev {
+    position: absolute;
     cursor: pointer;
     background: url(images/prev.png) no-repeat center;
     z-index: 51;
+    display: block;
     opacity: 0.5;
+    align-self: flex-start;
     width: 32px;
-    height: 100%;
+    height: 64px;
     -webkit-transition: all .2s ease-in;
 }
 
 .clock_next, .draft_next, .deck_next {
     cursor: pointer;
+    position: absolute;
     background: url(images/next.png) no-repeat center;
     z-index: 51;
     opacity: 0.5;
+    align-self: flex-end;
+    display: block;
     width: 32px;
-    height: 100%;
+    height: 64px;
     -webkit-transition: all .2s ease-in;
 }
 

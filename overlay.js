@@ -7,6 +7,13 @@ var draftMode = 1;
 var deckMode = 0;
 var overlayMode = 0;
 
+var turnPhase = 0;
+var turnStep = 0;
+var turnNumber = 0;
+var turnActive = 0;
+var turnPriority = 0;
+var turnDecision = 0;
+
 const Database = require('./database.js');
 const cardsDb = new Database();
 
@@ -144,6 +151,22 @@ ipc.on('set_draft_cards', function (event, pack, picks, packn, pickn) {
 	packN = packn;
 	pickN = pickn;
 	setDraft();
+});
+
+//
+ipc.on("set_turn", function (event, _we, _phase, _step, _number, _active, _priority, _decision) {
+	turnPhase = _phase;
+	turnStep = _step;
+	turnNumber = _number;
+	turnActive = _active;
+	turnPriority = _priority;
+	turnDecision = _decision;
+	if (turnPriority == _we) {
+		$('.clock_turn').html("You have priority.");
+	}
+	else {
+		$('.clock_turn').html("Oppenent has priority.");
+	}
 });
 
 function setDraft() {

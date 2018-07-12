@@ -27,8 +27,8 @@ const serverAddress = 'mtgatool.com';
 const Database = require('./database.js');
 const cardsDb = new Database();
 
-const debugLog = false;
-const debugLogSpeed = 0.1;
+const debugLog = true;
+const debugLogSpeed = 50.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 
@@ -979,6 +979,8 @@ function gre_to_client(data) {
                     turnPriority = msg.gameStateMessage.turnInfo.priorityPlayer;
                     turnDecision = msg.gameStateMessage.turnInfo.decisionPlayer;
                     turnStorm = msg.gameStateMessage.turnInfo.stormCount;
+
+                    overlay.webContents.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
                     //console.log(msg.msgId, "Turn "+turnNumber, turnPhase, turnStep);
                 }
 
