@@ -1345,7 +1345,9 @@ function finishLoading() {
     var obj = store.get('windowBounds');
     mainWindow.setBounds(obj);
 
-	httpSetPlayer(playerName, playerRank, playerTier);	
+    if (playerName != null) {
+        httpSetPlayer(playerName, playerRank, playerTier);  
+    }
 }
 
 
