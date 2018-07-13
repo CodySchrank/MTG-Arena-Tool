@@ -204,11 +204,12 @@ var sets = {
 	"Magic 2019"
 }
 */
-var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria", "Magic 2019"];
+var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria", "Magic 2019", "Arena"];
 
 //
 function get_set_scryfall(set) {
 	switch (set) {
+	    case "Arena": 				return "ana";
 	    case "Magic 2019": 			return "m19";
 	    case "Dominaria": 			return "dom";
 	    case "Rivals of Ixalan": 	return "rix";
@@ -225,6 +226,7 @@ function get_set_scryfall(set) {
 //
 function get_set_code(set) {
 	switch (set) {
+	    case "Arena": 			return "ANA";
 	    case "Magic 2019": 			return "M19";
 	    case "Dominaria": 			return "DAR";
 	    case "Rivals of Ixalan": 	return "RIX";
