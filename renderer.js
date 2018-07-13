@@ -25,6 +25,7 @@ var loadHistory = 0;
 
 var goldHistory = null;
 var vaultHistory = null;
+var wildcardHistory = null;
 //var initialized = false;
 
 const chartjs = require('chart.js');
@@ -145,6 +146,7 @@ ipc.on('force_open_about', function (event, arg) {
 ipc.on('set_economy', function (event, arg) {
 	goldHistory = arg.gold;
 	vaultHistory = arg.vault;
+	wildcardHistory = arg.wildcards;
 	open_economy();
 });
 
@@ -842,9 +844,6 @@ function open_deck(i, type) {
 		var cont = $('<div class="pie_container_outer"></div>');
 		var wr = getDeckWinrate(deck.id, deck.lastUpdated);
 		if (wr != 0) {
-			console.log(wr.winColors);
-			console.log(wr.lossColors);
-
 			wr.winColors.total = wr.winColors.w+wr.winColors.u+wr.winColors.b+wr.winColors.r+wr.winColors.g;
 			wp = wr.winColors.w / wr.winColors.total * 100;
 			up = wp+wr.winColors.u / wr.winColors.total * 100;
@@ -1160,6 +1159,7 @@ function open_economy() {
 	$("#ux_1").html('');
 	var div = $('<div class="economy"></div>');
 	$('<div class="chart_container"><canvas id="goldChart"></canvas></div>').appendTo(div);
+	$('<div class="chart_container"><canvas id="wildcardsChart"></canvas></div>').appendTo(div);
 	$('<div class="chart_container"><canvas id="vaultChart"></canvas></div>').appendTo(div);
 
 	$("#ux_0").append(div);
@@ -1204,6 +1204,83 @@ function open_economy() {
 					type: 'time',
 					distribution: 'series',
 					display: true,
+	                time: {
+	                    unit: 'day'
+	                },
+					ticks: {
+						source: 'labels'
+					}
+				}],
+				yAxes: [{
+					display: true
+				}]
+			}
+	    }
+	});
+
+	// Set wildcards chart
+	wcCommon = [];
+	wcUncommon = [];
+	wcRare = [];
+	wcMythic = [];
+	labels = [];
+	wildcardHistory.forEach(function(item) {
+		var date = new Date(item.date);
+		labels.push(date);
+		wcCommon.push(item.value.wcCommon);
+		wcUncommon.push(item.value.wcUncommon);
+		wcRare.push(item.value.wcRare);
+		wcMythic.push(item.value.wcMythic);
+	});
+
+	var ctx = document.getElementById("wildcardsChart").getContext('2d');
+	var myChart = new Chart(ctx, {
+	    type: 'bar',
+	    data: {
+	        labels: labels,
+	        datasets: [{
+	            label: 'Common',
+				data: wcCommon,
+				type: 'line',
+	            borderColor: [
+	                'rgba(255, 255, 255, 0.5)',
+	            ]
+	        },{
+	            label: 'Uncommon',
+				data: wcUncommon,
+				type: 'line',
+	            borderColor: [
+	                'rgba(166, 206, 255, 0.5)',
+	            ]
+	        },{
+	            label: 'Rare',
+				data: wcRare,
+				type: 'line',
+				fill: true,
+	            borderColor: [
+	                'rgba(255, 186, 0, 0.5)',
+	            ]
+	        },{
+	            label: 'Mythic Rare',
+				data: wcMythic,
+				type: 'line',
+				fill: true,
+	            borderColor: [
+	                'rgba(255, 27, 0, 0.5)',
+	            ]
+	        }]
+	    },
+	    options: {
+	    	responsive: true,
+			elements: {
+				line: {
+					tension: 0.000001
+				}
+			},
+			scales: {
+				xAxes: [{
+					type: 'time',
+					distribution: 'series',
 	                time: {
 	                    unit: 'day'
 	                },

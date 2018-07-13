@@ -244,6 +244,7 @@ ipc.on('set_clipboard', function (event, arg) {
 ipc.on('get_economy', function (event, state) {
     goldHistory = store.get("gold_history");
     vaultHistory = store.get("vault_history");
+    wilcardsHistory = store.get("wildcards_history");
 
     for (let ii = 0; ii < goldHistory.length; ii++) {
         if (ii > 0 ) {
@@ -271,8 +272,20 @@ ipc.on('get_economy', function (event, state) {
         }
     }
 
-    
-    var economy = {gold: goldHistory, vault: vaultHistory};
+    for (let ii = 0; ii < wilcardsHistory.length; ii++) {
+        if (ii > 0 ) {
+            let dataPrev = wilcardsHistory[ii-1];
+            let data = wilcardsHistory[ii];
+            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
+            console.log(data.date - dataPrev.date, diff);
+            for (let i = 0; i<diff; i++) {
+                wilcardsHistory.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value});
+                ii++;
+            }
+        }
+    }
+
+    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory};
     mainWindow.webContents.send("set_economy", economy);
 });
 
@@ -667,6 +680,10 @@ function processLogData(data) {
 
         var gold = json.gold;
         var vault = json.vaultProgress;
+        var wcCommon = json.wcCommon;
+        var wcUncommon = json.wcUncommon;
+        var wcRare = json.wcRare;
+        var wcMythic = json.wcMythic;
 
         goldHistory = store.get("gold_history");
         var lastDate  = 0;
@@ -694,6 +711,23 @@ function processLogData(data) {
         if (vault != lastValue && lastDate < logTime.getTime()) {
             vaultHistory.push({date: logTime.getTime(), value: vault});
             store.set("vault_history", vaultHistory);
+        }
+
+        wilcardsHistory = store.get("wildcards_history");
+        var lastDate  = 0;
+        var lastValue = -1;
+        wilcardsHistory.forEach(function(data) {
+            if (data.date > lastDate) {
+                lastDate = data.date;
+                lastValue = data.value;
+            }
+        });
+        if (lastDate < logTime.getTime()) {
+            if (wcCommon != lastValue.wcCommon || wcUncommon != lastValue.wcUncommon || wcRare != lastValue.wcRare || wcMythic != lastValue.wcMythic) {
+                var newValue = {wcCommon: wcCommon, wcUncommon: wcUncommon, wcRare: wcRare, wcMythic: wcMythic};
+                wilcardsHistory.push({date: logTime.getTime(), value: newValue});
+                store.set("wildcards_history", wilcardsHistory);
+            }
         }
     }
 
