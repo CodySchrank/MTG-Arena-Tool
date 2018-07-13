@@ -246,48 +246,37 @@ ipc.on('get_economy', function (event, state) {
     vaultHistory = store.get("vault_history");
     wilcardsHistory = store.get("wildcards_history");
 
-    for (let ii = 0; ii < goldHistory.length; ii++) {
-        if (ii > 0 ) {
-            let dataPrev = goldHistory[ii-1];
-            let data = goldHistory[ii];
-            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
-            console.log(data.date - dataPrev.date, diff);
-            for (let i = 0; i<diff; i++) {
-                goldHistory.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value});
-                ii++;
-            }
-        }
-    }
-
-    for (let ii = 0; ii < vaultHistory.length; ii++) {
-        if (ii > 0 ) {
-            let dataPrev = vaultHistory[ii-1];
-            let data = vaultHistory[ii];
-            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
-            console.log(data.date - dataPrev.date, diff);
-            for (let i = 0; i<diff; i++) {
-                vaultHistory.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value});
-                ii++;
-            }
-        }
-    }
-
-    for (let ii = 0; ii < wilcardsHistory.length; ii++) {
-        if (ii > 0 ) {
-            let dataPrev = wilcardsHistory[ii-1];
-            let data = wilcardsHistory[ii];
-            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
-            console.log(data.date - dataPrev.date, diff);
-            for (let i = 0; i<diff; i++) {
-                wilcardsHistory.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value});
-                ii++;
-            }
-        }
-    }
+    goldHistory = fix_history(goldHistory);
+    vaultHistory = fix_history(vaultHistory);
+    wilcardsHistory = fix_history(wilcardsHistory);
 
     var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory};
     mainWindow.webContents.send("set_economy", economy);
 });
+
+//
+function fix_history(history) {
+    for (let ii = 0; ii < history.length; ii++) {
+        if (ii > 0) {
+            let dataPrev = history[ii-1]; let data = history[ii];
+            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
+            for (let i = 0; i<diff; i++) {
+                history.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value}); ii++;
+            }
+        }
+    }
+    for (let ii = 0; ii < history.length; ii++) {
+        if (ii > 0) {
+            let dataPrev = history[ii-1]; let data = history[ii];
+            let da = new Date(data.date);
+            let db = new Date(dataPrev.date);
+            if (da.toDateString() == db.toDateString()) {
+                history.splice(ii-1, 1); ii-=1;
+            }
+        }
+    }
+    return history;
+}
 
 // Catch exceptions
 process.on('uncaughtException', function (err) {
@@ -688,11 +677,12 @@ function processLogData(data) {
         goldHistory = store.get("gold_history");
         var lastDate  = 0;
         var lastValue = -1;
-        goldHistory.forEach(function(data) {
+        goldHistory.forEach(function(data, index) {
             if (data.date > lastDate) {
                 lastDate = data.date;
                 lastValue = data.value;
             }
+
         });
         if (gold != lastValue && lastDate < logTime.getTime()) {
             goldHistory.push({date: logTime.getTime(), value: gold});
