@@ -209,7 +209,7 @@ var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "H
 //
 function get_set_scryfall(set) {
 	switch (set) {
-	    case "Arena": 				return "ana";
+	    case "Arena": 				return "mtga";
 	    case "Magic 2019": 			return "m19";
 	    case "Dominaria": 			return "dom";
 	    case "Rivals of Ixalan": 	return "rix";

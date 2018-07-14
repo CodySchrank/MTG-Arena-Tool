@@ -1098,6 +1098,18 @@ span {
     margin: 6px;
 }
 
+.inventory_card_settings {
+    width: 140px;
+    margin: -40px 16px;
+    align-self: center;
+    position: relative;
+}
+
+.inventory_card_settings_img {
+    -webkit-border-radius: 4.75% / 3.5%;
+}
+
+
 .inventory_card_img {
     cursor: pointer;
     -webkit-border-radius: 4.75% / 3.5%;
@@ -1488,7 +1500,7 @@ span {
 .slidecontainer_settings {
     overflow: unset;
     display: flex;
-    margin: 10px 100px 10px 50px;
+    margin: 10px 48px 10px 50px;
 }
 
 .slidecontainer {

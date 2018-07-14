@@ -20,6 +20,7 @@ var draftPosition = 1;
 var overlayAlpha = 1;
 var cardSizePos = 4;
 var cardSize = 140;
+var cardQuality = "normal";
 var inputTimer = undefined;
 var loadHistory = 0;
 
@@ -109,7 +110,7 @@ ipc.on('set_settings', function (event, arg) {
 ipc.on('set_update', function (event, arg) {
 	updateState = arg;
 
-	if (sidebarActive == 5) {
+	if (sidebarActive == 6) {
 		open_about();
 	}
 });
@@ -180,10 +181,10 @@ function installUpdate() {
 }
 
 function force_open_settings() {
-	sidebarActive = 4;
+	sidebarActive = 5;
 	$(".sidebar_item").each(function(index) {
 		$(this).removeClass("item_selected");
-		if ($(this).hasClass("it4")) {
+		if ($(this).hasClass("it5")) {
 			$(this).addClass("item_selected");
 		}
 	});
@@ -192,10 +193,10 @@ function force_open_settings() {
 }
 
 function force_open_about() {
-	sidebarActive = 4;
+	sidebarActive = 6;
 	$(".sidebar_item").each(function(index) {
 		$(this).removeClass("item_selected");
-		if ($(this).hasClass("it5")) {
+		if ($(this).hasClass("it6")) {
 			$(this).addClass("item_selected");
 		}
 	});
@@ -464,7 +465,7 @@ function setHistory(arg, loadMore) {
 		mainDiv.appendChild(div);
 
 		console.log(match.id);
-		addHover(match);
+		addHover(match, tileGrpid);
 	}
 
 	$(this).off();
@@ -478,7 +479,7 @@ function setHistory(arg, loadMore) {
 	loadHistory += 20;
 }
 
-function addHover(_match) {
+function addHover(_match, tileGrpid) {
 	$('.'+_match.id).on('mouseenter', function(e) {
 	    $('.'+_match.id+'t').css('opacity', 1);
 	    $('.'+_match.id+'t').css('width', '200px');
@@ -957,7 +958,7 @@ function open_draft(id, tileGrpid, set) {
         if (grpId == pick && draftPosition % 2 == 0) {
         	img.addClass('draft_card_picked');
         }
-		img.attr("src", "https://img.scryfall.com/cards/small/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+		img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
 		img.appendTo(d);
 		img.on('mouseenter', function(e) {
 			$('.main_hover').css("opacity", 1);
@@ -1357,7 +1358,7 @@ function open_cards() {
 	var filters = $('<div class="inventory_filters"></div>');
 	var sets = $('<div class="sets_container"><label>Filter by set:</label></div>');
 	setsList.forEach(function(set) {
-		var setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(sets/'+get_set_scryfall(set)+'.png)" title="'+set+'"></div>');
+		var setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(sets/'+get_set_code(set)+'.png)" title="'+set+'"></div>');
 		setbutton.appendTo(sets);
 		setbutton.click(function() {
 			if (setbutton.hasClass('set_filter_on')) {
@@ -1480,7 +1481,7 @@ function printStats() {
 	// each set stats
 	setsList.forEach(function(set) {
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_set_icon" style="background-image: url(sets/'+get_set_scryfall(set)+'.png)"><span>'+set+' <i>('+stats[set].ownedCards+'/'+stats[set].totalCards+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_set_icon" style="background-image: url(sets/'+get_set_code(set)+'.png)"><span>'+set+' <i>('+stats[set].ownedCards+'/'+stats[set].totalCards+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats[set].ownedCards/stats[set].totalCards*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(mainstats);
 
@@ -1682,7 +1683,7 @@ function printCards() {
 	        }
 
 	        var img = $('<img style="width: '+cardSize+'px !important;" class="inventory_card_img"></img>');
-			img.attr("src", "https://img.scryfall.com/cards/small/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+			img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
 			img.appendTo(d);
 
 			img.on('mouseenter', function(e) {
@@ -1774,6 +1775,13 @@ function open_settings() {
 	var sliderInput = $('<input type="range" min="0" max="20" value="'+cardSizePos+'" class="slider sliderA" id="myRange">');
 	sliderInput.appendTo(slider);
 
+	var d = $('<div style="width: '+cardSize+'px; !important" class="inventory_card_settings"></div>');
+	var img = $('<img style="width: '+cardSize+'px; !important" class="inventory_card_settings_img"></img>');
+	img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/m19/"+Math.round(Math.random()*314)+".jpg");
+	img.appendTo(d);
+
+	d.appendTo(slider);
+
 	/*
 	var alphaSlider = $('<div class="slidecontainer_settings"></div>');
 	alphaSlider.appendTo(div);
@@ -1806,6 +1814,16 @@ function open_settings() {
 		cardSizePos = Math.round(parseInt(this.value));
 		cardSize = 100+(cardSizePos*10);
 		sliderlabel.html('Cards size: '+cardSize+'px');
+
+		$('.inventory_card_settings').css('width', '');
+		var styles = $('.inventory_card_settings').attr('style');
+		styles += 'width: '+cardSize+'px !important;'
+		$('.inventory_card_settings').attr('style', styles);
+
+		$('.inventory_card_settings_img').css('width', '');
+		var styles = $('.inventory_card_settings_img').attr('style');
+		styles += 'width: '+cardSize+'px !important;'
+		$('.inventory_card_settings_img').attr('style', styles);
 	});
 
 	$(".sliderA").on('click mouseup', function() {
