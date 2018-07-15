@@ -56,7 +56,18 @@ ipc.on('set_timer', function (event, arg) {
 		$(".overlay_deck_container").hide();
 		$(".overlay_draft_container").show();
 		$(".overlay_draft_container").css("display", "flex");
-		$(".overlay_decklist").css("height", "100%").css("height", "-=146px");
+
+
+		let height = 146;
+		if ($('.top').css('display') == 'none') {
+			height -= 64;
+		}
+		if ($('.overlay_deckname').css('display') == 'none') {
+			height -= 78;
+		}
+		console.log(height);
+
+		$(".overlay_decklist").css("height", "100%").css("height", "-="+height+"px");
 		overlayMode = 1;
 		matchBeginTime = Date.now();
 	}
@@ -67,17 +78,74 @@ ipc.on('set_timer', function (event, arg) {
 });
 
 $( window ).resize(function() {
+	
 	if (overlayMode == 1) {
-		$(".overlay_decklist").css("height", "100%").css("height", "-=146px");
+		let height = 146;
+		if ($('.top').css('display') == 'none') {
+			height -= 64;
+		}
+		if ($('.overlay_deckname').css('display') == 'none') {
+			height -= 78;
+		}
+		console.log(height);
+		$(".overlay_decklist").css("height", "100%").css("height", "-="+height+"px");
 	}
 });
 
 
-ipc.on('alpha', function (event, arg) {
-	$('body').css("background-color", "rgba(0,0,0,"+arg+")");
-	$('.overlay_wrapper:before').css("opacity", 0.4*arg);
-	$('.overlay_wrapper').css("opacity", arg);
+ipc.on('settings', function (event, alpha, top, title, deck, clock) {
+	/*
+	// Alpha does some weird things..
+	$('body').css("background-color", "rgba(0,0,0,"+alpha+")");
+	$('.overlay_wrapper:before').css("opacity", 0.4*alpha);
+	$('.overlay_wrapper').css("opacity", alpha);
+	*/
+	$('.top').css('display', '');
+	$('.overlay_deckname').css('display', '');
+	$('.overlay_deckcolors').css('display', '');
+	$('.overlay_separator').css('display', '');
+	$('.overlay_decklist').css('display', '');
+	$('.overlay_clock_container').css('display', '');
+	$('.overlay_deck_container').attr('style', '');
+	$('.overlay_draft_container').attr('style', '');
+
+	if (!top) {
+		hideDiv('.top');
+		let style = 'top: 0px !important;';
+		$('.overlay_deck_container').attr('style', style);
+		$('.overlay_draft_container').attr('style', style);
+	}
+	if (!title) {
+		hideDiv('.overlay_deckname');
+		hideDiv('.overlay_deckcolors');
+		hideDiv('.overlay_separator');
+	}
+	if (!deck) {
+		hideDiv('.overlay_decklist');
+		hideDiv('.overlay_deck_container');
+		hideDiv('.overlay_draft_container');
+	}
+	if (!clock || overlayMode == 1) {
+		hideDiv('.overlay_clock_container');
+	}
+
+	let height = 210;
+	if (overlayMode == 1) {
+		height = 146;
+	}
+	if (!top) {
+		height -= 64;
+	}
+	if (!title) {
+		height -= 78;
+	}
+	$(".overlay_decklist").css("height", "100%").css("height", "-="+height+"px");
 });
+
+function hideDiv(div) {
+	let style = $(div).attr('style');	style += 'display: none !important;';
+	$(div).attr('style', style);
+}
 
 
 ipc.on('ping', function (event, arg) {

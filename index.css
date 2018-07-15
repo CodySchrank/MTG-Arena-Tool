@@ -790,12 +790,14 @@ label {
 }
 
 .overlay_deckname {
+    -webkit-app-region:drag;
     padding: 12px 0 0 0;
     text-align: center;
     color: #FAE5D2;
 }
 
 .overlay_deckcolors {
+    -webkit-app-region:drag;
     height: 24px;
     display: flex;
     justify-content: center;
@@ -900,6 +902,7 @@ label {
 }
 
 .clock_prev, .draft_prev, .deck_prev {
+    -webkit-app-region:no-drag;
     position: absolute;
     cursor: pointer;
     background: url(images/prev.png) no-repeat center;
@@ -913,6 +916,7 @@ label {
 }
 
 .clock_next, .draft_next, .deck_next {
+    -webkit-app-region:no-drag;
     cursor: pointer;
     position: absolute;
     background: url(images/next.png) no-repeat center;

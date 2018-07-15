@@ -96,8 +96,6 @@ ipc.on('open_course_deck', function (event, arg) {
 	open_deck(arg, 1);
 });
 
-
-
 //
 ipc.on('set_settings', function (event, arg) {
 	settings = arg;
@@ -157,7 +155,6 @@ ipc.on('initialize', function (event, arg) {
 	$('.sidebar').removeClass('hidden');
 	$('.overflow_ux').removeClass('hidden');
 	$('.message_center').css('display', 'none');
-
 	//arenaCheckLoop();
 	//$('.wrapper').css('left', '100%');
 });
@@ -507,70 +504,72 @@ function setDecks(arg) {
 	if (arg != null) {
 		decks = arg;//JSON.parse(arg);
 	}
-	sort_decks();
-	$("#ux_0").html('');
+	if (sidebarActive == 0) {
+		sort_decks();
+		$("#ux_0").html('');
 
-	$("#ux_0").append('<div class="list_fill"></div>');
-	decks.forEach(function(deck, index) {
+		$("#ux_0").append('<div class="list_fill"></div>');
+		decks.forEach(function(deck, index) {
 
-		var tileGrpid = deck.deckTileId;
-		var tile = $('<div class="'+deck.id+'t deck_tile"></div>');
-		tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
+			var tileGrpid = deck.deckTileId;
+			var tile = $('<div class="'+deck.id+'t deck_tile"></div>');
+			tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 
-		var div = $('<div class="'+deck.id+' list_deck"></div>');
+			var div = $('<div class="'+deck.id+' list_deck"></div>');
 
-		var fll = $('<div class="flex_item"></div>');
-		var flc = $('<div class="flex_item"></div>');
-		var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
-		var flr = $('<div class="flex_item"></div>');
-		flr.css("flex-direction","column")
-		flc.css("flex-direction","column")
+			var fll = $('<div class="flex_item"></div>');
+			var flc = $('<div class="flex_item"></div>');
+			var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
+			var flr = $('<div class="flex_item"></div>');
+			flr.css("flex-direction","column")
+			flc.css("flex-direction","column")
 
-		var flt = $('<div class="flex_top"></div>');
-		var flb = $('<div class="flex_bottom"></div>');
+			var flt = $('<div class="flex_top"></div>');
+			var flb = $('<div class="flex_bottom"></div>');
 
-		if (deck.name.indexOf('?=?Loc/Decks/Precon/') != -1) {
-			deck.name = deck.name.replace('?=?Loc/Decks/Precon/', '');
-		}
+			if (deck.name.indexOf('?=?Loc/Decks/Precon/') != -1) {
+				deck.name = deck.name.replace('?=?Loc/Decks/Precon/', '');
+			}
 
-		$('<div class="list_deck_name">'+deck.name+'</div>').appendTo(flt);
-		deck.colors.forEach(function(color) {
-			$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
+			$('<div class="list_deck_name">'+deck.name+'</div>').appendTo(flt);
+			deck.colors.forEach(function(color) {
+				$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
+			});
+
+			var wr = getDeckWinrate(deck.id, deck.lastUpdated);
+			if (wr != 0) {
+				$('<div class="list_deck_winrate">Winrate: '+(wr.total*100).toFixed(2)+'%</div>').appendTo(flr);
+				$('<div class="list_deck_winrate">Since last edit: '+(wr.lastEdit*100).toFixed(2)+'%</div>').appendTo(flr);
+			}
+
+			fll.appendTo(div);
+			tile.appendTo(fll);
+
+			flc.appendTo(div);
+			flcf.appendTo(div);
+			flt.appendTo(flc);
+			flb.appendTo(flc);
+			flr.appendTo(div);
+			$("#ux_0").append(div);
+
+			$('.'+deck.id).on('mouseenter', function(e) {
+			    $('.'+deck.id+'t').css('opacity', 1);
+			    $('.'+deck.id+'t').css('width', '200px');
+			});
+
+			$('.'+deck.id).on('mouseleave', function(e) {
+			    $('.'+deck.id+'t').css('opacity', 0.66);
+			    $('.'+deck.id+'t').css('width', '128px');
+			});
+
+			$('.'+deck.id).on('click', function(e) {
+				open_deck(index, 0);
+			    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
+			});
+
 		});
-
-		var wr = getDeckWinrate(deck.id, deck.lastUpdated);
-		if (wr != 0) {
-			$('<div class="list_deck_winrate">Winrate: '+(wr.total*100).toFixed(2)+'%</div>').appendTo(flr);
-			$('<div class="list_deck_winrate">Since last edit: '+(wr.lastEdit*100).toFixed(2)+'%</div>').appendTo(flr);
-		}
-
-		fll.appendTo(div);
-		tile.appendTo(fll);
-
-		flc.appendTo(div);
-		flcf.appendTo(div);
-		flt.appendTo(flc);
-		flb.appendTo(flc);
-		flr.appendTo(div);
-		$("#ux_0").append(div);
-
-		$('.'+deck.id).on('mouseenter', function(e) {
-		    $('.'+deck.id+'t').css('opacity', 1);
-		    $('.'+deck.id+'t').css('width', '200px');
-		});
-
-		$('.'+deck.id).on('mouseleave', function(e) {
-		    $('.'+deck.id+'t').css('opacity', 0.66);
-		    $('.'+deck.id+'t').css('width', '128px');
-		});
-
-		$('.'+deck.id).on('click', function(e) {
-			open_deck(index, 0);
-		    $('.moving_ux').animate({'left': '-100%'}, 250, 'easeInOutCubic'); 
-		});
-
-	});
-	$("#ux_0").append('<div class="list_fill"></div>');
+		$("#ux_0").append('<div class="list_fill"></div>');
+	}
 }
 
 //
@@ -1764,9 +1763,17 @@ function open_settings() {
 	add_checkbox(div, 'Close main window on match found', 'settings_closeonmatch', settings.close_on_match);
 	add_checkbox(div, 'Close to tray', 'settings_closetotray', settings.close_to_tray);
 
-	div.append('<div class="settings_title">Visual</div>');
+	div.append('<div class="settings_title">Overlay</div>');
 
-	add_checkbox(div, 'Show in-game overlay', 'settings_showoverlay', settings.show_overlay);
+	add_checkbox(div, 'Show overlay', 'settings_showoverlay', settings.show_overlay);
+	add_checkbox(div, 'Persistent overlay', 'settings_showoverlayalways', settings.show_overlay_always);
+
+	add_checkbox(div, 'Show top bar', 'settings_overlay_top', settings.overlay_top);
+	add_checkbox(div, 'Show title', 'settings_overlay_title', settings.overlay_title);
+	add_checkbox(div, 'Show deck/lists', 'settings_overlay_deck', settings.overlay_deck);
+	add_checkbox(div, 'Show clock', 'settings_overlay_clock', settings.overlay_clock);
+
+	div.append('<div class="settings_title">Visual</div>');
 
 	var slider = $('<div class="slidecontainer_settings"></div>');
 	slider.appendTo(div);
@@ -1852,18 +1859,30 @@ function eraseData() {
 function updateSettings() {
 	var startup = document.getElementById("settings_startup").checked;
 	var showOverlay = document.getElementById("settings_showoverlay").checked;
+	var showOverlayAlways = document.getElementById("settings_showoverlayalways").checked;
+
 	var closeToTray = document.getElementById("settings_closetotray").checked;
 	var sendData = document.getElementById("settings_senddata").checked;
 	var closeOnMatch = document.getElementById("settings_closeonmatch").checked;
 
+	var overlayTop = document.getElementById("settings_overlay_top").checked;
+	var overlayTitle = document.getElementById("settings_overlay_title").checked;
+	var overlayDeck = document.getElementById("settings_overlay_deck").checked;
+	var overlayClock = document.getElementById("settings_overlay_clock").checked;
+
 	settings = {
 		show_overlay: showOverlay,
+		show_overlay_always: showOverlayAlways,
 		startup: startup,
 		close_to_tray: closeToTray,
 		send_data: sendData,
 		close_on_match: closeOnMatch,
 		cards_size: cardSizePos,
-		overlay_alpha: overlayAlpha
+		overlay_alpha: overlayAlpha,
+		overlay_top: overlayTop,
+		overlay_title: overlayTitle,
+		overlay_deck: overlayDeck,
+		overlay_clock: overlayClock
 	};
 	cardSize = 100+(cardSizePos*10);
 	ipc.send('save_settings', settings);

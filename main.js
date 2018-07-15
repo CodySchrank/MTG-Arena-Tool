@@ -14,7 +14,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1},
+		settings: {show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
         matches_index:[],
         draft_index:[],
         vault_history:[],
@@ -123,7 +123,6 @@ ipc.on('save_settings', function (event, settings) {
     if (settings.overlay_alpha < 0.5) {
         over.setIgnoreMouseEvents(true);
     }
-    overlay.webContents.send("alpha", settings.overlay_alpha);
     */
 });
 
@@ -146,7 +145,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {show_overlay: true, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1},
+            settings: {show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
             matches_index:[],
             draft_index:[],
             vault_history:[],
@@ -171,16 +170,28 @@ function updateSettings(settings) {
     app.setLoginItemSettings({
         openAtLogin: settings.startup
     });
+    if (settings.show_overlay == false) {
+        overlay.hide();
+    }
+    else if (duringMatch || settings.show_overlay_always) {
+        overlay.show();
+    }
+    overlay.webContents.send("settings", 1, settings.overlay_top, settings.overlay_title, settings.overlay_deck, settings.overlay_clock);
 }
 
 
 ipc.on('request_history', function (event, state) {
-	history.matches = store.get('matches_index');
-	history.matches.forEach(function(id) {
-		history[id] = store.get(id);
+    requestHistorySend(state);
+});
+
+//
+function requestHistorySend(state) {
+    history.matches = store.get('matches_index');
+    history.matches.forEach(function(id) {
+        history[id] = store.get(id);
         history[id].type = "match";
-	});
-	
+    });
+    
     var drafts = {};
     drafts.matches = store.get('draft_index');
     drafts.matches.forEach(function(id) {
@@ -189,13 +200,13 @@ ipc.on('request_history', function (event, state) {
         history[id].type = "draft";
     });
 
-	if (state == 1) {
-	    mainWindow.webContents.send("set_history", history);
-	}
-	else {
-	    mainWindow.webContents.send("set_history_data", history);
-	}
-});
+    if (state == 1) {
+        mainWindow.webContents.send("set_history", history);
+    }
+    else {
+        mainWindow.webContents.send("set_history_data", history);
+    }
+}
 
 ipc.on('request_explore', function (event, arg) {
     httpGetTopDecks(arg);
@@ -368,7 +379,7 @@ function toggleWindow() {
 
 function showWindow() {
     mainWindow.show();
-    mainWindow.focus();
+    //mainWindow.focus();
 }
 
 function quit() {
@@ -456,12 +467,12 @@ function createOverlay() {
 	over.on('resize', () => {
 		saveOverlayPos();
 	});
-
+    /*
     setTimeout( function() {
         overlay.webContents.send("set_deck", currentDeck);
     	//debug_overlay_show();
     }, 1000);
-
+    */
     return over;
 }
 
@@ -653,6 +664,7 @@ function processLogData(data) {
     strCheck = '<== Deck.GetDeckLists(';
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
+        requestHistorySend(0);
         mainWindow.webContents.send("set_decks", json);
     }
 
@@ -837,7 +849,9 @@ function processLogData(data) {
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
         saveOverlayPos();
-        overlay.hide();
+        if (!store.get('settings.show_overlay_always')) {
+            overlay.hide();
+        }
         mainWindow.show();
         saveDraft();
     }
@@ -871,7 +885,9 @@ function processLogData(data) {
         	});
 
             saveOverlayPos();
-            overlay.hide();
+            if (!store.get('settings.show_overlay_always')) {
+                overlay.hide();
+            }
             mainWindow.show();
             saveMatch();
         }
@@ -1030,7 +1046,9 @@ function gre_to_client(data) {
                     }
                     if (msg.gameStateMessage.gameInfo.matchState == "MatchState_MatchComplete") {
                         saveOverlayPos();
-                        overlay.hide();
+                        if (!store.get('settings.show_overlay_always')) {
+                            overlay.hide();
+                        }
                         saveMatch();
                     }
                 }
@@ -1088,6 +1106,7 @@ function gre_to_client(data) {
 
 function createMatch(arg) {
     var obj = store.get('overlayBounds');
+
     annotationsRead = [];
     zones = {};
     gameObjs = {};
@@ -1167,23 +1186,6 @@ function update_deck() {
         var currentOppDeck = getOppDeck();
         overlay.webContents.send("set_deck", currentOppDeck);
     }
-}
-
-function debug_overlay_show() {
-    zones = {};
-    gameObjs = {};
-    hideWindow();
-    overlay.show();
-    overlay.focus();
-    oppName = "Dummy";
-    oppRank = "Master";
-    oppTier = 1;
-    currentMatchId = null;
-	playerWin = 0;
-	oppWin = 0;
-    overlay.webContents.send("set_opponent", "Dummy");
-    overlay.webContents.send("set_opponent_rank", get_rank_index(oppRank, oppTier), "Master 1");
-    overlay.webContents.send("set_deck", currentDeck);
 }
 
 //
@@ -1320,6 +1322,9 @@ function saveMatch() {
     store.set('matches_index', matches);
     store.set(currentMatchId, match);
     httpSetMatch(match);
+    if (!debugLog) {
+        requestHistorySend(0);
+    }
 }
 
 
@@ -1357,21 +1362,7 @@ function finishLoading() {
         update_deck();
     }
 
-    history.matches = store.get('matches_index');
-    history.matches.forEach(function(id) {
-        history[id] = store.get(id);
-        history[id].type = "match";
-    });
-
-    var drafts = {};
-    drafts.matches = store.get('draft_index');
-    drafts.matches.forEach(function(id) {
-        history.matches.push(id);
-        history[id] = store.get(id);
-        history[id].type = "draft";
-    });
-
-	mainWindow.webContents.send("set_history_data", history);
+    requestHistorySend(0);
 	mainWindow.webContents.send("initialize", 1);
 
     var obj = store.get('windowBounds');
