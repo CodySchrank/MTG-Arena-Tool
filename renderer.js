@@ -1800,13 +1800,7 @@ function open_settings() {
 	var button = $('<div class="button_simple button_long" onclick="eraseData()"">Erase my shared data</div>');
 	button.appendTo(label);
 
-
-	// overlay transparency
-	// hover timeout
-	// hide when zero left
-
 	$("#ux_0").append(div);
-
 
 	$(".sliderA").off();
 

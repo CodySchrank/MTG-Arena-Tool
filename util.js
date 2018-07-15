@@ -283,7 +283,7 @@ function get_collection_stats() {
 
     Object.keys(cardsDb.cards).forEach(function(grpId) {
     	card = cardsDb.get(grpId);
-    	if (card.rarity !== "token" && card.rarity !== "land" && card.set !== "Oath of the Gatewatch") {
+    	if (card.rarity !== "token" && card.rarity !== "land" && card.set !== "Oath of the Gatewatch" && card.dfc != "DFC_Front" && card.dfc != "SplitCard") {
 
 			// add to totals
 			stats[card.set].totalCards += 4;
