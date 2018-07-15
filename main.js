@@ -849,6 +849,7 @@ function processLogData(data) {
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
         saveOverlayPos();
+        clear_deck();
         if (!store.get('settings.show_overlay_always')) {
             overlay.hide();
         }
@@ -885,6 +886,7 @@ function processLogData(data) {
         	});
 
             saveOverlayPos();
+            clear_deck();
             if (!store.get('settings.show_overlay_always')) {
                 overlay.hide();
             }
@@ -1046,6 +1048,7 @@ function gre_to_client(data) {
                     }
                     if (msg.gameStateMessage.gameInfo.matchState == "MatchState_MatchComplete") {
                         saveOverlayPos();
+                        clear_deck();
                         if (!store.get('settings.show_overlay_always')) {
                             overlay.hide();
                         }
@@ -1169,6 +1172,13 @@ function select_deck(arg) {
     currentDeck = arg.CourseDeck;
     var str = JSON.stringify(currentDeck);
     currentDeckUpdated = JSON.parse(str);
+    overlay.webContents.send("set_deck", currentDeck);
+}
+
+function clear_deck() {
+    var deck = {mainDeck: [], sideboard : [], name: ""};
+    currentDeck = deck;
+    currentDeckUpdated = deck;
     overlay.webContents.send("set_deck", currentDeck);
 }
 

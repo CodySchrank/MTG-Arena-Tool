@@ -203,7 +203,7 @@ ipc.on('set_deck', function (event, arg) {
 		prevIndex = grpId;
 	});
 
-	if (deckMode == 2) {
+	if (deckMode == 2 && name != "") {
 		deckListDiv.append('<div class="chance_title"></div>');// Add some space
 		deckListDiv.append('<div class="chance_title">Creature: '+arg.chanceCre+'%</div>');
 		deckListDiv.append('<div class="chance_title">Instant: '+arg.chanceIns+'%</div>');
