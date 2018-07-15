@@ -116,11 +116,14 @@ ipc.on('set_deck', function (event, arg) {
 	});
 
 	arg.mainDeck.sort(compare_cards); 
-	//arg.mainDeck.forEach(function(card) {
-	//	var grpId = card.id;
 	var deckListDiv = $(".overlay_decklist");
-
 	var prevIndex = 0;
+	var deckSize = 0
+	arg.mainDeck.forEach(function(card) {
+		deckSize += card.quantity;
+	});
+	deckListDiv.append('<div class="chance_title">'+deckSize+' cards</div>');
+
 	arg.mainDeck.forEach(function(card) {
 		var grpId = card.id;
 		if (deckMode == 2) {
@@ -133,6 +136,7 @@ ipc.on('set_deck', function (event, arg) {
 	});
 
 	if (deckMode == 2) {
+		deckListDiv.append('<div class="chance_title"></div>');// Add some space
 		deckListDiv.append('<div class="chance_title">Creature: '+arg.chanceCre+'%</div>');
 		deckListDiv.append('<div class="chance_title">Instant: '+arg.chanceIns+'%</div>');
 		deckListDiv.append('<div class="chance_title">Sorcery: '+arg.chanceSor+'%</div>');
@@ -274,14 +278,14 @@ $(document).ready(function() {
 	$(".deck_prev").click(function () {
 	    deckMode -= 1;
 	    if (deckMode < 0) {
-	    	deckMode = 2;
+	    	deckMode = 3;
 	    }
 	    ipc.send('set_deck_mode', deckMode);
 	});
 	//
 	$(".deck_next").click(function () {
 	    deckMode += 1;
-	    if (deckMode > 2) {
+	    if (deckMode > 3) {
 	    	deckMode = 0;
 	    }
 	    ipc.send('set_deck_mode', deckMode);

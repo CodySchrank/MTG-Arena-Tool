@@ -1163,6 +1163,10 @@ function update_deck() {
     if (overlayDeckMode == 2) {
         overlay.webContents.send("set_deck", currentDeckUpdated);
     }
+    if (overlayDeckMode == 3) {
+        var currentOppDeck = getOppDeck();
+        overlay.webContents.send("set_deck", currentOppDeck);
+    }
 }
 
 function debug_overlay_show() {
@@ -1251,6 +1255,8 @@ function forceDeckUpdate() {
 function getOppDeck() {
 	var oppDeck = {mainDeck: [], sideboard : []};
 	var doAdd = true;
+    oppDeck.name = "played by "+oppName;
+
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
