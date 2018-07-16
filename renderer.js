@@ -1357,7 +1357,36 @@ function open_cards() {
 	$("#ux_1").html('');
 	var div = $('<div class="inventory"></div>');
 	
+	var basicFilters = $('<div class="inventory_filters_basic"></div>');
+
+	var flex = $('<div class="inventory_flex"></div>');
+
+	var label = $('<label class="input_container">Search</label>');
+	label.appendTo(flex);
+	var input = $('<input type="search" id="query_name" autocomplete="off" />');
+	input.appendTo(label);
+
+	var searchButton = $('<div class="button_simple button_thin" onClick="printCards()">Search</div>');	
+	searchButton.appendTo(flex);
+	var advancedButton = $('<div class="button_simple button_thin" onClick="expandFilters()">Advanced filters</div>');
+	advancedButton.appendTo(flex);
+
+	flex.appendTo(basicFilters);
+
+	var flex = $('<div class="inventory_flex"></div>');
+
+	var exp   = $('<div class="button_simple button_thin" onClick="exportCollection()">Copy to Clipboard</div>');
+	exp.appendTo(flex);
+	var reset = $('<div class="button_simple button_thin" onClick="resetFilters()">Reset</div>');
+	reset.appendTo(flex);
+	var stats = $('<div class="button_simple button_thin stats_button" onClick="printStats()">Collection Stats</div>');
+	stats.appendTo(flex);
+
+	flex.appendTo(basicFilters);
+
+	// "ADVANCED" FILTERS
 	var filters = $('<div class="inventory_filters"></div>');
+
 	var sets = $('<div class="sets_container"><label>Filter by set:</label></div>');
 	setsList.forEach(function(set) {
 		var setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(sets/'+get_set_code(set)+'.png)" title="'+set+'"></div>');
@@ -1374,7 +1403,6 @@ function open_cards() {
 					filteredSets.splice(n, 1);
 				}
 			}
-			printCards();
 		});
 	});
 	sets.appendTo(filters);
@@ -1397,68 +1425,58 @@ function open_cards() {
 					filteredMana.splice(n, 1);
 				}
 			}
-			printCards();
 		});
 	});
 	manas.appendTo(filters);
 
-	// Search box
-	var label = $('<label class="input_container">Search</label>');
-	label.appendTo(filters);
-	var input = $('<input type="search" id="query_name" autocomplete="off" />');
-	input.appendTo(label);
-
 	var cont = $('<div class="buttons_container"></div>');
-
-	// Newly added only
-	var label = $('<label class="check_container">Newly aquired only</label>');
-	label.appendTo(cont);
-	var check_new = $('<input type="checkbox" id="query_new" onclick="printCards()" />');
-	check_new.appendTo(label);
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
-
-	// Require multicolored
-	var label = $('<label class="check_container">Require multicolored</label>');
-	label.appendTo(cont);
-	var check_multi = $('<input type="checkbox" id="query_multicolor" onclick="printCards()" />');
-	check_multi.appendTo(label);
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
-
-	// Exclude unselected
-	var label = $('<label class="check_container">Exclude unselected</label>');
-	label.appendTo(cont);
-	var check_exclude = $('<input type="checkbox" id="query_exclude" onclick="printCards()" />');
-	check_exclude.appendTo(label);
-	var span = $('<span class="checkmark"></span>');
-	span.appendTo(label);
-
-	// Stats
-	var reset = $('<div class="button_simple button_thin" onClick="resetFilters()">Reset</div>');
-	var exp   = $('<div class="button_simple button_thin" onClick="exportCollection()">Copy</div>');
-	var stats = $('<div class="button_simple button_thin stats_button" onClick="printStats()">Collection Stats</div>');
-
-	reset.appendTo(cont);
-	exp.appendTo(cont);
-	stats.appendTo(cont);
+	add_checkbox_search(cont, 'Newly aquired only', 'query_new', false);
+	add_checkbox_search(cont, 'Require multicolored', 'query_multicolor', false);
+	add_checkbox_search(cont, 'Exclude unselected', 'query_exclude', false);
 	cont.appendTo(filters);
 
-	input.on('input', function() {
-		if (inputTimer != undefined) {
-			clearTimeout(inputTimer);
-		}
-		console.log("print cards in a second..")
-		inputTimer = setTimeout(function(){
-			console.log("printed")
-			printCards();
-		}, 500);
-	});
-
+	var cont = $('<div class="buttons_container"></div>');
+	add_checkbox_search(cont, 'Common', 'query_common', true);
+	add_checkbox_search(cont, 'Uncommon', 'query_uncommon', true);
+	add_checkbox_search(cont, 'Rare', 'query_rare', true);
+	add_checkbox_search(cont, 'Mythic Rare', 'query_mythic', true);
+	//add_checkbox_search(cont, 'Land', 'query_land', true);
+	cont.appendTo(filters);
+	
+	$("#ux_0").append(basicFilters);
 	$("#ux_0").append(filters);
 	$("#ux_0").append(div);
 
 	printCards();
+}
+
+//
+function add_checkbox_search(div, label, iid, def) {
+	var label = $('<label class="check_container">'+label+'</label>');
+	var check_new = $('<input type="checkbox" id="'+iid+'" />');
+	check_new.appendTo(label);
+	check_new.prop('checked', def);
+
+	var span = $('<span class="checkmark"></span>');
+	span.appendTo(label);
+	label.appendTo(div);
+}
+
+function expandFilters() {
+	var div = $('.inventory_filters');
+	if (div.css('opacity') == 1) {
+		div.css('height', '0px');
+		div.css('opacity', 0);
+		$('.inventory').show();
+
+	}
+	else {
+		div.css('height', 'calc(100% - 90px)');
+		div.css('opacity', 1);
+		setTimeout(function() {
+			$('.inventory').hide();
+		}, 200);
+	}
 }
 
 function resetFilters() {
@@ -1604,7 +1622,12 @@ function printStats() {
 
 //
 function printCards() {
-	var div = $(".inventory");
+	var div = $('.inventory_filters');
+	div.css('height', '0px');
+	div.css('opacity', 0);
+	$('.inventory').show();
+
+	div = $(".inventory");
 	div.html('');
 
 	var paging = $('<div class="paging_container"></div>');
@@ -1615,17 +1638,24 @@ function printCards() {
 	filterMulti = document.getElementById("query_multicolor");
 	filterExclude = document.getElementById("query_exclude");
 
+	filterCommon = document.getElementById("query_common");
+	filterUncommon = document.getElementById("query_uncommon");
+	filterRare = document.getElementById("query_rare");
+	filterMythic = document.getElementById("query_mythic");
+
 	console.log("filter", filterNew.checked);
 	var totalCards = 0;
     for (n=0; n<Object.keys(cards).length; n++) {
     	key = Object.keys(cards)[n];
     	let grpId = key;
+    	let card = cardsDb.get(grpId);
     	let doDraw = true;
 
-    	let name = cardsDb.get(key).name.toLowerCase();
-    	let type = cardsDb.get(key).type.toLowerCase();
-    	let cost = cardsDb.get(key).cost;
-    	let set  = cardsDb.get(key).set;
+    	let name = card.name.toLowerCase();
+    	let type = card.type.toLowerCase();
+    	let rarity = card.rarity;
+    	let cost = card.cost;
+    	let set  = card.set;
 
 		if (name.indexOf(filterName) == -1 && type.indexOf(filterName) == -1) {
 			doDraw = false;
@@ -1640,6 +1670,19 @@ function printCards() {
 	    		doDraw = false;
 	    	}
     	}
+
+    	switch (rarity) {
+    		case 'common':
+    			if (!filterCommon.checked) 		doDraw = false; break;
+    		case 'uncommon':
+    			if (!filterUncommon.checked) 	doDraw = false; break;
+    		case 'rare':
+    			if (!filterRare.checked) 		doDraw = false; break;
+    		case 'mythic':
+    			if (!filterMythic.checked) 		doDraw = false; break;
+			default:
+    			break;
+		}
 
 		if (filterExclude.checked && cost.length == 0) {
 			doDraw = false;
@@ -1688,9 +1731,9 @@ function printCards() {
 
     	if (doDraw) {
 			let dfc = '';
-			if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
-			if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
-			if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
+			if (card.dfc == 'DFC_Back')	dfc = 'a';
+			if (card.dfc == 'DFC_Front')	dfc = 'b';
+			if (card.dfc == 'SplitHalf')	dfc = 'a';
 
 	        var d = $('<div style="width: '+cardSize+'px !important;" class="inventory_card"></div>');
 
@@ -1707,16 +1750,16 @@ function printCards() {
 	        }
 
 	        var img = $('<img style="width: '+cardSize+'px !important;" class="inventory_card_img"></img>');
-			img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+			img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
 			img.appendTo(d);
 
 			img.on('mouseenter', function(e) {
 				$('.main_hover').css("opacity", 1);
 				let dfc = '';
-				if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
-				if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
-				if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
-				$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+				if (card.dfc == 'DFC_Back')	dfc = 'a';
+				if (card.dfc == 'DFC_Front')	dfc = 'b';
+				if (card.dfc == 'SplitHalf')	dfc = 'a';
+				$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
 
 				$('.main_hover').on('load', function(){
 					$('.loader').css("opacity", 0);
