@@ -1830,6 +1830,7 @@ function open_settings() {
 	add_checkbox(div, 'Launch on startup', 'settings_startup', settings.startup);
 	add_checkbox(div, 'Close main window on match found', 'settings_closeonmatch', settings.close_on_match);
 	add_checkbox(div, 'Close to tray', 'settings_closetotray', settings.close_to_tray);
+	add_checkbox(div, 'Sound when priority changes', 'settings_soundpriority', settings.sound_priority);
 
 	div.append('<div class="settings_title">Overlay</div>');
 
@@ -1947,6 +1948,7 @@ function updateSettings() {
 	var startup = document.getElementById("settings_startup").checked;
 	var showOverlay = document.getElementById("settings_showoverlay").checked;
 	var showOverlayAlways = document.getElementById("settings_showoverlayalways").checked;
+	var soundPriority = document.getElementById("settings_soundpriority").checked;
 
 	var closeToTray = document.getElementById("settings_closetotray").checked;
 	var sendData = document.getElementById("settings_senddata").checked;
@@ -1958,6 +1960,7 @@ function updateSettings() {
 	var overlayClock = document.getElementById("settings_overlay_clock").checked;
 
 	settings = {
+		sound_priority: soundPriority,
 		show_overlay: showOverlay,
 		show_overlay_always: showOverlayAlways,
 		startup: startup,

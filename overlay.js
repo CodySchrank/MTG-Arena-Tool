@@ -13,7 +13,9 @@ var turnNumber = 0;
 var turnActive = 0;
 var turnPriority = 0;
 var turnDecision = 0;
+var soundPriority = false;
 
+const playSound = require('play-sound')(opts = {})
 const Database = require('./database.js');
 const cardsDb = new Database();
 
@@ -93,13 +95,14 @@ $( window ).resize(function() {
 });
 
 
-ipc.on('settings', function (event, alpha, top, title, deck, clock) {
+ipc.on('settings', function (event, sound_priority, alpha, top, title, deck, clock) {
 	/*
 	// Alpha does some weird things..
 	$('body').css("background-color", "rgba(0,0,0,"+alpha+")");
 	$('.overlay_wrapper:before').css("opacity", 0.4*alpha);
 	$('.overlay_wrapper').css("opacity", alpha);
 	*/
+	soundPriority = sound_priority;
 	$('.top').css('display', '');
 	$('.overlay_deckname').css('display', '');
 	$('.overlay_deckcolors').css('display', '');
@@ -227,6 +230,11 @@ ipc.on('set_draft_cards', function (event, pack, picks, packn, pickn) {
 
 //
 ipc.on("set_turn", function (event, _we, _phase, _step, _number, _active, _priority, _decision) {
+	if (turnPriority != _priority) {
+		playSound.play('sounds/blip.mp3', function(err){
+		  if (err) throw err
+		})
+	}
 	turnPhase = _phase;
 	turnStep = _step;
 	turnNumber = _number;

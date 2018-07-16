@@ -23,7 +23,8 @@
 		"chart.js": "^2.7.2",
 		"conf": "^2.0.0",
 		"electron-debug": "^1.5.0",
-		"electron-updater": "^2.21.10"
+		"electron-updater": "^2.21.10",
+		"play-sound": "^1.1.2"
 	},
 	"devDependencies": {
 		"electron-builder": "^20.15.1",

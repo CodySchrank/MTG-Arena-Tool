@@ -14,7 +14,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
+		settings: {sound_priority: true, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
         matches_index:[],
         draft_index:[],
         vault_history:[],
@@ -145,7 +145,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
+            settings: {sound_priority: true, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
             matches_index:[],
             draft_index:[],
             vault_history:[],
@@ -176,7 +176,7 @@ function updateSettings(settings) {
     else if (duringMatch || settings.show_overlay_always) {
         overlay.show();
     }
-    overlay.webContents.send("settings", 1, settings.overlay_top, settings.overlay_title, settings.overlay_deck, settings.overlay_clock);
+    overlay.webContents.send("settings", 1, settings.sound_priority, settings.overlay_top, settings.overlay_title, settings.overlay_deck, settings.overlay_clock);
 }
 
 
