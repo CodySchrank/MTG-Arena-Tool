@@ -101,6 +101,9 @@ ipc.on('set_settings', function (event, arg) {
 	settings = arg;
 	cardSizePos = settings.cards_size;
 	overlayAlpha = settings.overlay_alpha;
+	if (settings.cards_quality != undefined) {
+		cardQuality = settings.cards_quality;
+	}
 	cardSize = 100+(cardSizePos*10);
 });
 
@@ -1432,9 +1435,11 @@ function open_cards() {
 	span.appendTo(label);
 
 	// Stats
-	var exp   = $('<div class="button_simple button_thin" onClick="exportCollection()">Copy to Clipboard</div>');
+	var reset = $('<div class="button_simple button_thin" onClick="resetFilters()">Reset</div>');
+	var exp   = $('<div class="button_simple button_thin" onClick="exportCollection()">Copy</div>');
 	var stats = $('<div class="button_simple button_thin stats_button" onClick="printStats()">Collection Stats</div>');
 
+	reset.appendTo(cont);
 	exp.appendTo(cont);
 	stats.appendTo(cont);
 	cont.appendTo(filters);
@@ -1452,6 +1457,26 @@ function open_cards() {
 
 	$("#ux_0").append(filters);
 	$("#ux_0").append(div);
+
+	printCards();
+}
+
+function resetFilters() {
+	filteredSets = [];
+	filteredMana = [];
+	
+	$(".set_filter").each(function( index ) {
+		$( this ).removeClass('set_filter_on');
+		$( this ).addClass('set_filter_on');
+	});
+	$(".mana_filter").each(function( index ) {
+		$( this ).removeClass('mana_filter_on');
+		$( this ).addClass('mana_filter_on');
+	});
+	document.getElementById("query_name").value = "";
+	document.getElementById("query_new").checked = false;
+	document.getElementById("query_multicolor").checked = false;
+	document.getElementById("query_exclude").checked = false;
 
 	printCards();
 }
@@ -1775,6 +1800,11 @@ function open_settings() {
 
 	div.append('<div class="settings_title">Visual</div>');
 
+	var label = $('<label class="but_container_label">Cards quality:</label>');
+	label.appendTo(div);
+	var button = $('<div class="button_simple button_long" style="margin-left: 32px;" onclick="changeQuality(this)">'+cardQuality+'</div>');
+	button.appendTo(label);
+
 	var slider = $('<div class="slidecontainer_settings"></div>');
 	slider.appendTo(div);
 	var sliderlabel = $('<label style="width: 400px; !important" class="card_size_container">Cards size: '+cardSize+'px</label>');
@@ -1804,7 +1834,7 @@ function open_settings() {
 	// Erase data
 	var label = $('<label class="check_container_but"></label>');
 	label.appendTo(div);
-	var button = $('<div class="button_simple button_long" onclick="eraseData()"">Erase my shared data</div>');
+	var button = $('<div class="button_simple button_long" onclick="eraseData()">Erase my shared data</div>');
 	button.appendTo(label);
 
 	$("#ux_0").append(div);
@@ -1844,6 +1874,20 @@ function open_settings() {
 		updateSettings();
 	});
 
+}
+
+//
+function changeQuality(dom) {
+	if (cardQuality == "normal") {
+		cardQuality = "large";
+	}
+	else if (cardQuality == "large") {
+		cardQuality = "small";
+	}
+	else if (cardQuality == "small") {
+		cardQuality = "normal";
+	}
+	dom.innerHTML = cardQuality;
 }
 
 //
