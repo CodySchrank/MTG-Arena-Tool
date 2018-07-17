@@ -210,7 +210,7 @@ ipc.on('set_deck', function (event, arg) {
 		prevIndex = grpId;
 	});
 
-	if (deckMode == 2 && name != "") {
+	if (deckMode == 2) {
 		deckListDiv.append('<div class="chance_title"></div>');// Add some space
 		deckListDiv.append('<div class="chance_title">Creature: '+arg.chanceCre+'%</div>');
 		deckListDiv.append('<div class="chance_title">Instant: '+arg.chanceIns+'%</div>');
@@ -234,7 +234,7 @@ ipc.on('set_draft_cards', function (event, pack, picks, packn, pickn) {
 
 //
 ipc.on("set_turn", function (event, _we, _phase, _step, _number, _active, _priority, _decision) {
-	if (turnPriority != _priority && _priority == _we) {
+	if (turnPriority != _priority && _priority == _we && soundPriority) {
 		sound.play();
 	}
 	turnPhase = _phase;

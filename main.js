@@ -1187,9 +1187,7 @@ function select_deck(arg) {
 
 function clear_deck() {
     var deck = {mainDeck: [], sideboard : [], name: ""};
-    currentDeck = deck;
-    currentDeckUpdated = deck;
-    overlay.webContents.send("set_deck", currentDeck);
+    overlay.webContents.send("set_deck", deck);
 }
 
 function update_deck() {
