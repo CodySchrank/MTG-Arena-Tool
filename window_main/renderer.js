@@ -30,7 +30,7 @@ var wildcardHistory = null;
 //var initialized = false;
 
 const chartjs = require('chart.js');
-const Database = require('./database.js');
+const Database = require('../shared/database.js');
 const cardsDb = new Database();
 
 
@@ -1389,7 +1389,7 @@ function open_cards() {
 
 	var sets = $('<div class="sets_container"><label>Filter by set:</label></div>');
 	setsList.forEach(function(set) {
-		var setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(sets/'+get_set_code(set)+'.png)" title="'+set+'"></div>');
+		var setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(../images/sets/'+get_set_code(set)+'.png)" title="'+set+'"></div>');
 		setbutton.appendTo(sets);
 		setbutton.click(function() {
 			if (setbutton.hasClass('set_filter_on')) {
@@ -1411,7 +1411,7 @@ function open_cards() {
 	var ms = ["w", "u", "b", "r", "g"];
 	ms.forEach(function(s, i) {
 		var mi = [1, 2, 3, 4, 5];
-		var manabutton = $('<div class="mana_filter mana_filter_on" style="background-image: url(images/'+s+'20.png)"></div>');
+		var manabutton = $('<div class="mana_filter mana_filter_on" style="background-image: url(../images/'+s+'20.png)"></div>');
 		manabutton.appendTo(manas);
 		manabutton.click(function() {
 			if (manabutton.hasClass('mana_filter_on')) {
@@ -1523,7 +1523,7 @@ function printStats() {
 	// each set stats
 	setsList.forEach(function(set) {
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_set_icon" style="background-image: url(sets/'+get_set_code(set)+'.png)"><span>'+set+' <i>('+stats[set].ownedCards+'/'+stats[set].totalCards+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_set_icon" style="background-image: url(../images/sets/'+get_set_code(set)+'.png)"><span>'+set+' <i>('+stats[set].ownedCards+'/'+stats[set].totalCards+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats[set].ownedCards/stats[set].totalCards*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(mainstats);
 
@@ -1532,20 +1532,20 @@ function printStats() {
 			substats.html('');
 			$('<label>'+set+' Completion</label>').appendTo(substats);
 			var setdiv = $('<div class="stats_set_completion"></div>');
-			$('<div class="stats_rarity_icon" style="background-image: url(images/wc_common.png)"><span>Commons <i>('+stats[set].ownedCommon+'/'+stats[set].totalCommon+')</i></span></div>').appendTo(setdiv);
+			$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_common.png)"><span>Commons <i>('+stats[set].ownedCommon+'/'+stats[set].totalCommon+')</i></span></div>').appendTo(setdiv);
 			$('<div class="stats_set_bar" style="width: '+stats[set].ownedCommon/stats[set].totalCommon*100+'%"></div>').appendTo(setdiv);
 			setdiv.appendTo(substats);
 			var setdiv = $('<div class="stats_set_completion"></div>');
-			$('<div class="stats_rarity_icon" style="background-image: url(images/wc_uncommon.png)"><span>Uncommons <i>('+stats[set].ownedUncommon+'/'+stats[set].totalUncommon+')</i></span></div>').appendTo(setdiv);
+			$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_uncommon.png)"><span>Uncommons <i>('+stats[set].ownedUncommon+'/'+stats[set].totalUncommon+')</i></span></div>').appendTo(setdiv);
 			$('<div class="stats_set_bar" style="width: '+stats[set].ownedUncommon/stats[set].totalUncommon*100+'%"></div>').appendTo(setdiv);
 			setdiv.appendTo(substats);
 			var setdiv = $('<div class="stats_set_completion"></div>');
-			$('<div class="stats_rarity_icon" style="background-image: url(images/wc_rare.png)"><span>Rares <i>('+stats[set].ownedRare+'/'+stats[set].totalRare+')</i></span></div>').appendTo(setdiv);
+			$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_rare.png)"><span>Rares <i>('+stats[set].ownedRare+'/'+stats[set].totalRare+')</i></span></div>').appendTo(setdiv);
 			$('<div class="stats_set_bar" style="width: '+stats[set].ownedRare/stats[set].totalRare*100+'%"></div>').appendTo(setdiv);
 			setdiv.appendTo(substats);
 			if (stats[set].totalMythic == 0)	stats[set].totalMythic = 1;
 			var setdiv = $('<div class="stats_set_completion"></div>');
-			$('<div class="stats_rarity_icon" style="background-image: url(images/wc_mythic.png)"><span>Mythics <i>('+stats[set].ownedMythic+'/'+stats[set].totalMythic+')</i></span></div>').appendTo(setdiv);
+			$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_mythic.png)"><span>Mythics <i>('+stats[set].ownedMythic+'/'+stats[set].totalMythic+')</i></span></div>').appendTo(setdiv);
 			$('<div class="stats_set_bar" style="width: '+stats[set].ownedMythic/stats[set].totalMythic*100+'%"></div>').appendTo(setdiv);
 			setdiv.appendTo(substats);
 		});
@@ -1553,7 +1553,7 @@ function printStats() {
 
 	// Complete collection sats
 	var setdiv = $('<div class="stats_set_completion"></div>');
-	$('<div class="stats_set_icon" style="background-image: url(sets/pw.png)"><span>Complete collection <i>('+stats.ownedCards+'/'+stats.totalCards+')</i></span></div>').appendTo(setdiv);
+	$('<div class="stats_set_icon" style="background-image: url(../images/sets/pw.png)"><span>Complete collection <i>('+stats.ownedCards+'/'+stats.totalCards+')</i></span></div>').appendTo(setdiv);
 	$('<div class="stats_set_bar" style="width: '+stats.ownedCards/stats.totalCards*100+'%"></div>').appendTo(setdiv);
 	setdiv.appendTo(mainstats);
 
@@ -1562,26 +1562,26 @@ function printStats() {
 		substats.html('');
 		$('<label>Complete collection completion</label>').appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_common.png)"><span>Commons <i>('+stats.ownedCommon+'/'+stats.totalCommon+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_common.png)"><span>Commons <i>('+stats.ownedCommon+'/'+stats.totalCommon+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedCommon/stats.totalCommon*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_uncommon.png)"><span>Uncommons <i>('+stats.ownedUncommon+'/'+stats.totalUncommon+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_uncommon.png)"><span>Uncommons <i>('+stats.ownedUncommon+'/'+stats.totalUncommon+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedUncommon/stats.totalUncommon*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_rare.png)"><span>Rares <i>('+stats.ownedRare+'/'+stats.totalRare+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_rare.png)"><span>Rares <i>('+stats.ownedRare+'/'+stats.totalRare+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedRare/stats.totalRare*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_mythic.png)"><span>Mythics <i>('+stats.ownedMythic+'/'+stats.totalMythic+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_mythic.png)"><span>Mythics <i>('+stats.ownedMythic+'/'+stats.totalMythic+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedMythic/stats.totalMythic*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 	});
 
 	// Singleton collection sats
 	var setdiv = $('<div class="stats_set_completion"></div>');
-	$('<div class="stats_set_icon" style="background-image: url(sets/pw.png)"><span>Singles <i>('+stats.ownedSingles+'/'+stats.totalSingles+')</i></span></div>').appendTo(setdiv);
+	$('<div class="stats_set_icon" style="background-image: url(../images/sets/pw.png)"><span>Singles <i>('+stats.ownedSingles+'/'+stats.totalSingles+')</i></span></div>').appendTo(setdiv);
 	$('<div class="stats_set_bar" style="width: '+stats.ownedSingles/stats.totalSingles*100+'%"></div>').appendTo(setdiv);
 	setdiv.appendTo(mainstats);
 
@@ -1590,19 +1590,19 @@ function printStats() {
 		substats.html('');
 		$('<label>Singles completion</label>').appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_common.png)"><span>Commons <i>('+stats.ownedSinglesCommon+'/'+stats.totalSinglesCommon+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_common.png)"><span>Commons <i>('+stats.ownedSinglesCommon+'/'+stats.totalSinglesCommon+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedSinglesCommon/stats.totalSinglesCommon*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_uncommon.png)"><span>Uncommons <i>('+stats.ownedSinglesUncommon+'/'+stats.totalSinglesUncommon+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_uncommon.png)"><span>Uncommons <i>('+stats.ownedSinglesUncommon+'/'+stats.totalSinglesUncommon+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedSinglesUncommon/stats.totalSinglesUncommon*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_rare.png)"><span>Rares <i>('+stats.ownedSinglesRare+'/'+stats.totalSinglesRare+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_rare.png)"><span>Rares <i>('+stats.ownedSinglesRare+'/'+stats.totalSinglesRare+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedSinglesRare/stats.totalSinglesRare*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_rarity_icon" style="background-image: url(images/wc_mythic.png)"><span>Mythics <i>('+stats.ownedSinglesMythic+'/'+stats.totalSinglesMythic+')</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_rarity_icon" style="background-image: url(../images/wc_mythic.png)"><span>Mythics <i>('+stats.ownedSinglesMythic+'/'+stats.totalSinglesMythic+')</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats.ownedSinglesMythic/stats.totalSinglesMythic*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(substats);
 	});

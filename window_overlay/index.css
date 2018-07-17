@@ -1,0 +1,150 @@
+.overlay_decklist {
+    /*padding-right: 12px;*/
+    height: calc(100% - 210px);
+    overflow: overlay;
+}
+
+.overlay_deckname {
+    -webkit-app-region:drag;
+    padding: 12px 0 0 0;
+    text-align: center;
+    color: #FAE5D2;
+}
+
+.overlay_deckcolors {
+    -webkit-app-region:drag;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.overlay_separator {
+    padding: 4px;
+    height: 16px;
+    background: url(../images/separator_spr.png) center no-repeat;
+}
+
+.overlay_hover {
+    pointer-events: none;
+    width: 90%;
+    max-width: 300px;
+    opacity: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    -webkit-border-radius: 4.75% / 3.5%;
+    box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.5);
+    -webkit-transition: opacity .2s ease-in;
+}
+
+.overlay_hover_container {
+    pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    float: right;
+    width: 100%;
+    z-index: 50;
+}
+
+.overlay_clock_container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    bottom: 0;
+    float: center;
+    width: 100%;
+    height: 64px;
+    z-index: 40;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.overlay_draft_container {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    bottom: 0;
+    float: center;
+    width: 100%;
+    height: 64px;
+    top: 64px;
+    z-index: 40;
+}
+
+.overlay_deck_container {
+    position: absolute;
+    flex-direction: column;
+    display: flex;
+    justify-content: space-between;
+    bottom: 0;
+    float: center;
+    width: 100%;
+    height: 64px;
+    top: 64px;
+    z-index: 40;
+}
+
+
+.chance_title {
+    font-size: 15px;
+    height: 20px;
+    line-height: 20px;
+    margin: 0px auto;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.clock_elapsed {
+    height: 48px;
+    width: 100%;
+    text-align: center;
+    line-height: 48px;
+    font-size: 25px;
+    color: rgba(255, 255, 255, 0.8);
+    z-index: 50;
+}
+
+.clock_turn {
+    height: 16px;
+    position: relative;
+    top: 5px;
+    width: 100%;
+    text-align: center;
+    line-height: 16px;
+    font-size: 15px;
+    color: #d4c6af;
+    z-index: 50;
+}
+
+.clock_prev, .draft_prev, .deck_prev {
+    -webkit-app-region:no-drag;
+    position: absolute;
+    cursor: pointer;
+    background: url(../images/prev.png) no-repeat center;
+    z-index: 51;
+    display: block;
+    opacity: 0.5;
+    align-self: flex-start;
+    width: 32px;
+    height: 64px;
+    -webkit-transition: all .2s ease-in;
+}
+
+.clock_next, .draft_next, .deck_next {
+    -webkit-app-region:no-drag;
+    cursor: pointer;
+    position: absolute;
+    background: url(../images/next.png) no-repeat center;
+    z-index: 51;
+    opacity: 0.5;
+    align-self: flex-end;
+    display: block;
+    width: 32px;
+    height: 64px;
+    -webkit-transition: all .2s ease-in;
+}
+
+.clock_prev:hover, .clock_next:hover, .draft_prev:hover, .draft_next:hover, .deck_prev:hover, .deck_next:hover {
+    opacity: 1;
+}

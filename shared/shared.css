@@ -1,0 +1,367 @@
+html {
+    -webkit-user-select:none;
+     cursor: default;
+    height: 100%;
+    font-family: "Mplantin"; 
+    -webkit-font-smoothing: antialiased !important;
+    text-rendering: optimizeLegibility !important;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    background-color: rgba(0,0,0,1);
+    overflow: hidden;
+}
+
+label {
+    font-family: "Mplantin";
+    color: #FAE5D2;
+    margin-top: 2px;
+}
+
+@font-face {
+    font-family: 'belerenbold';
+    src: url('../fonts/belerenbold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Mplantin';
+    src: url('../fonts/Mplantin.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Mplantin-italic';
+    src: url('../fonts/mplantinit.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Mplantin-bold';
+    src: url('../fonts/mplantinbold.woff') format('woff');
+}
+
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #33281E;
+    border-radius: 10px;
+    margin-top: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #917961;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #B59579; 
+}
+
+.flex_top {
+    height: 50%;
+    display: flex;
+}
+
+.flex_bottom {
+    height: 50%;
+    display: flex;
+}
+
+.flex_item {
+    display: flex;
+}
+
+.hidden {
+    display: none !important;
+    opacity: 0;
+}
+
+.main_wrapper {
+    padding: 2px;
+    height: calc(100% - 4px);
+}
+
+.wrapper {
+    position: relative;
+    opacity: 1;
+    display: flex;
+    height: calc(100% - 64px);
+}
+
+.overlay_wrapper {
+    padding: 2px;
+    position: relative;
+    height: calc(100% - 4px);
+}
+
+.wrapper:before, .overlay_wrapper:before {
+    content: ' ';
+    top: 0;
+    left: 0px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: url(../images/Mox-Amber-Dominaria-MtG-Art.jpg);
+    background-color: #917961;
+    background-size: cover;
+    background-blend-mode: luminosity;
+    background-position: center;
+    opacity: 0.4;
+    z-index: -1;
+}
+
+.top {
+    -webkit-app-region:drag;
+    position: relative;
+    z-index: 30;
+    height: 64px;
+    background: url(../images/top_bar.png);
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
+}
+
+
+.button {
+    -webkit-app-region: no-drag;
+    cursor:pointer;
+    align-self: center;
+    position: relative;
+    left: 0px;
+    margin-right: 12px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+    -webkit-transition: all .33s ease-in-out;
+}
+
+.button:hover {
+    opacity: 0.2;
+    -webkit-transform: rotate(-90deg);
+}
+
+.button.minimize:hover {
+    opacity: 0.2;
+    -webkit-transform: rotate(-180deg);
+}
+
+.button.back:hover {
+    opacity: 1;
+    -webkit-transform: rotate(0deg);
+    left: -8px;
+}
+
+.button.settings {
+    background-image: url(../images/icon_settings.png);
+}
+.button.minimize {
+    background-image: url(../images/icon_minimize.png);
+}
+.button.close {
+    background-image: url(../images/icon_close.png);
+}
+.button.back {
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 64px;
+    height: 64px;
+    background-image: url(../images/icon_back_light.png);
+}
+
+
+.main_hover {
+    pointer-events: none;
+    width: 90%;
+    max-width: 240px;
+    opacity: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: 24px;
+    margin-bottom: 24px;
+    -webkit-border-radius: 4.75% / 3.5%;
+    box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.5);
+    -webkit-transition: all .2s ease-in;
+}
+
+.mana_20 {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+}
+
+.mana_16 {
+    z-index: 15;
+    pointer-events: none;
+    width: 20px;
+    height: 20px;
+    margin: 2px -1px 2px -1px;
+}
+
+.mana_white     { background: url(../images/w20.png) center;}
+.mana_blue      { background: url(../images/u20.png) center;}
+.mana_black     { background: url(../images/b20.png) center;}
+.mana_red       { background: url(../images/r20.png) center;}
+.mana_green     { background: url(../images/g20.png) center;}
+.mana_colorless { background: url(../images/c20.png) center;}
+
+.mana_16.mana_white    { background: url(../images/16sh/w.png) center;}
+.mana_16.mana_blue     { background: url(../images/16sh/u.png) center;}
+.mana_16.mana_black    { background: url(../images/16sh/b.png) center;}
+.mana_16.mana_red      { background: url(../images/16sh/r.png) center;}
+.mana_16.mana_green    { background: url(../images/16sh/g.png) center;}
+.mana_16.mana_colorless{ background: url(../images/16sh/c.png) center;}
+.mana_16.mana_x        { background: url(../images/16sh/x.png) center;}
+.mana_16.mana_g0       { background: url(../images/16sh/0.png) center;}
+.mana_16.mana_g1       { background: url(../images/16sh/1.png) center;}
+.mana_16.mana_g2       { background: url(../images/16sh/2.png) center;}
+.mana_16.mana_g3       { background: url(../images/16sh/3.png) center;}
+.mana_16.mana_g4       { background: url(../images/16sh/4.png) center;}
+.mana_16.mana_g5       { background: url(../images/16sh/5.png) center;}
+.mana_16.mana_g6       { background: url(../images/16sh/6.png) center;}
+.mana_16.mana_g7       { background: url(../images/16sh/7.png) center;}
+.mana_16.mana_g8       { background: url(../images/16sh/8.png) center;}
+.mana_16.mana_g9       { background: url(../images/16sh/9.png) center;}
+.mana_16.mana_g10      { background: url(../images/16sh/10.png) center;}
+.mana_16.mana_g11      { background: url(../images/16sh/11.png) center;}
+.mana_16.mana_g12      { background: url(../images/16sh/12.png) center;}
+.mana_16.mana_g13      { background: url(../images/16sh/13.png) center;}
+.mana_16.mana_g14      { background: url(../images/16sh/14.png) center;}
+.mana_16.mana_g15      { background: url(../images/16sh/15.png) center;}
+.mana_16.mana_g16      { background: url(../images/16sh/16.png) center;}
+.mana_16.mana_g17      { background: url(../images/16sh/17.png) center;}
+.mana_16.mana_g18      { background: url(../images/16sh/18.png) center;}
+.mana_16.mana_g19      { background: url(../images/16sh/19.png) center;}
+.mana_16.mana_g20      { background: url(../images/16sh/20.png) center;}
+
+.tile_w {     -webkit-border-image: url(../images/w.png) 0 15 0 15 stretch;}
+.tile_u {     -webkit-border-image: url(../images/u.png) 0 15 0 15 stretch;}
+.tile_b {     -webkit-border-image: url(../images/b.png) 0 15 0 15 stretch;}
+.tile_r {     -webkit-border-image: url(../images/r.png) 0 15 0 15 stretch;}
+.tile_g {     -webkit-border-image: url(../images/g.png) 0 15 0 15 stretch;}
+.tile_c {     -webkit-border-image: url(../images/c.png) 0 15 0 15 stretch;}
+.tile_multi { -webkit-border-image: url(../images/multi.png) 0 15 0 15 stretch;}
+
+.tile_wr { -webkit-border-image: url(../images/wr.png) 0 15 0 15 stretch;}
+.tile_wb { -webkit-border-image: url(../images/wb.png) 0 15 0 15 stretch;}
+.tile_uw { -webkit-border-image: url(../images/uw.png) 0 15 0 15 stretch;}
+.tile_ur { -webkit-border-image: url(../images/ur.png) 0 15 0 15 stretch;}
+.tile_ug { -webkit-border-image: url(../images/ug.png) 0 15 0 15 stretch;}
+.tile_ub { -webkit-border-image: url(../images/ub.png) 0 15 0 15 stretch;}
+.tile_rg { -webkit-border-image: url(../images/rg.png) 0 15 0 15 stretch;}
+.tile_gw { -webkit-border-image: url(../images/gw.png) 0 15 0 15 stretch;}
+.tile_br { -webkit-border-image: url(../images/br.png) 0 15 0 15 stretch;}
+.tile_bg { -webkit-border-image: url(../images/bg.png) 0 15 0 15 stretch;}
+
+.card_tile {
+    width: 100%;
+    min-width: calc(100% - 72px);
+    height: 24px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-style: solid;
+    border-width: 0px 8px;
+    -webkit-transition: all .15s ease-in;
+    cursor: pointer;
+}
+
+.card_tile_glow {
+    width: 100%;
+    left: calc(0px - 100% + 56px);
+    min-width: calc(100% - 72px);
+    height: 24px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-style: solid;
+    border-width: 0px 8px;
+    position: relative;
+    opacity: 0;
+    -webkit-border-image: url(../images/over.png) 0 15 0 15 stretch;
+    -webkit-transition: opacity .12s ease-in-out, margin-top .12s ease-in-out, border-image .2s ease-out;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.card_tile_glow:hover {
+    opacity: 1;
+    margin-top: 0px;
+    -webkit-border-image: url(../images/flash.png) 0 15 0 15 stretch;
+}
+
+span {
+    align-self: center;
+}
+
+.card_tile_quantity {
+    text-indent: -3px;
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    height: 24px;
+    min-width: 24px;
+    width: 24px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    text-align: center;
+    font-family: Mplantin;
+    background: url(../images/quantity.png);
+    background-size: cover;
+}
+
+.card_tile_odds {
+    text-indent: -3px;
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+    height: 24px;
+    min-width: 32px;
+    width: 32px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    text-align: center;
+    font-family: Mplantin;
+    background: url(../images/odds.png);
+    background-size: cover;
+}
+
+.card_tile_not_owned {
+    min-width: 24px;
+    left: calc(0px - 100% + 42px);
+    position: relative;
+    background: url(../images/not_owned.png) center no-repeat;
+}
+
+.card_tile_container {
+    display: flex;
+}
+
+.card_tile_separator {
+    color: rgba(255, 255, 255, 0.8);
+    height: 32px;
+    vertical-align: middle;
+    line-height: 32px;k,
+    font-size: 15px;
+    text-align: center;
+    font-family: beleren;
+    align-self: center;
+}
+
+.card_tile_name {
+    padding-left: 2px;
+    overflow: hidden;
+    height: 16px;
+    font-size: 14px;
+    font-family: "belerenbold";
+    align-self: center;
+    justify-content: flex-start;
+    z-index: 15;
+    pointer-events: none;
+}

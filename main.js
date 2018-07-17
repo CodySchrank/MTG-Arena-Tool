@@ -24,11 +24,11 @@ var store = new Store({
 });
 
 const serverAddress = 'mtgatool.com';
-const Database = require('./database.js');
+const Database = require('./shared/database.js');
 const cardsDb = new Database();
 
-const debugLog = false;
-const debugLogSpeed = 0.1;
+const debugLog = true;
+const debugLogSpeed = 25.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 
@@ -118,12 +118,6 @@ ipc.on('renderer_state', function (event, state) {
 ipc.on('save_settings', function (event, settings) {
     store.set('settings', settings);
     updateSettings(settings);
-    /*
-    over.setIgnoreMouseEvents(false);
-    if (settings.overlay_alpha < 0.5) {
-        over.setIgnoreMouseEvents(true);
-    }
-    */
 });
 
 ipc.on('erase_data', function (event, settings) {
@@ -427,7 +421,7 @@ function createMainWindow() {
         title: "MTG Arena Tool",
         icon:'icon.png'
     });
-    win.loadURL(`file://${__dirname}/index.html`);
+    win.loadURL(`file://${__dirname}/window_main/index.html`);
     win.on('closed', onClosed);
 
     let iconPath = path.join(__dirname, 'icon.png');
@@ -466,7 +460,7 @@ function createOverlay() {
         title: "MTG Arena Tool",
         icon:'images/icon.png'
     });
-    over.loadURL(`file://${__dirname}/overlay.html`);
+    over.loadURL(`file://${__dirname}/window_overlay/index.html`);
     over.on('closed', onOverlayClosed);
 
 	over.on('resize', () => {
@@ -981,32 +975,9 @@ function processLogData(data) {
 
 function gre_to_client(data) {
     data.forEach(function(msg) {
-        /*
-        // Only shows what the opp hovers now.. :(
-        if (msg.type == "GREMessageType_UIMessage") {
-            if (msg.uiMessage.onHover != undefined) {
-                if (msg.uiMessage.onHover.objectId != undefined) {
-                    if (gameObjs[msg.uiMessage.onHover.objectId] != undefined && gameObjs[msg.uiMessage.onHover.objectId].type == "GameObjectType_Card") {
-                        hoverCard = gameObjs[msg.uiMessage.onHover.objectId].grpId;
-                        if (cardsDb.get(gameObjs[msg.uiMessage.onHover.objectId].grpId) != undefined) {
-                            overlay.webContents.send("set_hover", hoverCard);
-                        }
-                    }
-                    else {
-                        overlay.webContents.send("set_hover", undefined);
-                    }
-                }
-                else {
-                    overlay.webContents.send("set_hover", undefined);
-                }
-            }
-        }
-        */
-
         if (msg.type == "GREMessageType_SubmitDeckReq") {
             gameObjs = {};
         }
-
 
         if (msg.type == "GREMessageType_GameStateMessage") {
             if (msg.gameStateMessage.type == "GameStateType_Full") {

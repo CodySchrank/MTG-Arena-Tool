@@ -16,7 +16,7 @@ var turnDecision = 0;
 var soundPriority = false;
 
 
-const Database = require('./database.js');
+const Database = require('../shared/database.js');
 const cardsDb = new Database();
 
 var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"};
