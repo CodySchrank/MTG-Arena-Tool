@@ -176,6 +176,7 @@ function updateSettings(settings) {
     else if (duringMatch || settings.show_overlay_always) {
         overlay.show();
     }
+    
     overlay.webContents.send("settings", 1, settings.sound_priority, settings.overlay_top, settings.overlay_title, settings.overlay_deck, settings.overlay_clock);
 }
 
@@ -1022,7 +1023,9 @@ function gre_to_client(data) {
                     turnDecision = msg.gameStateMessage.turnInfo.decisionPlayer;
                     turnStorm = msg.gameStateMessage.turnInfo.stormCount;
 
-                    overlay.webContents.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
+                    if (!firstPass) {
+                        overlay.webContents.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
+                    }
                     //console.log(msg.msgId, "Turn "+turnNumber, turnPhase, turnStep);
                 }
 

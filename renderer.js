@@ -1932,6 +1932,7 @@ function changeQuality(dom) {
 		cardQuality = "normal";
 	}
 	dom.innerHTML = cardQuality;
+	open_settings();
 }
 
 //

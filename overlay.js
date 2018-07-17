@@ -15,11 +15,16 @@ var turnPriority = 0;
 var turnDecision = 0;
 var soundPriority = false;
 
-const playSound = require('play-sound')(opts = {})
+
 const Database = require('./database.js');
 const cardsDb = new Database();
 
 var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"};
+
+const Howler = require('howler');
+var sound = new Howl({
+	src: ['./sounds/blip.mp3']
+});
 
 ipc_log = function (str, arg) {
     ipc.send('ipc_log', arg);
@@ -231,9 +236,7 @@ ipc.on('set_draft_cards', function (event, pack, picks, packn, pickn) {
 //
 ipc.on("set_turn", function (event, _we, _phase, _step, _number, _active, _priority, _decision) {
 	if (turnPriority != _priority) {
-		playSound.play('sounds/blip.mp3', function(err){
-		  if (err) throw err
-		})
+		sound.play();
 	}
 	turnPhase = _phase;
 	turnStep = _step;
