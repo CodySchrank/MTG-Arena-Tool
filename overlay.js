@@ -65,16 +65,15 @@ ipc.on('set_timer', function (event, arg) {
 		$(".overlay_draft_container").css("display", "flex");
 
 
-		let height = 146;
+		let _height = 146;
 		if ($('.top').css('display') == 'none') {
-			height -= 64;
+			_height -= 64;
 		}
 		if ($('.overlay_deckname').css('display') == 'none') {
-			height -= 78;
+			_height -= 78;
 		}
-		console.log(height);
 
-		$(".overlay_decklist").css("height", "100%").css("height", "-="+height+"px");
+		$(".overlay_decklist").css("height", "100%").css("height", "-="+_height+"px");
 		overlayMode = 1;
 		matchBeginTime = Date.now();
 	}
@@ -85,28 +84,28 @@ ipc.on('set_timer', function (event, arg) {
 });
 
 $( window ).resize(function() {
-	
-	if (overlayMode == 1) {
-		let height = 146;
-		if ($('.top').css('display') == 'none') {
-			height -= 64;
-		}
-		if ($('.overlay_deckname').css('display') == 'none') {
-			height -= 78;
-		}
-		console.log(height);
-		$(".overlay_decklist").css("height", "100%").css("height", "-="+height+"px");
+	let _height = 146;
+	if ($('.top').css('display') == 'none') {
+		_height -= 64;
 	}
+	if ($('.overlay_deckname').css('display') == 'none') {
+		_height -= 78;
+	}
+	if (overlayMode == 1) {
+		_height += 64;
+	}
+	$(".overlay_decklist").css("height", "100%").css("height", "-="+_height+"px");
 });
 
 
-ipc.on('settings', function (event, sound_priority, alpha, top, title, deck, clock) {
-	/*
+ipc.on('set_settings', function (event, sound_priority, alpha, top, title, deck, clock) {
 	// Alpha does some weird things..
+	/*
 	$('body').css("background-color", "rgba(0,0,0,"+alpha+")");
 	$('.overlay_wrapper:before').css("opacity", 0.4*alpha);
 	$('.overlay_wrapper').css("opacity", alpha);
 	*/
+
 	soundPriority = sound_priority;
 	$('.top').css('display', '');
 	$('.overlay_deckname').css('display', '');
@@ -137,17 +136,17 @@ ipc.on('settings', function (event, sound_priority, alpha, top, title, deck, clo
 		hideDiv('.overlay_clock_container');
 	}
 
-	let height = 210;
+	let _height = 210;
 	if (overlayMode == 1) {
-		height = 146;
+		_height = 146;
 	}
 	if (!top) {
-		height -= 64;
+		_height -= 64;
 	}
 	if (!title) {
-		height -= 78;
+		_height -= 78;
 	}
-	$(".overlay_decklist").css("height", "100%").css("height", "-="+height+"px");
+	$(".overlay_decklist").css("height", "100%").css("height", "-="+_height+"px");
 });
 
 function hideDiv(div) {
@@ -235,7 +234,7 @@ ipc.on('set_draft_cards', function (event, pack, picks, packn, pickn) {
 
 //
 ipc.on("set_turn", function (event, _we, _phase, _step, _number, _active, _priority, _decision) {
-	if (turnPriority != _priority) {
+	if (turnPriority != _priority && _priority == _we) {
 		sound.play();
 	}
 	turnPhase = _phase;

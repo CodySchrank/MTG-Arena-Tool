@@ -171,13 +171,17 @@ function updateSettings(settings) {
         openAtLogin: settings.startup
     });
     if (settings.show_overlay == false) {
-        overlay.hide();
+        if (overlay.isVisible()) {
+            overlay.hide();
+        }
     }
     else if (duringMatch || settings.show_overlay_always) {
-        overlay.show();
+        if (!overlay.isVisible()) {
+            overlay.show();
+        }
     }
     
-    overlay.webContents.send("settings", 1, settings.sound_priority, settings.overlay_top, settings.overlay_title, settings.overlay_deck, settings.overlay_clock);
+    overlay.webContents.send("set_settings", settings.sound_priority, 1, settings.overlay_top, settings.overlay_title, settings.overlay_deck, settings.overlay_clock);
 }
 
 
@@ -1121,9 +1125,10 @@ function createMatch(arg) {
         if (store.get("settings").close_on_match) {
             hideWindow();
         }
-
-        overlay.show();
-        overlay.focus();
+        if (!overlay.isVisible()) {
+            overlay.show();
+            overlay.focus();
+        }
         overlay.setBounds(obj);
     }
 
@@ -1151,8 +1156,10 @@ function createDraft() {
             hideWindow();
         }
 
-        overlay.show();
-        overlay.focus();
+        if (!overlay.isVisible()) {
+            overlay.show();
+            overlay.focus();
+        }
         overlay.setBounds(obj);
     }
 
@@ -1369,8 +1376,10 @@ function finishLoading() {
         var obj = store.get('overlayBounds');
 
         hideWindow();
-        overlay.show();
-        overlay.focus();
+        if (!overlay.isVisible()) {
+            overlay.show();
+            overlay.focus();
+        }
         overlay.setBounds(obj);
         update_deck();
     }
