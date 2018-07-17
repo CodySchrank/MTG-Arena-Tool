@@ -14,7 +14,7 @@ class Database {
     		console.log("Unable to find card with id "+grpId);
     		return false;
     	}
-        return this.cards[grpId];
+        return ret;
     }
 }
 

@@ -509,51 +509,82 @@ function setDecks(arg) {
 	}
 	if (sidebarActive == 0) {
 		sort_decks();
-		$("#ux_0").html('');
+		var mainDiv = document.getElementById("ux_0");
+		mainDiv.innerHTML = '';
+		var d = document.createElement("div");
+		d.classList.add("list_fill");
+		mainDiv.appendChild(d);
 
-		$("#ux_0").append('<div class="list_fill"></div>');
 		decks.forEach(function(deck, index) {
-
 			var tileGrpid = deck.deckTileId;
-			var tile = $('<div class="'+deck.id+'t deck_tile"></div>');
-			tile.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 
-			var div = $('<div class="'+deck.id+' list_deck"></div>');
+			var tile = document.createElement("div");
+			tile.classList.add(deck.id+'t');
+			tile.classList.add('deck_tile');
+			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
 
-			var fll = $('<div class="flex_item"></div>');
-			var flc = $('<div class="flex_item"></div>');
-			var flcf = $('<div class="flex_item" style="flex-grow: 2"></div>');
-			var flr = $('<div class="flex_item"></div>');
-			flr.css("flex-direction","column")
-			flc.css("flex-direction","column")
+			var div = document.createElement("div");
+			div.classList.add(deck.id);
+			div.classList.add('list_deck');
 
-			var flt = $('<div class="flex_top"></div>');
-			var flb = $('<div class="flex_bottom"></div>');
+			var fll = document.createElement("div");
+			fll.classList.add('flex_item');
+
+			var flc = document.createElement("div");
+			flc.classList.add('flex_item');
+			flc.style.flexDirection = "column";
+
+			var flcf = document.createElement("div");
+			flcf.classList.add('flex_item');
+			flcf.style.flexGrow = 2;
+
+			var flr = document.createElement("div");
+			flr.classList.add('flex_item');
+			flr.style.flexDirection = "column";
+
+			var flt = document.createElement("div");
+			flt.classList.add('flex_top');
+
+			var flb = document.createElement("div");
+			flb.classList.add('flex_bottom');
 
 			if (deck.name.indexOf('?=?Loc/Decks/Precon/') != -1) {
 				deck.name = deck.name.replace('?=?Loc/Decks/Precon/', '');
 			}
 
-			$('<div class="list_deck_name">'+deck.name+'</div>').appendTo(flt);
+			var d = document.createElement("div");
+			d.classList.add('list_deck_name');
+			d.innerHTML = deck.name;
+			flt.appendChild(d);
+
 			deck.colors.forEach(function(color) {
-				$('<div class="mana_20 mana_'+mana[color]+'"></div>').appendTo(flb);
+				var d = document.createElement("div");
+				d.classList.add('mana_20');
+				d.classList.add('mana_'+mana[color]);
+				flb.appendChild(d);
 			});
 
 			var wr = getDeckWinrate(deck.id, deck.lastUpdated);
 			if (wr != 0) {
-				$('<div class="list_deck_winrate">Winrate: '+(wr.total*100).toFixed(2)+'%</div>').appendTo(flr);
-				$('<div class="list_deck_winrate">Since last edit: '+(wr.lastEdit*100).toFixed(2)+'%</div>').appendTo(flr);
+				var d = document.createElement("div");
+				d.classList.add('list_deck_winrate');
+				d.innerHTML = 'Winrate: '+(wr.total*100).toFixed(2)+'%';
+				flr.appendChild(d);
+
+				var d = document.createElement("div");
+				d.classList.add('list_deck_winrate');
+				d.innerHTML = 'Since last edit: '+(wr.lastEdit*100).toFixed(2)+'%';
+				flr.appendChild(d);
 			}
 
-			fll.appendTo(div);
-			tile.appendTo(fll);
-
-			flc.appendTo(div);
-			flcf.appendTo(div);
-			flt.appendTo(flc);
-			flb.appendTo(flc);
-			flr.appendTo(div);
-			$("#ux_0").append(div);
+			div.appendChild(fll);
+			fll.appendChild(tile);
+			div.appendChild(flc);
+			div.appendChild(flcf);
+			flc.appendChild(flt);
+			flc.appendChild(flb);
+			div.appendChild(flr);
+			mainDiv.appendChild(div);
 
 			$('.'+deck.id).on('mouseenter', function(e) {
 			    $('.'+deck.id+'t').css('opacity', 1);
@@ -580,7 +611,6 @@ function updateExplore() {
 	filterEvent = document.getElementById("query_explore").value;
 	ipc.send('request_explore', filterEvent);
 }
-
 
 //
 function setExplore(arg) {

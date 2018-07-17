@@ -27,8 +27,8 @@ const serverAddress = 'mtgatool.com';
 const Database = require('./shared/database.js');
 const cardsDb = new Database();
 
-const debugLog = true;
-const debugLogSpeed = 25.1;
+const debugLog = false;
+const debugLogSpeed = 0.1;
 const fs = require("fs");
 const ipc = electron.ipcMain;
 
@@ -84,6 +84,7 @@ var currentDraftPack = undefined;
 var draftSet = "";
 var draftId = undefined;
 var overlayDeckMode = 0;
+var lastDeckUpdate = new Date();
 
 var goldHistory = [];
 var vaultHistory = [];
@@ -506,7 +507,10 @@ else {
 console.log(logUri);
 
 var file;
-logLoop();
+setTimeout( function() {
+    logLoop();
+}, 50000);
+
 
 function logLoop() {
     //console.log("logLoop() start")
@@ -663,8 +667,10 @@ function processLogData(data) {
     strCheck = '<== Deck.GetDeckLists(';
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
-        requestHistorySend(0);
-        mainWindow.webContents.send("set_decks", json);
+        //if (debugLog == true || firstPass == false) {
+            requestHistorySend(0);
+            mainWindow.webContents.send("set_decks", json);
+        //}
     }
 
     // Get inventory
@@ -1162,18 +1168,22 @@ function clear_deck() {
 }
 
 function update_deck() {
-    if (overlayDeckMode == 0) {
-        overlay.webContents.send("set_deck", currentDeckUpdated);
-    }
-    if (overlayDeckMode == 1) {
-        overlay.webContents.send("set_deck", currentDeck);
-    }
-    if (overlayDeckMode == 2) {
-        overlay.webContents.send("set_deck", currentDeckUpdated);
-    }
-    if (overlayDeckMode == 3) {
-        var currentOppDeck = getOppDeck();
-        overlay.webContents.send("set_deck", currentOppDeck);
+    var nd = new Date()
+    if (nd - lastDeckUpdate > 1000 || debugLog == true) {
+        if (overlayDeckMode == 0) {
+            overlay.webContents.send("set_deck", currentDeckUpdated);
+        }
+        if (overlayDeckMode == 1) {
+            overlay.webContents.send("set_deck", currentDeck);
+        }
+        if (overlayDeckMode == 2) {
+            overlay.webContents.send("set_deck", currentDeckUpdated);
+        }
+        if (overlayDeckMode == 3) {
+            var currentOppDeck = getOppDeck();
+            overlay.webContents.send("set_deck", currentOppDeck);
+        }
+        lastDeckUpdate = nd;
     }
 }
 
@@ -1198,11 +1208,12 @@ function forceDeckUpdate() {
     var typeArt = 0;
     var typeEnc = 0;
     var typeLan = 0;
-    currentDeckUpdated.mainDeck.forEach(function(card) {
-        card.total = card.quantity;
-        decksize += card.quantity;
-    });
-
+    if (debugLog == true || firstPass == false) {
+        currentDeckUpdated.mainDeck.forEach(function(card) {
+            card.total = card.quantity;
+            decksize += card.quantity;
+        });
+    }
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
@@ -1219,28 +1230,29 @@ function forceDeckUpdate() {
             }
         }
     }); 
+    if (debugLog == true || firstPass == false) {
+        currentDeckUpdated.mainDeck.forEach(function(card) {
+            var c = cardsDb.get(card.id);
+            if (c) {
+                if (c.type.includes("Creature", 0))      typeCre += card.quantity;
+                if (c.type.includes("Planeswalker", 0))  typePla += card.quantity;
+                if (c.type.includes("Instant", 0))       typeIns += card.quantity;
+                if (c.type.includes("Sorcery", 0))       typeSor += card.quantity;
+                if (c.type.includes("Artifact", 0))      typeArt += card.quantity;
+                if (c.type.includes("Enchantment", 0))   typeEnc += card.quantity;
+                if (c.type.includes("Land", 0))          typeLan += card.quantity;
+            }
+            card.chance = Math.round(hypergeometric(1, decksize, 1, card.quantity)*100);
+        });
 
-    currentDeckUpdated.mainDeck.forEach(function(card) {
-        var c = cardsDb.get(card.id);
-        if (c) {
-            if (c.type.includes("Creature", 0))      typeCre += card.quantity;
-            if (c.type.includes("Planeswalker", 0))  typePla += card.quantity;
-            if (c.type.includes("Instant", 0))       typeIns += card.quantity;
-            if (c.type.includes("Sorcery", 0))       typeSor += card.quantity;
-            if (c.type.includes("Artifact", 0))      typeArt += card.quantity;
-            if (c.type.includes("Enchantment", 0))   typeEnc += card.quantity;
-            if (c.type.includes("Land", 0))          typeLan += card.quantity;
-        }
-        card.chance = Math.round(hypergeometric(1, decksize, 1, card.quantity)*100);
-    });
-
-    currentDeckUpdated.chanceCre = Math.round(hypergeometric(1, decksize, 1, typeCre) * 1000)/10;
-    currentDeckUpdated.chanceIns = Math.round(hypergeometric(1, decksize, 1, typeIns) * 1000)/10;
-    currentDeckUpdated.chanceSor = Math.round(hypergeometric(1, decksize, 1, typeSor) * 1000)/10;
-    currentDeckUpdated.chancePla = Math.round(hypergeometric(1, decksize, 1, typePla) * 1000)/10;
-    currentDeckUpdated.chanceArt = Math.round(hypergeometric(1, decksize, 1, typeArt) * 1000)/10;
-    currentDeckUpdated.chanceEnc = Math.round(hypergeometric(1, decksize, 1, typeEnc) * 1000)/10;
-    currentDeckUpdated.chanceLan = Math.round(hypergeometric(1, decksize, 1, typeLan) * 1000)/10;
+        currentDeckUpdated.chanceCre = Math.round(hypergeometric(1, decksize, 1, typeCre) * 1000)/10;
+        currentDeckUpdated.chanceIns = Math.round(hypergeometric(1, decksize, 1, typeIns) * 1000)/10;
+        currentDeckUpdated.chanceSor = Math.round(hypergeometric(1, decksize, 1, typeSor) * 1000)/10;
+        currentDeckUpdated.chancePla = Math.round(hypergeometric(1, decksize, 1, typePla) * 1000)/10;
+        currentDeckUpdated.chanceArt = Math.round(hypergeometric(1, decksize, 1, typeArt) * 1000)/10;
+        currentDeckUpdated.chanceEnc = Math.round(hypergeometric(1, decksize, 1, typeEnc) * 1000)/10;
+        currentDeckUpdated.chanceLan = Math.round(hypergeometric(1, decksize, 1, typeLan) * 1000)/10;
+    }
 }
 
 function getOppDeck() {
@@ -1552,10 +1564,10 @@ function parseWotcTime(str) {
     }
 
     var date = new Date(datePart[2], datePart[0]-1, datePart[1], timePart[0], timePart[1], timePart[2]);
-    //console.log(str, date.toString(), date.getTime(), date)
     return date;
 }
 
+//
 function makeId(length) {
     var ret = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -1564,7 +1576,6 @@ function makeId(length) {
 
     return ret;
 }
-
 
 //
 function fact(arg0) {
