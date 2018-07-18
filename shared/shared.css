@@ -89,7 +89,7 @@ label {
     position: relative;
     opacity: 1;
     display: flex;
-    height: calc(100% - 64px);
+    height: calc(100% - 32px);
 }
 
 .overlay_wrapper {
@@ -119,11 +119,22 @@ label {
     -webkit-app-region:drag;
     position: relative;
     z-index: 30;
-    height: 64px;
+    height: 32px;
     background: url(../images/top_bar.png);
     display: flex;
     justify-content: space-between;
     box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
+}
+
+.top_logo {
+    -webkit-app-region:drag;
+    width: 200px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-image: url(../images/logo_top.png);
+    opacity: 0.33;
 }
 
 
@@ -134,9 +145,10 @@ label {
     position: relative;
     left: 0px;
     margin-right: 12px;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     opacity: 0.5;
+    background-size: contain;
     -webkit-transition: all .33s ease-in-out;
 }
 
@@ -170,6 +182,7 @@ label {
     background-position: center;
     width: 64px;
     height: 64px;
+    background-size: unset !important;
     background-image: url(../images/icon_back_light.png);
 }
 

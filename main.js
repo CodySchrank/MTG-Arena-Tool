@@ -108,9 +108,9 @@ ipc.on('renderer_state', function (event, state) {
     console.log("Renderer state: ", state);
     showWindow();
     var settings = store.get("settings");
+    updateSettings(settings);
     mainWindow.webContents.send("set_settings", settings);
 
-    updateSettings(settings);
     if (debugLog) {
         finishLoading()
     }
@@ -154,13 +154,18 @@ function loadPlayerConfig(playerId) {
     wilcardsHistory = store.get("wildcards_history");
 
     var settings = store.get("settings");
-    mainWindow.webContents.send("set_settings", settings);
     updateSettings(settings);
+    mainWindow.webContents.send("set_settings", settings);
 }
 
 
 function updateSettings(settings) {
     const exeName = path.basename(process.execPath);
+
+    if (settings.overlay_top   == undefined) settings.overlay_top   = true;
+    if (settings.overlay_title == undefined) settings.overlay_title = true;
+    if (settings.overlay_deck  == undefined) settings.overlay_deck  = true;
+    if (settings.overlay_clock == undefined) settings.overlay_clock = true;
 
     app.setLoginItemSettings({
         openAtLogin: settings.startup
@@ -507,10 +512,7 @@ else {
 console.log(logUri);
 
 var file;
-setTimeout( function() {
-    logLoop();
-}, 50000);
-
+logLoop();
 
 function logLoop() {
     //console.log("logLoop() start")
@@ -627,7 +629,9 @@ function checkJsonWithStart(str, check, chop, start) {
 
 
 /*
+
     unnecessarily long text to mark a point in the code that is fairly important because I cant remember the line number \^.^/
+
 */
 
 function processLogData(data) {

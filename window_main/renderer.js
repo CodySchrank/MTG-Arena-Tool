@@ -52,7 +52,7 @@ ipc.on('set_username', function (event, arg) {
 
 //
 ipc.on('set_rank', function (event, offset, rank) {
-	$(".top_rank").css("background-position", (offset*-48)+"px 0px").attr("title", rank);
+	$(".top_rank").css("background-position", (offset*-32)+"px 0px").attr("title", rank);
 });
 
 //
@@ -464,7 +464,6 @@ function setHistory(arg, loadMore) {
 
 		mainDiv.appendChild(div);
 
-		console.log(match.id);
 		addHover(match, tileGrpid);
 	}
 
@@ -1074,7 +1073,7 @@ function open_match(id) {
 	// this is a mess
 	var flt = $('<div class="flex_item"></div>')
 	var fltl = $('<div class="flex_item"></div>')
-	var r = $('<div class="top_rank"></div>'); r.appendTo(fltl);
+	var r = $('<div class="rank"></div>'); r.appendTo(fltl);
 
 	var fltr = $('<div class="flex_item"></div>'); fltr.css("flex-direction","column");
 	var fltrt = $('<div class="flex_top"></div>');
@@ -1131,7 +1130,7 @@ function open_match(id) {
 
 	var flt = $('<div class="flex_item" style="flex-direction: row-reverse;"></div>')
 	var fltl = $('<div class="flex_item"></div>')
-	var r = $('<div class="top_rank"></div>'); r.appendTo(fltl);
+	var r = $('<div class="rank"></div>'); r.appendTo(fltl);
 
 	var fltr = $('<div class="flex_item"></div>'); fltr.css("flex-direction","column"); fltr.css("align-items","flex-end");
 	var fltrt = $('<div class="flex_top"></div>');
@@ -1525,6 +1524,11 @@ function resetFilters() {
 	document.getElementById("query_new").checked = false;
 	document.getElementById("query_multicolor").checked = false;
 	document.getElementById("query_exclude").checked = false;
+
+	document.getElementById("query_common").checked = false;
+	document.getElementById("query_uncommon").checked = false;
+	document.getElementById("query_rare").checked = false;
+	document.getElementById("query_mythic").checked = false;
 
 	printCards();
 }
@@ -2073,9 +2077,9 @@ function getDeckWinrate(deckid, lastEdit) {
 	if (matchesHistory == undefined) {
 		return 0;
 	}
-	matchesHistory.matches.forEach(function(match, index) {
-		match = matchesHistory[match];
-		if (match.type == "match") {
+	matchesHistory.matches.forEach(function(matchid, index) {
+		match = matchesHistory[matchid];
+		if (matchid != null && match.type == "match") {
 			if (match.playerDeck.id == deckid) {
 				if (match.player.win > match.opponent.win) {
 					winColors = add_deck_colors(winColors, match.oppDeck.mainDeck);
@@ -2133,7 +2137,7 @@ function sort_history() {
 	matchesHistory.matches.forEach(function(mid) {
 		var match = matchesHistory[mid];
 
-		if (match.type != "draft") {
+		if (mid != null && match.type != "draft") {
 			if (match.playerDeck.mainDeck == undefined) {
 				match.playerDeck = JSON.parse('{"deckTileId":67003,"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}');
 			}

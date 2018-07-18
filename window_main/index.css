@@ -1,10 +1,3 @@
-.top_logo {
-    -webkit-app-region:drag;
-    padding-left: 128px;
-    width: 240px;
-    background: url(../images/logo.png) no-repeat center;
-}
-
 .top_logo_about {
     cursor: pointer;
     align-self: center;
@@ -114,9 +107,19 @@
     -webkit-app-region: no-drag;
     align-self: center;
     margin-left: 16px;
+    width: 32px;
+    height: 32px;
+    background: url(../images/ranks_32.png);
+    background-position: 0px 0px;
+}
+
+.rank {
+    -webkit-app-region: no-drag;
+    align-self: center;
+    margin-left: 16px;
     width: 48px;
     height: 48px;
-    background: url(../images/ranks_spr.png);
+    background: url(../images/ranks_48.png);
     background-position: 0px 0px;
 }
 
@@ -144,7 +147,7 @@
     vertical-align: middle;
     color: #FAE5D2;
     opacity: 0.5;
-    -webkit-transition: all .25s ease-in-out;
+    -webkit-transition: all .15s ease-in-out;
 }
 
 .sidebar_item:hover {
@@ -377,10 +380,10 @@
     -webkit-app-region: no-drag;
     align-self: center;
     margin-left: 16px;
-    width: 48px;
-    height: 48px;
-    background: url(../images/ranks_spr.png);
-    background-position: 48px 0px;
+    width: 32px;
+    height: 32px;
+    background: url(../images/ranks_32.png);
+    background-position: 32px 0px;
 }
 
 .list_fill {
@@ -570,7 +573,7 @@
     padding-left: 8px;
     padding-right: 8px;
     width: calc(100% - 16px);
-    height: calc(100% - 90px);
+    height: calc(100% - 122px);
     overflow: auto;
     display: flex;
     flex-wrap: wrap;
@@ -581,7 +584,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 0px 32px;
+    padding: 16px 32px;
     height: 90px;
     background-color: rgba(0, 0, 0, 0.2);
 }

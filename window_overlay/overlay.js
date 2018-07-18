@@ -67,7 +67,7 @@ ipc.on('set_timer', function (event, arg) {
 
 		let _height = 146;
 		if ($('.top').css('display') == 'none') {
-			_height -= 64;
+			_height -= 32;
 		}
 		if ($('.overlay_deckname').css('display') == 'none') {
 			_height -= 78;
@@ -86,7 +86,7 @@ ipc.on('set_timer', function (event, arg) {
 $( window ).resize(function() {
 	let _height = 146;
 	if ($('.top').css('display') == 'none') {
-		_height -= 64;
+		_height -= 32;
 	}
 	if ($('.overlay_deckname').css('display') == 'none') {
 		_height -= 78;
