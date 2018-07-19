@@ -23,7 +23,7 @@ var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "
 
 const Howler = require('howler');
 var sound = new Howl({
-	src: ['./sounds/blip.mp3']
+	src: ['../sounds/blip.mp3']
 });
 
 ipc_log = function (str, arg) {
@@ -65,14 +65,16 @@ ipc.on('set_timer', function (event, arg) {
 		$(".overlay_draft_container").css("display", "flex");
 
 
-		let _height = 146;
+		let _height = 114;
 		if ($('.top').css('display') == 'none') {
 			_height -= 32;
 		}
 		if ($('.overlay_deckname').css('display') == 'none') {
 			_height -= 78;
 		}
-
+		if ($('.overlay_clock_container').css('display') == 'none') {
+			_height -= 64;
+		}
 		$(".overlay_decklist").css("height", "100%").css("height", "-="+_height+"px");
 		overlayMode = 1;
 		matchBeginTime = Date.now();
@@ -84,12 +86,15 @@ ipc.on('set_timer', function (event, arg) {
 });
 
 $( window ).resize(function() {
-	let _height = 146;
+	let _height = 114;
 	if ($('.top').css('display') == 'none') {
 		_height -= 32;
 	}
 	if ($('.overlay_deckname').css('display') == 'none') {
 		_height -= 78;
+	}
+	if ($('.overlay_clock_container').css('display') == 'none') {
+		_height -= 64;
 	}
 	if (overlayMode == 1) {
 		_height += 64;
@@ -136,15 +141,18 @@ ipc.on('set_settings', function (event, sound_priority, alpha, top, title, deck,
 		hideDiv('.overlay_clock_container');
 	}
 
-	let _height = 210;
+	let _height = 174;
 	if (overlayMode == 1) {
-		_height = 146;
+		_height = 110;
 	}
 	if (!top) {
-		_height -= 64;
+		_height -= 32;
 	}
 	if (!title) {
 		_height -= 78;
+	}
+	if (!clock) {
+		_height -= 64;
 	}
 	$(".overlay_decklist").css("height", "100%").css("height", "-="+_height+"px");
 });
@@ -358,7 +366,7 @@ $(document).ready(function() {
 	    if (deckMode < 0) {
 	    	deckMode = 3;
 	    }
-	    ipc.send('set_deck_mode', deckMode);
+	    ipc.send('overlay_set_deck_mode', deckMode);
 	});
 	//
 	$(".deck_next").click(function () {
@@ -366,7 +374,7 @@ $(document).ready(function() {
 	    if (deckMode > 3) {
 	    	deckMode = 0;
 	    }
-	    ipc.send('set_deck_mode', deckMode);
+	    ipc.send('overlay_set_deck_mode', deckMode);
 	});
 
 	//

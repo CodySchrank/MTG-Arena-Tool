@@ -177,7 +177,7 @@ $(".list_deck").on('mouseenter mouseleave', function(e) {
 });
 
 function installUpdate() {
-	ipc.send('update_install', 1);
+	ipc.send('renderer_update_install', 1);
 }
 
 function force_open_settings() {
@@ -245,12 +245,12 @@ function isArenaRunning() {
 $(document).ready(function() {
 	//
 	$(".close").click(function () {
-	    ipc.send('window_close', 1);
+	    ipc.send('renderer_window_close', 1);
 	});
 
 	//
 	$(".minimize").click(function () {
-	    ipc.send('window_minimize', 1);
+	    ipc.send('renderer_window_minimize', 1);
 	});
 
 	//
@@ -277,12 +277,12 @@ $(document).ready(function() {
 			if ($(this).hasClass("it1")) {
 				sidebarActive = 1;
 				$("#ux_0").html('');
-				ipc.send('request_history', 1);
+				ipc.send('renderer_request_history', 1);
 			}
 			if ($(this).hasClass("it2")) {
 				sidebarActive = 2;
 				$("#ux_0").html('');
-				ipc.send('request_explore', filterEvent);
+				ipc.send('renderer_request_explore', filterEvent);
 			}
 			if ($(this).hasClass("it3")) {
 				sidebarActive = 3;
@@ -309,7 +309,7 @@ $(document).ready(function() {
 
 //
 function open_economy_ipc() {
-	ipc.send('get_economy', 1);
+	ipc.send('renderer_get_economy', 1);
 }
 
 //
@@ -744,7 +744,7 @@ function setExplore(arg) {
 
 //
 function open_course_request(courseId) {
-	ipc.send('request_course', courseId);
+	ipc.send('renderer_request_course', courseId);
 }
 
 // 
@@ -1972,7 +1972,7 @@ function changeQuality(dom) {
 //
 function eraseData() {
 	if (confirm('This will erase all of your decks and events shared online, are you sure?')) {
-		ipc.send('erase_data', true);
+		ipc.send('renderer_erase_data', true);
 	} else {
 		return;
 	}
@@ -2010,7 +2010,7 @@ function updateSettings() {
 		overlay_clock: overlayClock
 	};
 	cardSize = 100+(cardSizePos*10);
-	ipc.send('save_settings', settings);
+	ipc.send('renderer_save_settings', settings);
 }
 
 //
