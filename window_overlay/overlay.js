@@ -26,8 +26,8 @@ var sound = new Howl({
 	src: ['../sounds/blip.mp3']
 });
 
-ipc_log = function (str, arg) {
-    ipc.send('ipc_log', arg);
+ipc_send = function (method, arg) {
+    ipc.send('ipc_switch', method, arg);
 };
 
 updateClock();
@@ -103,15 +103,16 @@ $( window ).resize(function() {
 });
 
 
-ipc.on('set_settings', function (event, sound_priority, alpha, top, title, deck, clock) {
+ipc.on('set_settings', function (event, settings) {
 	// Alpha does some weird things..
 	/*
+	let alpha = settings.overlay_alpha;
 	$('body').css("background-color", "rgba(0,0,0,"+alpha+")");
 	$('.overlay_wrapper:before').css("opacity", 0.4*alpha);
 	$('.overlay_wrapper').css("opacity", alpha);
 	*/
 
-	soundPriority = sound_priority;
+	soundPriority = settings.sound_priority;
 	$('.top').css('display', '');
 	$('.overlay_deckname').css('display', '');
 	$('.overlay_deckcolors').css('display', '');
@@ -121,23 +122,23 @@ ipc.on('set_settings', function (event, sound_priority, alpha, top, title, deck,
 	$('.overlay_deck_container').attr('style', '');
 	$('.overlay_draft_container').attr('style', '');
 
-	if (!top) {
+	if (!settings.overlay_top) {
 		hideDiv('.top');
 		let style = 'top: 0px !important;';
 		$('.overlay_deck_container').attr('style', style);
 		$('.overlay_draft_container').attr('style', style);
 	}
-	if (!title) {
+	if (!settings.overlay_title) {
 		hideDiv('.overlay_deckname');
 		hideDiv('.overlay_deckcolors');
 		hideDiv('.overlay_separator');
 	}
-	if (!deck) {
+	if (!settings.overlay_deck) {
 		hideDiv('.overlay_decklist');
 		hideDiv('.overlay_deck_container');
 		hideDiv('.overlay_draft_container');
 	}
-	if (!clock || overlayMode == 1) {
+	if (!settings.overlay_clock || overlayMode == 1) {
 		hideDiv('.overlay_clock_container');
 	}
 
@@ -145,13 +146,13 @@ ipc.on('set_settings', function (event, sound_priority, alpha, top, title, deck,
 	if (overlayMode == 1) {
 		_height = 110;
 	}
-	if (!top) {
+	if (!settings.overlay_top) {
 		_height -= 32;
 	}
-	if (!title) {
+	if (!settings.overlay_title) {
 		_height -= 78;
 	}
-	if (!clock) {
+	if (!settings.overlay_clock) {
 		_height -= 64;
 	}
 	$(".overlay_decklist").css("height", "100%").css("height", "-="+_height+"px");
@@ -366,7 +367,7 @@ $(document).ready(function() {
 	    if (deckMode < 0) {
 	    	deckMode = 3;
 	    }
-	    ipc.send('overlay_set_deck_mode', deckMode);
+	    ipc_send('overlay_set_deck_mode', deckMode);
 	});
 	//
 	$(".deck_next").click(function () {
@@ -374,21 +375,21 @@ $(document).ready(function() {
 	    if (deckMode > 3) {
 	    	deckMode = 0;
 	    }
-	    ipc.send('overlay_set_deck_mode', deckMode);
+	    ipc_send('overlay_set_deck_mode', deckMode);
 	});
 
 	//
 	$(".close").click(function () {
-	    ipc.send('overlay_close', 1);
+	    ipc_send('overlay_close', 1);
 	});
 
 	//
 	$(".minimize").click(function () {
-	    ipc.send('overlay_minimize', 1);
+	    ipc_send('overlay_minimize', 1);
 	});
 
 	//
 	$(".settings").click(function () {
-		ipc.send('force_open_settings', 1);
+		ipc_send('force_open_settings', 1);
 	});
 });

@@ -22,184 +22,210 @@ var closeToTray = true;
 const ipc = electron.ipcMain;
 
 //Debug stuff
-ipc.on('ipc_log', function (event, msg) {
-    console.log("IPC LOG: ", msg);
+ipc.on('ipc_switch', function (event, method, arg) {
+    console.log("IPC ", method);
+    switch (method) {
+        case 'ipc_log':
+            console.log("IPC LOG: ", msg);
+            break;
+
+        // to renderer
+
+        case 'set_settings':
+            console.log("set settings: ", arg);
+            saveSettings(arg);
+            mainWindow.webContents.send("set_settings", arg);
+            overlay.webContents.send("set_settings", arg);
+            break;
+
+        case 'background_set_history':
+            mainWindow.webContents.send("set_history", arg);
+            break;
+
+        case 'background_set_history_data':
+            mainWindow.webContents.send("set_history_data", arg);
+            break;
+
+        case 'set_economy':
+            mainWindow.webContents.send("set_economy", arg);
+            break;
+
+        case 'renderer_set_bounds':
+            mainWindow.setBounds(arg);
+            break;
+
+        case 'renderer_window_minimize':
+            mainWindow.minimize();
+            break;
+
+        case 'no_log':
+            mainWindow.webContents.send("no_log", arg);
+            break;
+
+        case 'set_username':
+            mainWindow.webContents.send("set_username", arg);
+            break;
+
+        case 'set_rank':
+            mainWindow.webContents.send("set_rank", arg.rank, arg.str);
+            break;
+
+        case 'set_decks':
+            mainWindow.webContents.send("set_decks", arg);
+            break;
+
+        case 'set_cards':
+            mainWindow.webContents.send("set_cards", arg.cards, arg.new);
+            break;
+
+        case 'initialize':
+            mainWindow.webContents.send("initialize", arg);
+            break;
+
+        case 'set_explore':
+            mainWindow.webContents.send("set_explore", arg);
+            break;
+
+        case 'open_course_deck':
+            mainWindow.webContents.send("open_course_deck", arg);
+            break;
+
+        // to background
+        case 'renderer_get_economy':
+            background.webContents.send("set_economy", 1);
+            break;
+
+        case 'renderer_state':
+            showWindow();
+            background.webContents.send("set_renderer_state", arg);
+            break;
+
+        case 'save_settings':
+            saveSettings(arg);
+            background.webContents.send("save_settings", arg);
+            overlay.webContents.send("set_settings", arg);
+            break;
+
+        case 'renderer_erase_data':
+            background.webContents.send("delete_data", 1);
+            httpDeleteData();
+            break;
+
+        case 'renderer_update_install':
+            background.webContents.send("update_install", 1);
+            break;
+
+        case 'renderer_request_history':
+            background.webContents.send("request_history", arg);
+            break;
+
+        case 'renderer_request_explore':
+            background.webContents.send("request_explore", arg);
+            break;
+
+        case 'renderer_request_course':
+            background.webContents.send("request_course", arg);
+            break;
+
+        case 'overlay_set_deck_mode':
+            background.webContents.send("set_deck_mode", arg);
+            break;
+
+        // to overlay
+
+        case 'set_deck':
+            overlay.webContents.send("set_deck", arg);
+            break;
+
+        case 'set_draft':
+            overlay.webContents.send("set_draft", arg);
+            break;
+
+        case 'set_draft_picks':
+            overlay.webContents.send("set_draft_picks", arg);
+            break;
+
+        case 'set_timer':
+            overlay.webContents.send("set_timer", arg);
+            break;
+
+        case 'set_opponent':
+            overlay.webContents.send("set_opponent", arg);
+            break;
+
+        case 'set_opponent_rank':
+            overlay.webContents.send("set_opponent_rank", arg.rank, arg.str);
+            break;
+
+        // to main js / window handling
+        case 'show_background':
+            background.show();
+            break;
+
+        case 'renderer_show':
+            showWindow();
+            break;
+
+        case 'renderer_hide':
+            hideWindow();
+            break;
+
+        case 'renderer_window_close':
+            if (closeToTray) {
+                hideWindow();
+            }
+            else {
+                quit();
+            }
+            break;
+
+        case 'set_close_to_tray':
+            closeToTray = arg;
+            break;
+
+        case 'overlay_show':
+            if (!overlay.isVisible()) {
+                overlay.show();
+            }
+            break;
+
+        case 'overlay_close':
+            overlay.hide();
+            break;
+
+        case 'overlay_minimize':
+            overlay.minimize();
+            break;
+
+        case 'overlay_set_bounds':
+            overlay.setBounds(obj);
+            break;
+
+        case 'save_overlay_pos':
+            saveOverlayPos();
+            break;
+
+        case 'force_open_settings':
+            mainWindow.webContents.send("force_open_settings", true);
+            showWindow();
+            break;
+
+        case 'set_clipboard':
+            clipboard.writeText(arg);
+            break;
+
+        default:
+            console.log("IPC Switch unknown method ", method);
+            break;
+    }
 });
 
-// 
-ipc.on('renderer_state', function (event, state) {
-    console.log("Renderer state");
-    showWindow();
-
-    background.webContents.send("set_renderer_state", state);
-});
-
-//
-ipc.on('background_set_settings', function (event, settings) {
-    mainWindow.webContents.send("set_settings", settings);
-});
-
-//
-ipc.on('renderer_save_settings', function (event, settings) {
+function saveSettings(settings) {
+    app.setLoginItemSettings({
+        openAtLogin: settings.startup
+    });
     closeToTray = settings.close_to_tray;
-    background.webContents.send("save_settings", settings);
-});
-
-
-//
-ipc.on('renderer_erase_data', function (event, arg) {
-    background.webContents.send("delete_data", 1);
-    httpDeleteData();
-});
-
-//
-ipc.on('renderer_update_install', function (event, settings) {
-    background.webContents.send("update_install", 1);
-});
-
-//
-ipc.on('renderer_request_history', function (event, state) {
-    background.webContents.send("request_history", state);
-});
-
-//
-ipc.on('background_set_history', function (event, history) {
-    mainWindow.webContents.send("set_history", history);
-});
-
-//
-ipc.on('background_set_history_data', function (event, history) {
-    mainWindow.webContents.send("set_history_data", history);
-});
-
-//
-ipc.on('renderer_get_economy', function (event, state) {
-    background.webContents.send("set_economy", 1);
-});
-
-ipc.on('set_economy', function (event, economy) {
-    mainWindow.webContents.send("set_economy", economy);
-});
-
-//
-ipc.on('renderer_request_explore', function (event, arg) {
-    background.webContents.send("request_explore", arg);
-});
-
-ipc.on('renderer_request_course', function (event, arg) {
-    background.webContents.send("request_course", arg);
-});
-
-//
-ipc.on('renderer_window_close', function (event, state) {
-    if (closeToTray) {
-    //if (store.get("settings").close_to_tray) {
-        hideWindow();
-    }
-    else {
-        quit();
-    }
-});
-
-//
-ipc.on('renderer_hide', function (event, state) {
-    hideWindow();
-});
-
-//
-ipc.on('renderer_show', function (event, state) {
-    showWindow();
-});
-
-//
-ipc.on('renderer_set_bounds', function (event, obj) {
-    mainWindow.setBounds(obj);
-});
-
-//
-ipc.on('renderer_window_minimize', function (event, state) {
-    mainWindow.minimize();
-});
-
-//
-ipc.on('no_log', function (event, logUri) {
-    mainWindow.webContents.send("no_log", logUri);
-});
-
-//
-ipc.on('set_username', function (event, playerName) {
-    mainWindow.webContents.send("set_username", playerName);
-});
-
-//
-ipc.on('set_rank', function (event, rank, str) {
-    mainWindow.webContents.send("set_rank", rank, str);
-});
-
-//
-ipc.on('set_decks', function (event, json) {
-    mainWindow.webContents.send("set_decks", json);
-});
-
-//
-ipc.on('set_cards', function (event, json, newlyAdded) {
-    mainWindow.webContents.send("set_cards", json, newlyAdded);
-});
-
-//
-ipc.on('initialize', function (event, arg) {
-    mainWindow.webContents.send("initialize", arg);
-});
-
-//
-ipc.on('set_explore', function (event, arg) {
-    mainWindow.webContents.send("set_explore", arg);
-});
-
-//
-ipc.on('open_course_deck', function (event, arg) {
-    mainWindow.webContents.send("open_course_deck", arg);
-});
-
-//
-ipc.on('set_draft_picks', function (event, arg) {
-    overlay.webContents.send("set_draft_picks", arg);
-});
-
-//
-ipc.on('set_deck', function (event, arg) {
-    overlay.webContents.send("set_deck", arg);
-});
-
-//
-ipc.on('overlay_set_deck_mode', function (event, arg) {
-    background.webContents.send("set_deck_mode", arg);
-});
-
-//
-ipc.on('set_draft', function (event, arg) {
-    overlay.webContents.send("set_draft", arg);
-});
-
-//
-ipc.on('set_timer', function (event, arg) {
-    overlay.webContents.send("set_timer", arg);
-});
-
-//
-ipc.on('set_opponent', function (event, arg) {
-    overlay.webContents.send("set_opponent", arg);
-});
-
-//
-ipc.on('set_opponent_rank', function (event, rank, str) {
-    overlay.webContents.send("set_opponent_rank", rank, str);
-});
-
-//
-ipc.on('overlay_set_settings', function (event, sound_priority, alpha, top, title, deck, clock) {
-    overlay.webContents.send("set_settings", sound_priority, alpha, top, title, deck, clock);
-});
+}
 
 //
 ipc.on('set_draft_cards', function(event, pack, picks, packn, pickn) {
@@ -209,54 +235,6 @@ ipc.on('set_draft_cards', function(event, pack, picks, packn, pickn) {
 //
 ipc.on('set_turn', function(event, playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision) {
     overlay.webContents.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
-});
-
-//
-ipc.on('set_close_to_tray', function(event, arg) {
-    closeToTray = arg;
-});
-
-//
-ipc.on('overlay_close', function (event, state) {
-    overlay.hide();
-});
-
-//
-ipc.on('overlay_minimize', function (event, state) {
-    overlay.minimize();
-});
-
-//
-ipc.on('overlay_show', function (event, state) {
-    if (!overlay.isVisible()) {
-        overlay.show();
-    }
-});
-
-//
-ipc.on('overlay_set_bounds', function (event, obj) {
-    overlay.setBounds(obj);
-});
-
-
-//
-ipc.on('app_startup', function (event, arg) {
-    app.setLoginItemSettings({
-        openAtLogin: arg
-    });
-});
-
-ipc.on('force_open_settings', function (event, state) {
-    mainWindow.webContents.send("force_open_settings", true);
-    showWindow();
-});
-
-ipc.on('set_clipboard', function (event, arg) {
-    clipboard.writeText(arg);
-});
-
-ipc.on('show_background', function (event) {
-    background.show();
 });
 
 

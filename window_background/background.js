@@ -91,21 +91,19 @@ var goldHistory = [];
 var vaultHistory = [];
 var wilcardsHistory = [];
 
-ipc_log = function (str, arg) {
-    ipc.send('ipc_log', arg);
+ipc_send = function (method, arg) {
+    ipc.send('ipc_switch', method, arg);
 };
-
 
 //
 ipc.on('set_renderer_state', function (event, arg) {
 	renderer_state = arg;
 	var settings = store.get("settings");
 	updateSettings(settings);
-	ipc.send("background_set_settings", settings);
 
 	if (debugLog) {
-	    finishLoading()
-	    ipc.send("show_background", 1);
+	    finishLoading();
+	    ipc_send("show_background", 1);
 	}
 });
 
@@ -122,7 +120,7 @@ ipc.on('overlayBounds', function (event, obj) {
 //
 ipc.on('save_settings', function (event, settings) {
     store.set('settings', settings);
-    updateSettings(settings);
+    //updateSettings(settings);
 });
 
 //
@@ -145,10 +143,10 @@ ipc.on('request_history', function (event, state) {
 //
 function requestHistorySend(state) {
     if (state == 1) {
-        ipc.send("background_set_history", history);
+        ipc_send("background_set_history", history);
     }
     else {
-        ipc.send("background_set_history_data", history);
+        ipc_send("background_set_history_data", history);
     }
 }
 
@@ -164,7 +162,7 @@ ipc.on('set_economy', function (event, economy) {
 
     var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory};    
 
-    ipc.send("set_economy", economy);
+    ipc_send("set_economy", economy);
 });
 
 ipc.on('request_explore', function (event, arg) {
@@ -179,7 +177,6 @@ ipc.on('set_deck_mode', function (event, state) {
     overlayDeckMode = state;
     update_deck();
 });
-
 
 
 
@@ -223,11 +220,11 @@ function loadPlayerConfig(playerId) {
 
     var settings = store.get("settings");
     updateSettings(settings);
-    ipc.send("renderer_save_settings", settings);
 }
 
 
 function updateSettings(settings) {
+	//console.log(settings);
     const exeName = path.basename(process.execPath);
 
     if (settings.overlay_top   == undefined) settings.overlay_top   = true;
@@ -235,16 +232,14 @@ function updateSettings(settings) {
     if (settings.overlay_deck  == undefined) settings.overlay_deck  = true;
     if (settings.overlay_clock == undefined) settings.overlay_clock = true;
 
-    ipc.send("app_startup", settings.startup);
-
     if (settings.show_overlay == false) {
-    	ipc.send("overlay_close", 1);
+    	ipc_send("overlay_close", 1);
     }
     else if (duringMatch || settings.show_overlay_always) {
-        ipc.send("overlay_show", 1);
+        ipc_send("overlay_show", 1);
     }
     
-    ipc.send("overlay_set_settings", settings.sound_priority, 1, settings.overlay_top, settings.overlay_title, settings.overlay_deck, settings.overlay_clock);
+    ipc_send("set_settings", settings);
 }
 
 //
@@ -292,7 +287,7 @@ function logLoop() {
         file = fd;
         if (err) {
             setTimeout( function() {
-                ipc.send("no_log", logUri);
+                ipc_send("no_log", logUri);
             }, 1000);
             setTimeout(logLoop, 5000);
             console.log("No log file found");
@@ -428,7 +423,7 @@ function processLogData(data) {
     strCheck = '"PlayerScreenName":"';
     if (data.indexOf(strCheck) > -1) {
         playerName = dataChop(data, strCheck, '"');
-        ipc.send("set_username", playerName);
+        ipc_send("set_username", playerName);
     }
 
     // Get Ranks
@@ -440,7 +435,7 @@ function processLogData(data) {
 
         let rank = get_rank_index(playerRank, playerTier);
 
-        ipc.send("set_rank", rank, playerRank+" "+playerTier);
+        ipc_send("set_rank", {rank: rank, str: playerRank+" "+playerTier});
     }
 
     // Get Decks
@@ -449,7 +444,7 @@ function processLogData(data) {
     if (json != false) {
         //if (debugLog == true || firstPass == false) {
             requestHistorySend(0);
-            ipc.send("set_decks", json);
+            ipc_send("set_decks", json);
         //}
     }
 
@@ -553,7 +548,7 @@ function processLogData(data) {
             }
         });
 
-        ipc.send("set_cards", json, cardsNewlyAdded);
+        ipc_send("set_cards", {cards: json, new: cardsNewlyAdded});
     }
 
     // Select deck
@@ -612,7 +607,7 @@ function processLogData(data) {
     if (json != false) {
         // store pack in recording
         if (json.draftPack != undefined) {
-            ipc.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
+            ipc_send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
             currentDraftPack = json.draftPack.slice(0);
         }
     }
@@ -633,12 +628,12 @@ function processLogData(data) {
     strCheck = '<== Event.CompleteDraft(';
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
-        saveOverlayPos();
+        ipc_send("save_overlay_pos", 1);
         clear_deck();
         if (!store.get('settings.show_overlay_always')) {
-	        ipc.send("overlay_close", 1);
+	        ipc_send("overlay_close", 1);
         }
-        ipc.send("renderer_show", 1);
+        ipc_send("renderer_show", 1);
 
         saveDraft();
     }
@@ -671,12 +666,12 @@ function processLogData(data) {
                 }
         	});
 
-            saveOverlayPos();
+            ipc_send("save_overlay_pos", 1);
             clear_deck();
             if (!store.get('settings.show_overlay_always')) {
-            	ipc.send("overlay_close", 1);
+            	ipc_send("overlay_close", 1);
             }
-        	ipc.send("renderer_show", 1);
+        	ipc_send("renderer_show", 1);
             saveMatch();
         }
 
@@ -740,7 +735,7 @@ function processLogData(data) {
         // Update on overlay
         var str = JSON.stringify(currentDeck);
         currentDeckUpdated = JSON.parse(str);
-        ipc.send("set_deck", currentDeck);
+        ipc_send("set_deck", currentDeck);
 
         currentDeck.mainDeck = [];
         Object.keys(tempMain).forEach(function(key) {
@@ -817,10 +812,10 @@ function gre_to_client(data) {
                         });
                     }
                     if (msg.gameStateMessage.gameInfo.matchState == "MatchState_MatchComplete") {
-                        saveOverlayPos();
+                    	ipc_send("save_overlay_pos", 1);
                         clear_deck();
                         if (!store.get('settings.show_overlay_always')) {
-                            ipc.send("overlay_close", 1);
+                            ipc_send("overlay_close", 1);
                         }
 
                         saveMatch();
@@ -887,10 +882,10 @@ function createMatch(arg) {
 
     if (!firstPass && store.get("settings").show_overlay == true) {
         if (store.get("settings").close_on_match) {
-            ipc.send("renderer_hide", 1);
+            ipc_send("renderer_hide", 1);
         }
-        ipc.send("overlay_show", 1);
-        ipc.send("overlay_set_bounds", obj);
+        ipc_send("overlay_show", 1);
+        ipc_send("overlay_set_bounds", obj);
     }
 
     oppName = arg.opponentScreenName;
@@ -901,9 +896,9 @@ function createMatch(arg) {
     playerWin = 0;
     oppWin = 0;
 
-    ipc.send("set_timer", matchBeginTime);
-    ipc.send("set_opponent", oppName);
-    ipc.send("set_opponent_rank", get_rank_index(oppRank, oppTier), oppRank+" "+oppTier);
+    ipc_send("set_timer", matchBeginTime);
+    ipc_send("set_opponent", oppName);
+    ipc_send("set_opponent_rank", get_rank_index(oppRank, oppTier), oppRank+" "+oppTier);
 }
 
 function createDraft() {
@@ -914,11 +909,11 @@ function createDraft() {
 
     if (!firstPass && store.get("settings").show_overlay == true) {
         if (store.get("settings").close_on_match) {
-            ipc.send("renderer_hide", 1);
+            ipc_send("renderer_hide", 1);
         }
 
-        ipc.send("overlay_show", 1);
-        ipc.send("overlay_set_bounds", obj);
+        ipc_send("overlay_show", 1);
+        ipc_send("overlay_set_bounds", obj);
     }
 
     currentDraft = {};
@@ -930,39 +925,39 @@ function createDraft() {
     playerWin = 0;
     oppWin = 0;
 
-    ipc.send("set_draft", true);
-    ipc.send("set_timer", -1);
-    ipc.send("set_opponent", oppName);
-    ipc.send("set_opponent_rank", get_rank_index(oppRank, oppTier), oppRank+" "+oppTier);
+    ipc_send("set_draft", true);
+    ipc_send("set_timer", -1);
+    ipc_send("set_opponent", oppName);
+    ipc_send("set_opponent_rank", get_rank_index(oppRank, oppTier), oppRank+" "+oppTier);
 }
 
 function select_deck(arg) {
     currentDeck = arg.CourseDeck;
     var str = JSON.stringify(currentDeck);
     currentDeckUpdated = JSON.parse(str);
-    ipc.send("set_deck", currentDeck);
+    ipc_send("set_deck", currentDeck);
 }
 
 function clear_deck() {
     var deck = {mainDeck: [], sideboard : [], name: ""};
-    ipc.send("set_deck", deck);
+    ipc_send("set_deck", deck);
 }
 
 function update_deck() {
     var nd = new Date()
     if (nd - lastDeckUpdate > 1000 || debugLog == true) {
         if (overlayDeckMode == 0) {
-            ipc.send("set_deck", currentDeckUpdated);
+            ipc_send("set_deck", currentDeckUpdated);
         }
         if (overlayDeckMode == 1) {
-            ipc.send("set_deck", currentDeck);
+            ipc_send("set_deck", currentDeck);
         }
         if (overlayDeckMode == 2) {
-            ipc.send("set_deck", currentDeckUpdated);
+            ipc_send("set_deck", currentDeckUpdated);
         }
         if (overlayDeckMode == 3) {
             var currentOppDeck = getOppDeck();
-            ipc.send("set_deck", currentOppDeck);
+            ipc_send("set_deck", currentOppDeck);
         }
         lastDeckUpdate = nd;
     }
@@ -1104,10 +1099,9 @@ function saveMatch() {
     store.set('matches_index', matches);
     store.set(currentMatchId, match);
     history[currentMatchId] = match;
+    history[currentMatchId].type = "match";
     httpSetMatch(match);
-    if (!debugLog) {
-        requestHistorySend(0);
-    }
+    requestHistorySend(0);
 }
 
 
@@ -1128,7 +1122,10 @@ function saveDraft() {
 
     store.set('draft_index', drafts);
     store.set(draftId, draft);
+    history[currentMatchId] = draft;
+    history[currentMatchId].type = "draft";
     httpSetMatch(draft);
+    requestHistorySend(0);
 }
 
 
@@ -1138,17 +1135,17 @@ function finishLoading() {
     if (duringMatch) {
         var obj = store.get('overlayBounds');
 
-        ipc.send("renderer_hide", 1);
-        ipc.send("overlay_show", 1);
-        ipc.send("overlay_set_bounds", obj);
+        ipc_send("renderer_hide", 1);
+        ipc_send("overlay_show", 1);
+        ipc_send("overlay_set_bounds", obj);
         update_deck();
     }
 
     requestHistorySend(0);
-	ipc.send("initialize", 1);
+	ipc_send("initialize", 1);
 
     var obj = store.get('windowBounds');
-    ipc.send("renderer_set_bounds", obj);
+    ipc_send("renderer_set_bounds", obj);
 
     if (playerName != null) {
         httpSetPlayer(playerName, playerRank, playerTier);  
@@ -1196,25 +1193,24 @@ function httpBasic() {
             }); 
             res.on('end', function () {
                //console.log("RECV << "+index, _headers.method, _headers.reqId, _headers.token);
-               console.log("RECV << "+index, _headers.method, results);
+               //console.log("RECV << "+index, _headers.method, results);
                 try {
                     var parsedResult = JSON.parse(results);
                     if (parsedResult.ok) {
                         if (_headers.method == 'auth') {
                             tokenAuth = parsedResult.token;
-                            httpGetMeta();
                         }
                         //
                         if (_headers.method == 'get_top_decks') {
-                            ipc.send("set_explore", parsedResult.result);
+                            ipc_send("set_explore", parsedResult.result);
                         }
                         //
                         if (_headers.method == 'get_course') {
-                            ipc.send("open_course_deck", parsedResult.result);
+                            ipc_send("open_course_deck", parsedResult.result);
                         }
                     }
                     if (_headers.method == 'get_picks') {
-                     ipc.send("set_draft_picks", parsedResult);
+                     ipc_send("set_draft_picks", parsedResult);
                     }
                 } catch (e) {
                     console.error(e.message);
