@@ -780,7 +780,7 @@
 }
 
 .sets_container {
-    padding-top: 12px;
+    padding-bottom: 12px;
     margin-left: 16px;
     margin-right: 16px;
     display: flex;
@@ -788,7 +788,7 @@
 }
 
 .buttons_container {
-    padding-top: 8px;
+    padding-bottom: 8px;
     margin-left: 16px;
     margin-right: 16px;
     display: flex;
@@ -836,19 +836,19 @@
 }
 
 .input_container {
-    display: inline-block;
+    display: flex;
     height: 24px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    margin-left: 16px;
+    width: 50%;
+    margin: 8px 16px;
 }
 
 .input_container input {
+    display: inline-table;
     margin-left: 16px;
     border-radius: 5px;
     border-style: hidden;
     height: 24px;
-    width: 320px;
+    width: 100%;
     font-size: 14px;
     user-select: none;
     font-family: Mplantin;

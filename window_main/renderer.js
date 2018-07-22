@@ -636,10 +636,13 @@ function setExplore(arg, loadMore) {
 		mainDiv.appendChild(d);// goes down
 
 		// Search box
-		var label = $('<label class="input_container">Filter by event</label>');
+		var icd = $('<div class="input_container"></div>');
+		var label = $('<label style="display: table">Filter by event</label>');
+		label.appendTo(icd);
 		var input = $('<input type="search" id="query_explore" autocomplete="off" autofocus value="'+filterEvent+'" />');
-		input.appendTo(label);
-		label.appendTo($("#ux_0"));
+		input.appendTo(icd);
+
+		icd.appendTo($("#ux_0"));
 		input.focus();
 		input[0].setSelectionRange(filterEvent.length, filterEvent.length);
 
@@ -1415,13 +1418,20 @@ function open_cards() {
 	var div = $('<div class="inventory"></div>');
 	
 	var basicFilters = $('<div class="inventory_filters_basic"></div>');
-
 	var flex = $('<div class="inventory_flex"></div>');
 
-	var label = $('<label class="input_container">Search</label>');
-	label.appendTo(flex);
+	var icd = $('<div class="input_container"></div>');
+	var label = $('<label style="display: table">Search</label>');
+	label.appendTo(icd);
 	var input = $('<input type="search" id="query_name" autocomplete="off" />');
-	input.appendTo(label);
+	input.appendTo(icd);
+	icd.appendTo(flex);
+
+	input.keypress(function(e) {
+		if (e.which == 13) {
+			printCards();
+		}
+	});
 
 	var searchButton = $('<div class="button_simple button_thin" onClick="printCards()">Search</div>');	
 	searchButton.appendTo(flex);
@@ -1429,7 +1439,6 @@ function open_cards() {
 	advancedButton.appendTo(flex);
 
 	flex.appendTo(basicFilters);
-
 	var flex = $('<div class="inventory_flex"></div>');
 
 	var exp   = $('<div class="button_simple button_thin" onClick="exportCollection()">Copy to Clipboard</div>');
@@ -1440,6 +1449,7 @@ function open_cards() {
 	stats.appendTo(flex);
 
 	flex.appendTo(basicFilters);
+
 
 	// "ADVANCED" FILTERS
 	var filters = $('<div class="inventory_filters"></div>');
