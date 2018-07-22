@@ -82,7 +82,7 @@ ipc.on('set_cards', function (event, _cards, _cardsnew) {
 ipc.on('set_explore', function (event, arg) {
 	arg.sort(compare_explore);
 	//console.log(arg);
-	setExplore(arg);
+	setExplore(arg, 0);
 });
 
 //
@@ -617,38 +617,52 @@ function updateExplore() {
 }
 
 //
-function setExplore(arg) {
+function setExplore(arg, loadMore) {
 	if (arg != null) {
 		explore = arg;
 	}
 
 	var mainDiv = document.getElementById("ux_0");
-	mainDiv.innerHTML = '';
 
-	var d = document.createElement("div");
-	d.classList.add("list_fill");
-	mainDiv.appendChild(d);// goes down
+	if (loadMore > 0) {
+	}
+	else {
+		loadMore = 25;
 
-	// Search box
-	var label = $('<label class="input_container">Filter by event</label>');
-	var input = $('<input type="search" id="query_explore" autocomplete="off" autofocus value="'+filterEvent+'" />');
-	input.appendTo(label);
-	label.appendTo($("#ux_0"));
-	input.focus();
-	input[0].setSelectionRange(filterEvent.length, filterEvent.length);
+		mainDiv.innerHTML = '';
 
-	input.on('input', function() {
-		updateExplore();
-	});
+		var d = document.createElement("div");
+		d.classList.add("list_fill");
+		mainDiv.appendChild(d);// goes down
 
-	var d = document.createElement("div");
-	d.classList.add("list_fill");
-	mainDiv.appendChild(d);
-	var d = document.createElement("div");
-	d.classList.add("list_fill");
-	mainDiv.appendChild(d);
+		// Search box
+		var label = $('<label class="input_container">Filter by event</label>');
+		var input = $('<input type="search" id="query_explore" autocomplete="off" autofocus value="'+filterEvent+'" />');
+		input.appendTo(label);
+		label.appendTo($("#ux_0"));
+		input.focus();
+		input[0].setSelectionRange(filterEvent.length, filterEvent.length);
 
-	explore.forEach(function(_deck, index) {
+		input.on('input', function() {
+			updateExplore();
+		});
+
+		var d = document.createElement("div");
+		d.classList.add("list_fill");
+		mainDiv.appendChild(d);
+		var d = document.createElement("div");
+		d.classList.add("list_fill");
+		mainDiv.appendChild(d);
+
+		loadExplore = 0;
+	}
+
+
+	//explore.forEach(function(_deck, index) {
+	for (var loadEnd = loadExplore + loadMore; loadExplore < loadEnd; loadExplore++) {
+		let _deck = explore[loadExplore];
+		let index = loadExplore;
+
 		if (_deck.deck_colors == undefined) {
 			_deck.deck_colors = [];
 		}
@@ -743,8 +757,17 @@ function setExplore(arg) {
 			open_course_request(_deck.id);
 		});
 
-	});
-	$("#ux_0").append('<div class="list_fill"></div>');
+	}
+	//$("#ux_0").append('<div class="list_fill"></div>');
+
+	$(this).off();
+	$("#ux_0").on('scroll', function() {
+		if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+			setExplore(null, 20);
+		}
+	})
+
+	loadExplore += 20;
 }
 
 //

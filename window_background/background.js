@@ -151,7 +151,7 @@ function requestHistorySend(state) {
 }
 
 //
-ipc.on('set_economy', function (event, economy) {
+ipc.on('set_economy', function (event, arg) {
     goldHistory = store.get("gold_history");
     vaultHistory = store.get("vault_history");
     wilcardsHistory = store.get("wildcards_history");
@@ -160,7 +160,7 @@ ipc.on('set_economy', function (event, economy) {
     vaultHistory = fix_history(vaultHistory);
     wilcardsHistory = fix_history(wilcardsHistory);
 
-    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: false};    
+    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: true};    
 
     ipc_send("set_economy", economy);
 });
@@ -218,7 +218,7 @@ function loadPlayerConfig(playerId) {
     goldHistory = store.get("gold_history");
     vaultHistory = store.get("vault_history");
     wilcardsHistory = store.get("wildcards_history");
-    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: true};    
+    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: false};    
     ipc_send("set_economy", economy);
 
     var settings = store.get("settings");
@@ -1210,6 +1210,7 @@ function httpBasic() {
         else {
             var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv4.php', method: 'POST', headers: _headers };
         }
+        //console.log("SEND >> "+index+", "+_headers.method, _headers);
         //ipc_send("ipc_log", "SEND >> "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
 
         var results = ''; 
@@ -1218,8 +1219,8 @@ function httpBasic() {
                 results = results + chunk;
             }); 
             res.on('end', function () {
-               //ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
-               ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+results);
+				//ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
+				//ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+results);
                 try {
                     var parsedResult = JSON.parse(results);
                     if (parsedResult.ok) {

@@ -47,6 +47,7 @@ ipc.on('ipc_switch', function (event, method, arg) {
             break;
 
         case 'set_economy':
+            console.log(arg);
             mainWindow.webContents.send("set_economy", arg);
             break;
 
@@ -92,9 +93,9 @@ ipc.on('ipc_switch', function (event, method, arg) {
 
         // to background
         case 'request_explore':
-            background.webContents.send("request_explore", 1);
+            background.webContents.send("request_explore", arg);
             break;
-        
+
         case 'renderer_get_economy':
             background.webContents.send("set_economy", 1);
             break;
