@@ -26,13 +26,13 @@ ipc.on('ipc_switch', function (event, method, arg) {
     console.log("IPC ", method);
     switch (method) {
         case 'ipc_log':
-            console.log("IPC LOG: ", msg);
+            console.log("IPC LOG: ", arg);
             break;
 
         // to renderer
 
         case 'set_settings':
-            console.log("set settings: ", arg);
+            //console.log("set settings: ", arg);
             saveSettings(arg);
             mainWindow.webContents.send("set_settings", arg);
             overlay.webContents.send("set_settings", arg);
@@ -91,6 +91,10 @@ ipc.on('ipc_switch', function (event, method, arg) {
             break;
 
         // to background
+        case 'request_explore':
+            background.webContents.send("request_explore", 1);
+            break;
+        
         case 'renderer_get_economy':
             background.webContents.send("set_economy", 1);
             break;
@@ -158,6 +162,7 @@ ipc.on('ipc_switch', function (event, method, arg) {
             break;
 
         // to main js / window handling
+
         case 'show_background':
             background.show();
             break;
@@ -198,7 +203,7 @@ ipc.on('ipc_switch', function (event, method, arg) {
             break;
 
         case 'overlay_set_bounds':
-            overlay.setBounds(obj);
+            overlay.setBounds(arg);
             break;
 
         case 'save_overlay_pos':

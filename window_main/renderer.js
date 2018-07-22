@@ -40,10 +40,10 @@ ipc_send = function (method, arg) {
     ipc.send('ipc_switch', method, arg);
 };
 
-//
-setTimeout(function () {
-	ipc_send('renderer_state', 1);
-}, 1000);
+document.addEventListener('DOMContentLoaded', windowReady);
+ function windowReady(){
+     ipc_send('renderer_state', 1);
+ }
 
 //
 ipc.on('set_username', function (event, arg) {
@@ -150,7 +150,10 @@ ipc.on('set_economy', function (event, arg) {
 	goldHistory = arg.gold;
 	vaultHistory = arg.vault;
 	wildcardHistory = arg.wildcards;
-	open_economy();
+	open = arg.open;
+	if (open) {
+		open_economy();
+	}
 });
 
 //
@@ -421,6 +424,7 @@ function setHistory(arg, loadMore) {
 			}
 		}
 		else {
+			console.log("DRAFT: ", match)
 			var tileGrpid = 67106;
 			if (match.set == "Magic 2019")			tileGrpid = 65947;// Nicol Bolas art
 			if (match.set == "Dominaria")			tileGrpid = 67106;// Karn art
@@ -1870,7 +1874,7 @@ function open_settings() {
 	div.append('<div class="settings_title">Overlay</div>');
 
 	add_checkbox(div, 'Show overlay', 'settings_showoverlay', settings.show_overlay);
-	add_checkbox(div, 'Persistent overlay', 'settings_showoverlayalways', settings.show_overlay_always);
+	add_checkbox(div, 'Persistent overlay <i>(useful for OBS setup)</i>', 'settings_showoverlayalways', settings.show_overlay_always);
 
 	add_checkbox(div, 'Show top bar', 'settings_overlay_top', settings.overlay_top);
 	add_checkbox(div, 'Show title', 'settings_overlay_title', settings.overlay_title);

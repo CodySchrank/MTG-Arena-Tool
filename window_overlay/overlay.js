@@ -287,8 +287,10 @@ function setDraft() {
 
 		draftPack.forEach(function(grpId) {
 			var rank = 9;
-			if (picksRank[grpId] != undefined) {
-				rank = Math.round(picksRank[grpId].average/13*9);
+			if (picksRank != null) {
+				if (picksRank[grpId] != undefined) {
+					rank = Math.round(picksRank[grpId].average/13*9);
+				}
 			}
 			addCardTile(grpId, 'a', rank+1, $(".overlay_decklist"));
 		});
@@ -298,16 +300,17 @@ function setDraft() {
 function compare_draft_picks(a, b) {
 	var arank = 15;
 	var brank = 15;
+	if (picksRank != null) {
+		if (picksRank[a] != undefined) {
+			arank = picksRank[a].average;
+		}
+		if (picksRank[b] != undefined) {
+			brank = picksRank[b].average;
+		}
 
-	if (picksRank[a] != undefined) {
-		arank = picksRank[a].average;
+		if (arank < brank)	return -1;
+		if (arank > brank)	return 1;
 	}
-	if (picksRank[b] != undefined) {
-		brank = picksRank[b].average;
-	}
-
-	if (arank < brank)	return -1;
-	if (arank > brank)	return 1;
 	return 0;
 }
 

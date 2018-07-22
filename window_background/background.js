@@ -99,7 +99,7 @@ ipc_send = function (method, arg) {
 ipc.on('set_renderer_state', function (event, arg) {
 	renderer_state = arg;
 	var settings = store.get("settings");
-	updateSettings(settings);
+	updateSettings(settings, true);
 
 	if (debugLog) {
 	    finishLoading();
@@ -120,7 +120,7 @@ ipc.on('overlayBounds', function (event, obj) {
 //
 ipc.on('save_settings', function (event, settings) {
     store.set('settings', settings);
-    //updateSettings(settings);
+    updateSettings(settings, false);
 });
 
 //
@@ -160,7 +160,7 @@ ipc.on('set_economy', function (event, economy) {
     vaultHistory = fix_history(vaultHistory);
     wilcardsHistory = fix_history(wilcardsHistory);
 
-    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory};    
+    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: false};    
 
     ipc_send("set_economy", economy);
 });
@@ -175,13 +175,14 @@ ipc.on('request_course', function (event, arg) {
 
 ipc.on('set_deck_mode', function (event, state) {
     overlayDeckMode = state;
-    update_deck();
+    update_deck(true);
 });
 
 
 
 
 function loadPlayerConfig(playerId) {
+	ipc_send("ipc_log", "Load player ID: "+playerId);
     store = new Store({
         configName: playerId,
         defaults: {
@@ -217,13 +218,16 @@ function loadPlayerConfig(playerId) {
     goldHistory = store.get("gold_history");
     vaultHistory = store.get("vault_history");
     wilcardsHistory = store.get("wildcards_history");
+    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: true};    
+    ipc_send("set_economy", economy);
 
     var settings = store.get("settings");
-    updateSettings(settings);
+    updateSettings(settings, true);
+    requestHistorySend(0);
 }
 
 
-function updateSettings(settings) {
+function updateSettings(settings, relay) {
 	//console.log(settings);
     const exeName = path.basename(process.execPath);
 
@@ -239,31 +243,33 @@ function updateSettings(settings) {
         ipc_send("overlay_show", 1);
     }
     
-    ipc_send("set_settings", settings);
+    if (relay) {
+	    ipc_send("set_settings", settings);
+    }
 }
 
 //
-function fix_history(history) {
-    for (let ii = 0; ii < history.length; ii++) {
+function fix_history(_history) {
+    for (let ii = 0; ii < _history.length; ii++) {
         if (ii > 0) {
-            let dataPrev = history[ii-1]; let data = history[ii];
+            let dataPrev = _history[ii-1]; let data = _history[ii];
             let diff = (data.date - dataPrev.date) / (1000*60*60*24);
             for (let i = 0; i<diff; i++) {
-                history.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value}); ii++;
+                _history.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value}); ii++;
             }
         }
     }
-    for (let ii = 0; ii < history.length; ii++) {
+    for (let ii = 0; ii < _history.length; ii++) {
         if (ii > 0) {
-            let dataPrev = history[ii-1]; let data = history[ii];
+            let dataPrev = _history[ii-1]; let data = _history[ii];
             let da = new Date(data.date);
             let db = new Date(dataPrev.date);
             if (da.toDateString() == db.toDateString()) {
-                history.splice(ii-1, 1); ii-=1;
+                _history.splice(ii-1, 1); ii-=1;
             }
         }
     }
-    return history;
+    return _history;
 }
 
 // Read the log
@@ -412,11 +418,17 @@ function processLogData(data) {
     // Get player Id
     strCheck = '"PlayerId":"';
     if (data.indexOf(strCheck) > -1) {
-        if (playerId == null) {
+        //if (playerId == null) {
             playerId = dataChop(data, strCheck, '"');
+        //}
+    }
+
+    strCheck = '==> Authenticate(';
+    if (data.indexOf(strCheck) > -1) {
+    	//if (playerId != null) {
             httpAuth();
-            loadPlayerConfig(playerId);
-        }
+  			loadPlayerConfig(playerId);
+        //}
     }
 
     // Get User name
@@ -593,7 +605,7 @@ function processLogData(data) {
             if (json.eventName.indexOf("KLD") !== -1)   draftSet = "Kaladesh";
             if (json.eventName.indexOf("AER") !== -1)   draftSet = "Aether Revolt";
         }
-        if (json.draftStatus != undefined) {
+        if (json.packNumber == 0 && json.pickNumber == 0) {
             createDraft();
             ipc.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
             currentDraftPack = json.draftPack.slice(0);
@@ -607,7 +619,7 @@ function processLogData(data) {
     if (json != false) {
         // store pack in recording
         if (json.draftPack != undefined) {
-            ipc_send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
+            ipc.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
             currentDraftPack = json.draftPack.slice(0);
         }
     }
@@ -870,7 +882,7 @@ function gre_to_client(data) {
     var str = JSON.stringify(currentDeck);
     currentDeckUpdated = JSON.parse(str);
     forceDeckUpdate();
-    update_deck();
+    update_deck(false);
 }
 
 function createMatch(arg) {
@@ -943,9 +955,9 @@ function clear_deck() {
     ipc_send("set_deck", deck);
 }
 
-function update_deck() {
+function update_deck(force) {
     var nd = new Date()
-    if (nd - lastDeckUpdate > 1000 || debugLog == true) {
+    if (nd - lastDeckUpdate > 1000 || debugLog == true || force) {
         if (overlayDeckMode == 0) {
             ipc_send("set_deck", currentDeckUpdated);
         }
@@ -1088,16 +1100,23 @@ function saveMatch() {
     match.date = new Date();
 
     console.log("Save match:", match.id);
-    var matches = store.get('matches_index');
-    if (!matches.includes(currentMatchId)) {
-        matches.push(currentMatchId);
+    var matches_index = store.get('matches_index');
+
+    if (!matches_index.includes(currentMatchId)) {
+        matches_index.push(currentMatchId);
     }
     else {
         match.date = store.get(currentMatchId).date;
     }
 
-    store.set('matches_index', matches);
+	// add locally
+    if (!history.matches.includes(currentMatchId)) {
+        history.matches.push(currentMatchId);
+    }
+
+    store.set('matches_index', matches_index);
     store.set(currentMatchId, match);
+
     history[currentMatchId] = match;
     history[currentMatchId].type = "match";
     httpSetMatch(match);
@@ -1109,21 +1128,28 @@ function saveDraft() {
     var draft = currentDraft;
     draft.id = draftId;
     draft.date = new Date();
-    draft.set = draftSet;
+    draft.set = draftSet; 
 
     console.log("Save draft:", draftId);
-    var drafts = store.get('draft_index');
-    if (!drafts.includes(draftId)) {
-        drafts.push(draftId);
+    
+	var draft_index = store.get('draft_index');
+	// add to config
+    if (!draft_index.includes(draftId)) {
+        draft_index.push(draftId);
     }
     else {
         draft.date = store.get(draftId).date;
     }
 
-    store.set('draft_index', drafts);
+    // add locally
+    if (!history.matches.includes(draftId)) {
+        history.matches.push(draftId);
+    }
+ 
+    store.set('draft_index', draft_index);
     store.set(draftId, draft);
-    history[currentMatchId] = draft;
-    history[currentMatchId].type = "draft";
+    history[draftId] = draft;
+    history[draftId].type = "draft";
     httpSetMatch(draft);
     requestHistorySend(0);
 }
@@ -1138,7 +1164,7 @@ function finishLoading() {
         ipc_send("renderer_hide", 1);
         ipc_send("overlay_show", 1);
         ipc_send("overlay_set_bounds", obj);
-        update_deck();
+        update_deck(false);
     }
 
     requestHistorySend(0);
@@ -1162,7 +1188,7 @@ function httpBasic() {
     async.forEachOfSeries(httpAsyncNew, function (value, index, callback) {
         var _headers = value;
 
-        if (store.get("settings").send_data == false && _headers.method != 'delete_data') {
+        if (store.get("settings").send_data == false && _headers.method != 'delete_data' && debugLog == false) {
             callback({message: "Settings dont allow sending data! > "+_headers.method});
             removeFromHttp(_headers.reqId);
         }
@@ -1184,7 +1210,7 @@ function httpBasic() {
         else {
             var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv4.php', method: 'POST', headers: _headers };
         }
-        //console.log("SEND >> "+index, _headers.method, _headers.reqId, _headers.token);
+        //ipc_send("ipc_log", "SEND >> "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
 
         var results = ''; 
         var req = http.request(options, function(res) {
@@ -1192,8 +1218,8 @@ function httpBasic() {
                 results = results + chunk;
             }); 
             res.on('end', function () {
-               //console.log("RECV << "+index, _headers.method, _headers.reqId, _headers.token);
-               //console.log("RECV << "+index, _headers.method, results);
+               //ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
+               ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+results);
                 try {
                     var parsedResult = JSON.parse(results);
                     if (parsedResult.ok) {
@@ -1210,7 +1236,7 @@ function httpBasic() {
                         }
                     }
                     if (_headers.method == 'get_picks') {
-                     ipc_send("set_draft_picks", parsedResult);
+						ipc_send("set_draft_picks", parsedResult);
                     }
                 } catch (e) {
                     console.error(e.message);
@@ -1219,21 +1245,22 @@ function httpBasic() {
                     callback();
                 }
                 removeFromHttp(_headers.reqId);
-                //var str = ""; httpAsync.forEach( function(h) { str += h.reqId+", "; }); console.log("httpAsync: ", str);
+                //var str = ""; httpAsync.forEach( function(h) { str += h.reqId+", "; });
+                //ipc_send("ipc_log", "httpAsync: "+str);
             }); 
         });
 
         req.on('error', function(e) {
             callback(e);
             removeFromHttp(_headers.reqId);
-            console.error(e.message);
+            ipc_send("ipc_log", e.message);
         });
 
         req.end();
 
     }, function (err) {
         if (err) {
-            console.log("httpBasic() Error", err.message);
+            ipc_send("ipc_log", "httpBasic() Error: "+err.message);
         }
         // do it again
         setTimeout( function() {
