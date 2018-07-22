@@ -61,6 +61,10 @@ label {
     background: #B59579; 
 }
 
+.auto_width {
+    width: auto !important;
+}
+
 .flex_top {
     height: 50%;
     display: flex;

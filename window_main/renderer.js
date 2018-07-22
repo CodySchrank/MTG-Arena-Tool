@@ -641,13 +641,19 @@ function setExplore(arg, loadMore) {
 		label.appendTo(icd);
 		var input = $('<input type="search" id="query_explore" autocomplete="off" autofocus value="'+filterEvent+'" />');
 		input.appendTo(icd);
-
 		icd.appendTo($("#ux_0"));
+
 		input.focus();
 		input[0].setSelectionRange(filterEvent.length, filterEvent.length);
 
 		input.on('input', function() {
 			updateExplore();
+		});
+
+		input.keypress(function(e) {
+			if (e.which == 13) {
+				updateExplore();
+			}
 		});
 
 		var d = document.createElement("div");
@@ -1507,12 +1513,43 @@ function open_cards() {
 	add_checkbox_search(cont, 'Uncommon', 'query_uncommon', true);
 	add_checkbox_search(cont, 'Rare', 'query_rare', true);
 	add_checkbox_search(cont, 'Mythic Rare', 'query_mythic', true);
-	//add_checkbox_search(cont, 'Land', 'query_land', true);
+	cont.appendTo(filters);
+	
+	var cont = $('<div class="buttons_container"></div>');
+
+	var icd = $('<div class="input_container auto_width"></div>');
+	var label = $('<label style="display: table">CMC:</label>');
+	label.appendTo(icd);
+	var input = $('<input type="number" id="query_cmc" autocomplete="off" />');
+	input.appendTo(icd);
+	icd.appendTo(cont);
+
+	add_checkbox_search(cont, 'Lower than', 'query_cmclower', false);
+	add_checkbox_search(cont, 'Equal to', 'query_cmcequal', true);
+	add_checkbox_search(cont, 'Higher than', 'query_cmchigher', false);
+	
 	cont.appendTo(filters);
 	
 	$("#ux_0").append(basicFilters);
 	$("#ux_0").append(filters);
 	$("#ux_0").append(div);
+
+
+    $('#query_cmclower').change(function() {
+        if (document.getElementById("query_cmclower").checked == true) {
+            document.getElementById("query_cmchigher").checked = false;
+        }
+    });
+
+    $('#query_cmchigher').change(function() {
+        if (document.getElementById("query_cmchigher").checked == true) {
+            document.getElementById("query_cmclower").checked = false;
+        }
+    });
+
+	filterCmcLower 	= document.getElementById("query_cmclower");
+	filterCmcEqual 	= document.getElementById("query_cmcequal");
+	filterCmcHigher = document.getElementById("query_cmchigher");
 
 	printCards();
 }
@@ -1538,7 +1575,7 @@ function expandFilters() {
 
 	}
 	else {
-		div.css('height', 'calc(100% - 90px)');
+		div.css('height', 'calc(100% - 122px)');
 		div.css('opacity', 1);
 		setTimeout(function() {
 			$('.inventory').hide();
@@ -1567,6 +1604,11 @@ function resetFilters() {
 	document.getElementById("query_uncommon").checked = false;
 	document.getElementById("query_rare").checked = false;
 	document.getElementById("query_mythic").checked = false;
+
+	document.getElementById("query_cmc").value = "";
+	document.getElementById("query_cmclower").checked = false;
+	document.getElementById("query_cmcequal").checked = true;
+	document.getElementById("query_cmchigher").checked = false;
 
 	printCards();
 }
@@ -1705,17 +1747,21 @@ function printCards() {
 	var paging = $('<div class="paging_container"></div>');
 	div.append(paging);
 
-	filterName  = document.getElementById("query_name").value.toLowerCase();
-	filterNew   = document.getElementById("query_new");
-	filterMulti = document.getElementById("query_multicolor");
-	filterExclude = document.getElementById("query_exclude");
+	filterName  	= document.getElementById("query_name").value.toLowerCase();
+	filterNew   	= document.getElementById("query_new");
+	filterMulti 	= document.getElementById("query_multicolor");
+	filterExclude 	= document.getElementById("query_exclude");
 
-	filterCommon = document.getElementById("query_common");
-	filterUncommon = document.getElementById("query_uncommon");
-	filterRare = document.getElementById("query_rare");
-	filterMythic = document.getElementById("query_mythic");
+	filterCommon 	= document.getElementById("query_common");
+	filterUncommon 	= document.getElementById("query_uncommon");
+	filterRare 		= document.getElementById("query_rare");
+	filterMythic 	= document.getElementById("query_mythic");
 
-	console.log("filter", filterNew.checked);
+	filterCMC  		= document.getElementById("query_cmc").value;
+	filterCmcLower 	= document.getElementById("query_cmclower").checked;
+	filterCmcEqual 	= document.getElementById("query_cmcequal").checked;
+	filterCmcHigher = document.getElementById("query_cmchigher").checked;
+
 	var totalCards = 0;
     for (n=0; n<Object.keys(cards).length; n++) {
     	key = Object.keys(cards)[n];
@@ -1727,6 +1773,7 @@ function printCards() {
     	let type = card.type.toLowerCase();
     	let rarity = card.rarity;
     	let cost = card.cost;
+    	let cmc = card.cmc;
     	let set  = card.set;
 
 		if (name.indexOf(filterName) == -1 && type.indexOf(filterName) == -1) {
@@ -1741,6 +1788,34 @@ function printCards() {
 	    	if (!filteredSets.includes(set)) {
 	    		doDraw = false;
 	    	}
+    	}
+
+    	if (filterCMC && doDraw) {
+    		if (filterCmcLower && filterCmcEqual) {
+    			if (cmc > filterCMC) {
+    				doDraw = false;
+    			}
+    		}
+    		else if (filterCmcHigher && filterCmcEqual) {
+    			if (cmc < filterCMC) {
+    				doDraw = false;
+    			}
+    		}
+    		else if (filterCmcLower && !filterCmcEqual) {
+    			if (cmc >= filterCMC) {
+    				doDraw = false;
+    			}
+    		}
+    		else if (filterCmcHigher && !filterCmcEqual) {
+    			if (cmc <= filterCMC) {
+    				doDraw = false;
+    			}
+    		}
+    		else if (!filterCmcHigher && !filterCmcLower && filterCmcEqual) {
+    			if (cmc != filterCMC) {
+    				doDraw = false;
+    			}
+    		}
     	}
 
     	switch (rarity) {
