@@ -158,12 +158,10 @@ ipc.on('set_economy', function (event, arg) {
 
 //
 ipc.on('initialize', function (event, arg) {
-	//initialized = true;
 	$('.sidebar').removeClass('hidden');
 	$('.overflow_ux').removeClass('hidden');
 	$('.message_center').css('display', 'none');
-	//arenaCheckLoop();
-	//$('.wrapper').css('left', '100%');
+	$('.init_loading').hide();
 });
 
 //
@@ -285,7 +283,8 @@ $(document).ready(function() {
 			}
 			if ($(this).hasClass("it2")) {
 				sidebarActive = 2;
-				$("#ux_0").html('');
+				$("#ux_0").html('<div class="loading_bar ux_loading"><div class="loading_color loading_w"></div><div class="loading_color loading_u"></div><div class="loading_color loading_b"></div><div class="loading_color loading_r"></div><div class="loading_color loading_g"></div></div>');
+				document.body.style.cursor = "progress";
 				ipc_send('renderer_request_explore', filterEvent);
 			}
 			if ($(this).hasClass("it3")) {
@@ -618,6 +617,7 @@ function updateExplore() {
 
 //
 function setExplore(arg, loadMore) {
+	document.body.style.cursor = "auto";
 	if (arg != null) {
 		explore = arg;
 	}
@@ -1886,7 +1886,7 @@ function printCards() {
 
 	        for (let i=0; i<4; i++) {
 	        	if (cardsNew[key] != undefined && i < cardsNew[key]) {
-				    $('<div style="width: '+cardSize/4+'px;" class="inventory_card_quantity_blue"></div>').appendTo(d);
+				    $('<div style="width: '+cardSize/4+'px;" class="inventory_card_quantity_orange"></div>').appendTo(d);
 	        	}
 	        	else if (i < cards[key]) {
 			        $('<div style="width: '+cardSize/4+'px;" class="inventory_card_quantity_green"></div>').appendTo(d);

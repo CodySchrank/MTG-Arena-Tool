@@ -653,6 +653,13 @@
     background: center no-repeat url('../images/quantity_gray.png');
 }
 
+.inventory_card_quantity_orange {
+    width: 35px;
+    height: 24px;
+    display: inline-block;
+    background: center no-repeat url('../images/quantity_orange.png');
+}
+
 .paging_container {
     margin: 16px 24px 0 24px;
     display: flex;
