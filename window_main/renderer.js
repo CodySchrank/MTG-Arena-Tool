@@ -9,7 +9,7 @@ var cards = {};
 var cardsNew = {};
 var settings = null;
 var updateState =  {state: -1, available: false, progress: 0, speed: 0};
-var sidebarActive = 0;
+var sidebarActive = -1;
 var arenaRunning = false;
 var renderer = 0;
 var collectionPage = 0;
@@ -24,6 +24,9 @@ var cardQuality = "normal";
 var inputTimer = undefined;
 var loadHistory = 0;
 
+var rankOffset = 0;
+var rankTitle = "";
+var userName = ""
 var goldHistory = null;
 var vaultHistory = null;
 var wildcardHistory = null;
@@ -44,31 +47,57 @@ document.addEventListener('DOMContentLoaded', windowReady);
  function windowReady(){
      ipc_send('renderer_state', 1);
  }
-
+/*
+setTimeout( function() {
+	ipc_send('renderer_state', 1);
+}, 5000);
+*/
 //
 ipc.on('set_username', function (event, arg) {
-	$('.top_username').html(arg);
+	userName = arg;
+	if (sidebarActive != -1) {
+		$('.top_username').html(userName);
+	}
 });
 
 //
 ipc.on('set_rank', function (event, offset, rank) {
-	$(".top_rank").css("background-position", (offset*-32)+"px 0px").attr("title", rank);
+	rankOffset = offset;
+	rankTitle = rank;
+	if (sidebarActive != -1) {
+		$(".top_rank").css("background-position", (rankOffset*-32)+"px 0px").attr("title", rankTitle);
+	}
 });
 
 //
 ipc.on('set_decks', function (event, arg) {
+    try {
+        arg = JSON.parse(arg)
+    } catch(e) {
+        console.log("Error parsing JSON:", str);
+        return false;
+    }
 	setDecks(arg);
 });
 
 //
 ipc.on('set_history', function (event, arg) {
-	setHistory(arg, 0);
+	if (arg != null) {
+	    try {
+	        matchesHistory = JSON.parse(arg)
+	    } catch(e) {
+	        console.log("Error parsing JSON:", str);
+	        return false;
+	    }
+	}
+	
+	setHistory(0);
 });
 
 //
 ipc.on('set_history_data', function (event, arg) {
 	if (arg != null) {
-		matchesHistory = arg;
+		matchesHistory = JSON.parse(arg);
 	}
 });
 
@@ -158,6 +187,10 @@ ipc.on('set_economy', function (event, arg) {
 
 //
 ipc.on('initialize', function (event, arg) {
+	$('.top_username').html(userName);
+	$(".top_rank").css("background-position", (rankOffset*-32)+"px 0px").attr("title", rankTitle);
+	sidebarActive = 0;
+	setDecks(null);
 	$('.sidebar').removeClass('hidden');
 	$('.overflow_ux').removeClass('hidden');
 	$('.message_center').css('display', 'none');
@@ -316,11 +349,7 @@ function open_economy_ipc() {
 }
 
 //
-function setHistory(arg, loadMore) {
-	if (arg != null) {
-		matchesHistory = arg;
-	}
-
+function setHistory(loadMore) {
 	var mainDiv = document.getElementById("ux_0");
 	if (loadMore > 0) {
 	}
@@ -474,7 +503,7 @@ function setHistory(arg, loadMore) {
 	$(this).off();
 	$("#ux_0").on('scroll', function() {
 		if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-			setHistory(arg, 20);
+			setHistory(20);
 		}
 	})
 
@@ -1886,12 +1915,15 @@ function printCards() {
     		doDraw = false;
     	}
 
-    	if (doDraw) {
-			let dfc = '';
-			if (card.dfc == 'DFC_Back')	 dfc = 'a';
-			if (card.dfc == 'DFC_Front') dfc = 'b';
-			if (card.dfc == 'SplitHalf') dfc = 'a';
+		let dfc = '';
+		if (card.dfc == 'DFC_Back')	 dfc = 'a';
+		if (card.dfc == 'DFC_Front') dfc = 'b';
+		if (card.dfc == 'SplitHalf') dfc = 'a';
+		if (dfc == 'b') {
+			doDraw = false;
+		}
 
+    	if (doDraw) {
 	        var d = $('<div style="width: '+cardSize+'px !important;" class="inventory_card"></div>');
 
 	        for (let i=0; i<4; i++) {

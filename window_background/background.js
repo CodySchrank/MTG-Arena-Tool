@@ -143,10 +143,10 @@ ipc.on('request_history', function (event, state) {
 //
 function requestHistorySend(state) {
     if (state == 1) {
-        ipc_send("background_set_history", history);
+        ipc_send("background_set_history", JSON.stringify(history));
     }
     else {
-        ipc_send("background_set_history_data", history);
+        ipc_send("background_set_history_data", JSON.stringify(history));
     }
 }
 
@@ -400,12 +400,24 @@ function checkJsonWithStart(str, check, chop, start) {
     return false;
 }
 
+function checkJsonWithStartNoParse(str, check, chop, start) {
+    if (str.indexOf(check) > -1) {
+		str = dataChop(str, check, chop);
+		str = dataChop(str, start, chop);
+		return str;
+    }
+    return false;
+}
+
+
 
 /*
 
     unnecessarily long text to mark a point in the code that is fairly important because I cant remember the line number \^.^/
 
 */
+
+
 
 function processLogData(data) {
 	//console.log("Read log:", data);
@@ -452,7 +464,7 @@ function processLogData(data) {
 
     // Get Decks
     strCheck = '<== Deck.GetDeckLists(';
-    json = checkJsonWithStart(data, strCheck, '', ')');
+    json = checkJsonWithStartNoParse(data, strCheck, '', ')');
     if (json != false) {
         //if (debugLog == true || firstPass == false) {
             requestHistorySend(0);

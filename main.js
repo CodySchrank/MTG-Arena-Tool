@@ -333,7 +333,9 @@ function toggleWindow() {
 }
 
 function showWindow() {
-    mainWindow.show();
+    if (!mainWindow.isVisible()) {
+        mainWindow.show();
+    }
 }
 
 function quit() {
