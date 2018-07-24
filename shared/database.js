@@ -16,6 +16,11 @@ class Database {
     	}
         return ret;
     }
+
+    getAll() {
+    	let ret = this.cards;
+        return ret;
+    }
 }
 
 module.exports = Database;

@@ -1503,6 +1503,7 @@ function open_cards() {
 	manas.appendTo(filters);
 
 	var cont = $('<div class="buttons_container"></div>');
+	add_checkbox_search(cont, 'Show unowned', 'query_unown', false);
 	add_checkbox_search(cont, 'Newly aquired only', 'query_new', false);
 	add_checkbox_search(cont, 'Require multicolored', 'query_multicolor', false);
 	add_checkbox_search(cont, 'Exclude unselected', 'query_exclude', false);
@@ -1595,7 +1596,9 @@ function resetFilters() {
 		$( this ).removeClass('mana_filter_on');
 		$( this ).addClass('mana_filter_on');
 	});
+
 	document.getElementById("query_name").value = "";
+	document.getElementById("query_unown").checked = false;
 	document.getElementById("query_new").checked = false;
 	document.getElementById("query_multicolor").checked = false;
 	document.getElementById("query_exclude").checked = false;
@@ -1748,6 +1751,7 @@ function printCards() {
 	div.append(paging);
 
 	filterName  	= document.getElementById("query_name").value.toLowerCase();
+	filterUnown		= document.getElementById("query_unown");
 	filterNew   	= document.getElementById("query_new");
 	filterMulti 	= document.getElementById("query_multicolor");
 	filterExclude 	= document.getElementById("query_exclude");
@@ -1763,10 +1767,16 @@ function printCards() {
 	filterCmcHigher = document.getElementById("query_cmchigher").checked;
 
 	var totalCards = 0;
-    for (n=0; n<Object.keys(cards).length; n++) {
-    	key = Object.keys(cards)[n];
-    	let grpId = key;
-    	let card = cardsDb.get(grpId);
+	if (filterUnown) {
+		var list = cardsDb.getAll();
+	}
+	else {
+		var list = cards;
+	}
+    for (n=0; n<Object.keys(list).length; n++) {
+		let key = Object.keys(list)[n];
+		let grpId = key;
+		let card = cardsDb.get(grpId);
     	let doDraw = true;
 
     	let name = card.name.toLowerCase();
@@ -1878,9 +1888,9 @@ function printCards() {
 
     	if (doDraw) {
 			let dfc = '';
-			if (card.dfc == 'DFC_Back')	dfc = 'a';
-			if (card.dfc == 'DFC_Front')	dfc = 'b';
-			if (card.dfc == 'SplitHalf')	dfc = 'a';
+			if (card.dfc == 'DFC_Back')	 dfc = 'a';
+			if (card.dfc == 'DFC_Front') dfc = 'b';
+			if (card.dfc == 'SplitHalf') dfc = 'a';
 
 	        var d = $('<div style="width: '+cardSize+'px !important;" class="inventory_card"></div>');
 
@@ -1903,14 +1913,14 @@ function printCards() {
 			img.on('mouseenter', function(e) {
 				$('.main_hover').css("opacity", 1);
 				let dfc = '';
-				if (card.dfc == 'DFC_Back')	dfc = 'a';
-				if (card.dfc == 'DFC_Front')	dfc = 'b';
-				if (card.dfc == 'SplitHalf')	dfc = 'a';
+				if (card.dfc == 'DFC_Back')	 dfc = 'a';
+				if (card.dfc == 'DFC_Front') dfc = 'b';
+				if (card.dfc == 'SplitHalf') dfc = 'a';
+				console.log("https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
 				$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
 
 				$('.main_hover').on('load', function(){
 					$('.loader').css("opacity", 0);
-					
 				});
 			});
 
