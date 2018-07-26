@@ -84,7 +84,8 @@ ipc.on('set_decks', function (event, arg) {
 ipc.on('set_history', function (event, arg) {
 	if (arg != null) {
 	    try {
-	        matchesHistory = JSON.parse(arg)
+	        matchesHistory = JSON.parse(arg);
+			console.log(matchesHistory);
 	    } catch(e) {
 	        console.log("Error parsing JSON:", str);
 	        return false;
@@ -98,6 +99,7 @@ ipc.on('set_history', function (event, arg) {
 ipc.on('set_history_data', function (event, arg) {
 	if (arg != null) {
 		matchesHistory = JSON.parse(arg);
+		console.log(matchesHistory);
 	}
 });
 
@@ -361,13 +363,36 @@ function setHistory(loadMore) {
 		d.classList.add("list_fill");
 		mainDiv.appendChild(d);
 		loadHistory = 0;
+		/*
+		var div = document.createElement("div");
+		div.classList.add("ranks_history");
+
+		// Add ranks matchup history here
+		for (var key in matchesHistory.rankwinrates){
+		    if (matchesHistory.rankwinrates.hasOwnProperty(key)) {
+		    	var val = matchesHistory.rankwinrates[key];
+		    	if (val.t > 0) {
+					var fla = document.createElement("div");
+					fla.classList.add("flex_item");
+					var r = document.createElement("div");
+					r.classList.add("ranks_history_badge");
+					r.style.backgroundPosition = (get_rank_index(val.r, 1)*-48)+"px 0px";
+					r.title = val.r;
+					fla.appendChild(r);
+					div.appendChild(fla);
+		    	}
+		    }
+		}
+
+		mainDiv.appendChild(div);
+		*/
 	}
 
-	//matchesHistory.matches.forEach(function(match, index) {
-	//	match = matchesHistory[match];
 	for (var loadEnd = loadHistory + loadMore; loadHistory < loadEnd; loadHistory++) {
 		var match_id = matchesHistory.matches[loadHistory];
 		var match = matchesHistory[match_id];
+
+		if (match == undefined) continue;
 
 		var div = document.createElement("div");
 		div.classList.add(match.id);
@@ -539,7 +564,7 @@ function setDecks(arg) {
 	if (arg != null) {
 		decks = arg;//JSON.parse(arg);
 	}
-	if (sidebarActive == 0) {
+	if (sidebarActive == 0 && decks != null) {
 		sort_decks();
 		var mainDiv = document.getElementById("ux_0");
 		mainDiv.innerHTML = '';
@@ -674,10 +699,11 @@ function setExplore(arg, loadMore) {
 
 		input.focus();
 		input[0].setSelectionRange(filterEvent.length, filterEvent.length);
-
+		/*
 		input.on('input', function() {
 			updateExplore();
 		});
+		*/
 
 		input.keypress(function(e) {
 			if (e.which == 13) {
@@ -768,7 +794,7 @@ function setExplore(arg, loadMore) {
 
 		var d = document.createElement("div");
 		d.classList.add("list_deck_name_it");
-		d.innerHTML = _deck.event.replace(/_/g, " ");
+		d.innerHTML = _deck.event.replace(/_/g, " ")+" - "+timeSince(_deck.date*1000)+" ago";
 		flr.appendChild(d);
 
 		div.appendChild(fll);
@@ -2312,6 +2338,10 @@ function sort_history() {
 
 //
 function compare_matches(a, b) {
+	if (a == undefined)
+		return -1;
+	if (b == undefined)
+		return 1;
 	a = matchesHistory[a];
 	b = matchesHistory[b];
 	a = Date.parse(a.date);

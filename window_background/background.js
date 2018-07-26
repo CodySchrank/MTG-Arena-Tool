@@ -102,8 +102,8 @@ ipc.on('set_renderer_state', function (event, arg) {
 	updateSettings(settings, true);
 
 	if (debugLog) {
-	    finishLoading();
 	    ipc_send("show_background", 1);
+	    finishLoading();
 	}
 });
 
@@ -142,12 +142,58 @@ ipc.on('request_history', function (event, state) {
 
 //
 function requestHistorySend(state) {
+	if (history.matches != undefined) {
+		calculateRankWins(history);
+	}
     if (state == 1) {
         ipc_send("background_set_history", JSON.stringify(history));
     }
     else {
         ipc_send("background_set_history_data", JSON.stringify(history));
     }
+}
+
+//
+function calculateRankWins() {
+	var rankwinrates = {beginner: {w:0, l:0, t:0, r:"Beginner"}, bronze: {w:0, l:0, t:0, r:"Bronze"}, silver: {w:0, l:0, t:0, r:"Silver"}, gold: {w:0, l:0, t:0, r:"Gold"}, diamond: {w:0, l:0, t:0, r:"Diamond"}, master: {w:0, l:0, t:0, r:"Master"}};
+	for (var i = 0; i < history.matches.length; i++) {
+		let match_id = history.matches[i];
+		let match = history[match_id];
+
+		if (match == undefined) continue;
+		if (match.type != "match") continue;
+		if (match.opponent == undefined) continue;
+
+		if (daysPast(match.date) > 10) continue;
+
+		let struct = undefined;
+		switch (match.opponent.rank) {
+			case "Beginner":
+				struct = rankwinrates.beginner;	break;
+			case "Bronze":
+				struct = rankwinrates.bronze;	break;
+			case "Silver":
+				struct = rankwinrates.silver;	break;
+			case "Gold":
+				struct = rankwinrates.gold;		break;
+			case "Diamond":
+				struct = rankwinrates.diamond;	break;
+			case "Master":
+				struct = rankwinrates.master;	break;
+			default:
+				struct = undefined;	break;
+		}
+
+		if (struct != undefined) {
+			struct.t += 1;
+			if (match.opponent.win > match.player.win)
+				struct.l += 1;
+			else 
+				struct.w += 1;
+		}
+	}
+
+	history.rankwinrates = rankwinrates;
 }
 
 //
@@ -200,18 +246,22 @@ function loadPlayerConfig(playerId) {
 
     history.matches = store.get('matches_index');
     for (let i=0; i<history.matches.length; i++) {
-        let id = history.matches[i];
-        history[id] = store.get(id);
-        history[id].type = "match";
+        var id = history.matches[i];
+        if (id != null) {
+	        history[id] = store.get(id);
+	        history[id].type = "match";
+        }
     }
 
     drafts.matches = store.get('draft_index');
     for (let i=0; i<drafts.matches.length; i++) {
-        let id = drafts.matches[i];
+        var id = drafts.matches[i];
 
-        history.matches.push(id);
-        history[id] = store.get(id);
-        history[id].type = "draft";
+        if (id != null) {
+	        history.matches.push(id);
+	        history[id] = store.get(id);
+	        history[id].type = "draft";
+	    }
     }
 
 
@@ -430,17 +480,13 @@ function processLogData(data) {
     // Get player Id
     strCheck = '"PlayerId":"';
     if (data.indexOf(strCheck) > -1) {
-        //if (playerId == null) {
-            playerId = dataChop(data, strCheck, '"');
-        //}
+		playerId = dataChop(data, strCheck, '"');
     }
 
     strCheck = '==> Authenticate(';
-    if (data.indexOf(strCheck) > -1) {
-    	//if (playerId != null) {
-            httpAuth();
-  			loadPlayerConfig(playerId);
-        //}
+	if (data.indexOf(strCheck) > -1) {
+		httpAuth();
+		loadPlayerConfig(playerId);
     }
 
     // Get User name

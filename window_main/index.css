@@ -1109,3 +1109,19 @@
 }
 #vaultChart {
 }
+
+.ranks_history {
+    display: flex;
+    height: 128px;
+}
+
+.ranks_history_badge {
+    -webkit-app-region: no-drag;
+    align-self: center;
+    margin-left: 16px;
+    width: 48px;
+    height: 48px;
+    background: url(../images/ranks_48.png);
+    background-position: 0px 0px;
+}
+

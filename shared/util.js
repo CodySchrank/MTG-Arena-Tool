@@ -666,6 +666,13 @@ function timeSince(date) {
 }
 
 //
+function daysPast(date) {
+	var firstDate = new Date();
+	var secondDate = new Date(date);
+	return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(24*60*60*1000)));
+}
+
+//
 function replaceAll(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
