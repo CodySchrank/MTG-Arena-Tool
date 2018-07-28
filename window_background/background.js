@@ -14,7 +14,7 @@ var store = new Store({
 		settings: {sound_priority: true, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
         matches_index:[],
         draft_index:[],
-        vault_history:[],
+        gems_history:[],
         gold_history:[],
         wildcards_history:[]
 	}
@@ -88,7 +88,7 @@ var overlayDeckMode = 0;
 var lastDeckUpdate = new Date();
 
 var goldHistory = [];
-var vaultHistory = [];
+var gemsHistory = [];
 var wilcardsHistory = [];
 
 ipc_send = function (method, arg) {
@@ -199,14 +199,14 @@ function calculateRankWins() {
 //
 ipc.on('set_economy', function (event, arg) {
     goldHistory = store.get("gold_history");
-    vaultHistory = store.get("vault_history");
+    gemsHistory = store.get("gems_history");
     wilcardsHistory = store.get("wildcards_history");
 
     goldHistory = fix_history(goldHistory);
-    vaultHistory = fix_history(vaultHistory);
+    gemsHistory = fix_history(gemsHistory);
     wilcardsHistory = fix_history(wilcardsHistory);
 
-    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: true};    
+    var economy = {gold: goldHistory, gems: gemsHistory, wildcards: wilcardsHistory, open: true};    
 
     ipc_send("set_economy", economy);
 });
@@ -238,7 +238,7 @@ function loadPlayerConfig(playerId) {
             settings: {sound_priority: true, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
             matches_index:[],
             draft_index:[],
-            vault_history:[],
+            gems_history:[],
             gold_history:[],
             wildcards_history:[]
         }
@@ -266,9 +266,9 @@ function loadPlayerConfig(playerId) {
 
 
     goldHistory = store.get("gold_history");
-    vaultHistory = store.get("vault_history");
+    gemsHistory = store.get("gems_history");
     wilcardsHistory = store.get("wildcards_history");
-    var economy = {gold: goldHistory, vault: vaultHistory, wildcards: wilcardsHistory, open: false};    
+    var economy = {gold: goldHistory, gems: gemsHistory, wildcards: wilcardsHistory, open: false};    
     ipc_send("set_economy", economy);
 
     var settings = store.get("settings");
@@ -530,7 +530,7 @@ function processLogData(data) {
         }
 
         var gold = json.gold;
-        var vault = json.vaultProgress;
+        var gems = json.gems;
         var wcCommon = json.wcCommon;
         var wcUncommon = json.wcUncommon;
         var wcRare = json.wcRare;
@@ -551,18 +551,18 @@ function processLogData(data) {
             store.set("gold_history", goldHistory);
         }
 
-        vaultHistory = store.get("vault_history");
+        gemsHistory = store.get("gems_history");
         var lastDate  = 0;
         var lastValue = -1;
-        vaultHistory.forEach(function(data) {
+        gemsHistory.forEach(function(data) {
             if (data.date > lastDate) {
                 lastDate = data.date;
                 lastValue = data.value;
             }
         });
-        if (vault != lastValue && lastDate < logTime.getTime()) {
-            vaultHistory.push({date: logTime.getTime(), value: vault});
-            store.set("vault_history", vaultHistory);
+        if (gems != lastValue && lastDate < logTime.getTime()) {
+            gemsHistory.push({date: logTime.getTime(), value: gems});
+            store.set("gems_history", gemsHistory);
         }
 
         wilcardsHistory = store.get("wildcards_history");
@@ -902,7 +902,7 @@ function gre_to_client(data) {
                             affected.forEach(function(aff) {
                                 if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
                                     if (gameObjs[aff] !== undefined) {
-                                        //console.log(obj.id, cardsDb.get(gameObjs[aff].grpId).name, "Entered", zones[affector].type);
+                                        ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+aff+") "+cardsDb.get(gameObjs[aff].grpId).name+" Entered "+zones[affector].type);
                                         //annotationsRead[obj.id] = true;
                                     }
                                     
@@ -924,6 +924,7 @@ function gre_to_client(data) {
                 if (msg.gameStateMessage.gameObjects != undefined) {
                     msg.gameStateMessage.gameObjects.forEach(function(obj) {
                         gameObjs[obj.instanceId] = obj;
+                        //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") "+cardsDb.get(obj.grpId).name+" created at "+zones[obj.zoneId].type);
                     });
                 }
 
@@ -1105,11 +1106,12 @@ function getOppDeck() {
 	var oppDeck = {mainDeck: [], sideboard : []};
 	var doAdd = true;
     oppDeck.name = "played by "+oppName;
-
+    console.log("Deck "+oppName);
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
-                if (gameObjs[key].ownerSeatId == oppSeat && gameObjs[key].type == "GameObjectType_Card") {
+	        	console.log(cardsDb.get(gameObjs[key].grpId), cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type, gameObjs[key]);
+                if (gameObjs[key].ownerSeatId == oppSeat && gameObjs[key].type != "GameObjectType_Token" && gameObjs[key].type != "GameObjectType_Ability") {
 
                 	doAdd = true;
                     oppDeck.mainDeck.forEach(function(card) {

@@ -23,7 +23,7 @@ const ipc = electron.ipcMain;
 
 //Debug stuff
 ipc.on('ipc_switch', function (event, method, arg) {
-    console.log("IPC ", method);
+    //console.log("IPC ", method);
     switch (method) {
         case 'ipc_log':
             console.log("IPC LOG: ", arg);

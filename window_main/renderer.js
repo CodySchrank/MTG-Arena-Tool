@@ -28,7 +28,7 @@ var rankOffset = 0;
 var rankTitle = "";
 var userName = ""
 var goldHistory = null;
-var vaultHistory = null;
+var gemsHistory = null;
 var wildcardHistory = null;
 //var initialized = false;
 
@@ -179,7 +179,7 @@ ipc.on('force_open_about', function (event, arg) {
 //
 ipc.on('set_economy', function (event, arg) {
 	goldHistory = arg.gold;
-	vaultHistory = arg.vault;
+	gemsHistory = arg.gems;
 	wildcardHistory = arg.wildcards;
 	open = arg.open;
 	if (open) {
@@ -1284,7 +1284,7 @@ function open_economy() {
 	var div = $('<div class="economy"></div>');
 	$('<div class="chart_container"><canvas id="goldChart"></canvas></div>').appendTo(div);
 	$('<div class="chart_container"><canvas id="wildcardsChart"></canvas></div>').appendTo(div);
-	$('<div class="chart_container"><canvas id="vaultChart"></canvas></div>').appendTo(div);
+	$('<div class="chart_container"><canvas id="gemsChart"></canvas></div>').appendTo(div);
 
 	$("#ux_0").append(div);
 
@@ -1419,22 +1419,22 @@ function open_economy() {
 	    }
 	});
 
-	// Set vault chart
+	// Set gems chart
 	labels = [];
 	data = [];
-	vaultHistory.forEach(function(item) {
+	gemsHistory.forEach(function(item) {
 		var date = new Date(item.date);
 		labels.push(date);
 		data.push(item.value);
 	});
 
-	var ctx = document.getElementById("vaultChart").getContext('2d');
+	var ctx = document.getElementById("gemsChart").getContext('2d');
 	var myChart = new Chart(ctx, {
 	    type: 'bar',
 	    data: {
 	        labels: labels,
 	        datasets: [{
-	            label: 'Vault',
+	            label: 'gems',
 				data: data,
 				type: 'line',
 				fill: true,
