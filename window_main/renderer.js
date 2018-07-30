@@ -578,7 +578,12 @@ function setDecks(arg) {
 			var tile = document.createElement("div");
 			tile.classList.add(deck.id+'t');
 			tile.classList.add('deck_tile');
-			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
+
+			let dfc = '';
+			if (cardsDb.get(tileGrpid).dfc == 'DFC_Back')	dfc = 'a';
+			if (cardsDb.get(tileGrpid).dfc == 'DFC_Front')	dfc = 'b';
+			if (cardsDb.get(tileGrpid).dfc == 'SplitHalf')	dfc = 'a';
+			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg)";
 
 			var div = document.createElement("div");
 			div.classList.add(deck.id);
@@ -743,7 +748,12 @@ function setExplore(arg, loadMore) {
 		var tile = document.createElement("div");
 		tile.classList.add(index+"t");
 		tile.classList.add("deck_tile");
-		tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
+
+		let dfc = '';
+		if (cardsDb.get(tileGrpid).dfc == 'DFC_Back')	dfc = 'a';
+		if (cardsDb.get(tileGrpid).dfc == 'DFC_Front')	dfc = 'b';
+		if (cardsDb.get(tileGrpid).dfc == 'SplitHalf')	dfc = 'a';
+		tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg)";
 
 		var div = document.createElement("div");
 		div.classList.add(index);
@@ -1658,10 +1668,10 @@ function resetFilters() {
 	document.getElementById("query_multicolor").checked = false;
 	document.getElementById("query_exclude").checked = false;
 
-	document.getElementById("query_common").checked = false;
-	document.getElementById("query_uncommon").checked = false;
-	document.getElementById("query_rare").checked = false;
-	document.getElementById("query_mythic").checked = false;
+	document.getElementById("query_common").checked = true;
+	document.getElementById("query_uncommon").checked = true;
+	document.getElementById("query_rare").checked = true;
+	document.getElementById("query_mythic").checked = true;
 
 	document.getElementById("query_cmc").value = "";
 	document.getElementById("query_cmclower").checked = false;

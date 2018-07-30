@@ -202,11 +202,18 @@ ipc.on('set_deck', function (event, arg) {
 	arg.mainDeck.sort(compare_cards); 
 	var deckListDiv = $(".overlay_decklist");
 	var prevIndex = 0;
-	var deckSize = 0
-	arg.mainDeck.forEach(function(card) {
-		deckSize += card.quantity;
-	});
-	deckListDiv.append('<div class="chance_title">'+deckSize+' cards</div>');
+
+	if (deckMode == 0 || deckMode == 2) {
+		deckListDiv.append('<div class="chance_title">'+arg.cardsLeft+' cards left</div>');
+	}
+	else {
+		var deckSize = 0
+		arg.mainDeck.forEach(function(card) {
+			deckSize += card.quantity;
+		});
+
+		deckListDiv.append('<div class="chance_title">'+deckSize+' cards</div>');
+	}
 
 	arg.mainDeck.forEach(function(card) {
 		var grpId = card.id;

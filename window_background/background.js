@@ -902,11 +902,12 @@ function gre_to_client(data) {
                             affected.forEach(function(aff) {
                                 if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
                                     if (gameObjs[aff] !== undefined) {
+				                        ipc_send("ipc_log", "("+turnNumber+") Phase: "+turnPhase+" step: "+turnStep);
                                         ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+aff+") "+cardsDb.get(gameObjs[aff].grpId).name+" Entered "+zones[affector].type);
                                         //annotationsRead[obj.id] = true;
                                     }
-                                    
                                 }
+
 
                                 //if (obj.type.includes("AnnotationType_WinTheGame")) {
                                 //}
@@ -927,12 +928,13 @@ function gre_to_client(data) {
                         //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") "+cardsDb.get(obj.grpId).name+" created at "+zones[obj.zoneId].type);
                     });
                 }
-
+                /*
                 if (msg.gameStateMessage.diffDeletedInstanceIds != undefined) {
                     msg.gameStateMessage.diffDeletedInstanceIds.forEach(function(obj) {
                         gameObjs[obj] = undefined;
                     });
                 }
+                */
             }
         }
         //
@@ -942,7 +944,7 @@ function gre_to_client(data) {
     currentDeckUpdated = JSON.parse(str);
     forceDeckUpdate();
     update_deck(false);
-}
+}0
 
 function createMatch(arg) {
     var obj = store.get('overlayBounds');
@@ -1048,6 +1050,7 @@ function get_rank_index(_rank, _tier) {
 
 function forceDeckUpdate() {
     var decksize = 0;
+    var cardsleft = 0;
     var typeCre = 0;
     var typeIns = 0;
     var typeSor = 0;
@@ -1059,13 +1062,15 @@ function forceDeckUpdate() {
         currentDeckUpdated.mainDeck.forEach(function(card) {
             card.total = card.quantity;
             decksize += card.quantity;
+            cardsleft += card.quantity;
         });
     }
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
-            if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
-                if (gameObjs[key].ownerSeatId == playerSeat && gameObjs[key].type == "GameObjectType_Card") {
-                    if (currentDeckUpdated.mainDeck != undefined) {
+            if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo" && zones[gameObjs[key].zoneId].type != "ZoneType_Library") {
+                if (gameObjs[key].ownerSeatId == playerSeat && gameObjs[key].type != "GameObjectType_Token" && gameObjs[key].type != "GameObjectType_Ability") {
+                	cardsleft -= 1;
+	                if (currentDeckUpdated.mainDeck != undefined) {
                         currentDeckUpdated.mainDeck.forEach(function(card) {
                             if (card.id == gameObjs[key].grpId) {
                                 //console.log(cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
@@ -1076,7 +1081,8 @@ function forceDeckUpdate() {
                 }
             }
         }
-    }); 
+    });
+
     if (debugLog == true || firstPass == false) {
         currentDeckUpdated.mainDeck.forEach(function(card) {
             var c = cardsDb.get(card.id);
@@ -1099,6 +1105,8 @@ function forceDeckUpdate() {
         currentDeckUpdated.chanceArt = Math.round(hypergeometric(1, decksize, 1, typeArt) * 1000)/10;
         currentDeckUpdated.chanceEnc = Math.round(hypergeometric(1, decksize, 1, typeEnc) * 1000)/10;
         currentDeckUpdated.chanceLan = Math.round(hypergeometric(1, decksize, 1, typeLan) * 1000)/10;
+        currentDeckUpdated.deckSize  = decksize;
+        currentDeckUpdated.cardsLeft = cardsleft;
     }
 }
 
