@@ -191,19 +191,7 @@ function compare_draft_cards(a, b) {
 	return 0;
 }
 
-/*
-var sets = {
-	"Kaladesh"
-	"Aether Revolt"
-	"Welcome Deck 2017"
-	"Amonkhet"
-	"Hour of Devastation"
-	"Ixalan"
-	"Rivals of Ixalan"
-	"Dominaria"
-	"Magic 2019"
-}
-*/
+
 var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria", "Magic 2019", "Arena"];
 
 //
