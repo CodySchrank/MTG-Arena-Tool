@@ -15,6 +15,8 @@ var turnPriority = 0;
 var turnDecision = 0;
 var soundPriority = false;
 
+var showSideboard = false;
+
 
 const Database = require('../shared/database.js');
 const cardsDb = new Database();
@@ -111,7 +113,7 @@ ipc.on('set_settings', function (event, settings) {
 	$('.overlay_wrapper:before').css("opacity", 0.4*alpha);
 	$('.overlay_wrapper').css("opacity", alpha);
 	*/
-
+	showSideboard = settings.overlay_sideboard;
 	soundPriority = settings.sound_priority;
 	$('.top').css('display', '');
 	$('.overlay_deckname').css('display', '');
@@ -225,6 +227,20 @@ ipc.on('set_deck', function (event, arg) {
 		}
 		prevIndex = grpId;
 	});
+	if (showSideboard) {
+		deckListDiv.append('<div class="card_tile_separator">Sideboard</div>');
+		
+		arg.sideboard.forEach(function(card) {
+			var grpId = card.id;
+			if (deckMode == 2) {
+				addCardTile(grpId, 'a', "0%", deckListDiv);
+			}
+			else {
+				addCardTile(grpId, 'a', card.quantity, deckListDiv);
+			}
+			prevIndex = grpId;
+		});
+	}
 
 	if (deckMode == 2) {
 		deckListDiv.append('<div class="chance_title"></div>');// Add some space

@@ -2071,6 +2071,7 @@ function open_settings() {
 	add_checkbox(div, 'Show title', 'settings_overlay_title', settings.overlay_title);
 	add_checkbox(div, 'Show deck/lists', 'settings_overlay_deck', settings.overlay_deck);
 	add_checkbox(div, 'Show clock', 'settings_overlay_clock', settings.overlay_clock);
+	add_checkbox(div, 'Show sideboard', 'settings_overlay_sideboard', settings.overlay_sideboard);
 
 	div.append('<div class="settings_title">Visual</div>');
 
@@ -2190,6 +2191,7 @@ function updateSettings() {
 	var overlayTitle = document.getElementById("settings_overlay_title").checked;
 	var overlayDeck = document.getElementById("settings_overlay_deck").checked;
 	var overlayClock = document.getElementById("settings_overlay_clock").checked;
+	var overlaySideboard = document.getElementById("settings_overlay_sideboard").checked;
 
 	settings = {
 		sound_priority: soundPriority,
@@ -2205,7 +2207,8 @@ function updateSettings() {
 		overlay_top: overlayTop,
 		overlay_title: overlayTitle,
 		overlay_deck: overlayDeck,
-		overlay_clock: overlayClock
+		overlay_clock: overlayClock,
+		overlay_sideboard: overlaySideboard
 	};
 	cardSize = 100+(cardSizePos*10);
 	ipc_send('save_settings', settings);
