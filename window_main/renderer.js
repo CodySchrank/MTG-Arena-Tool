@@ -44,9 +44,9 @@ ipc_send = function (method, arg) {
 };
 
 document.addEventListener('DOMContentLoaded', windowReady);
- function windowReady(){
-     ipc_send('renderer_state', 1);
- }
+function windowReady(){
+	ipc_send('renderer_state', 1);
+}
 /*
 setTimeout( function() {
 	ipc_send('renderer_state', 1);
@@ -359,32 +359,48 @@ function setHistory(loadMore) {
 		loadMore = 25;
 		sort_history();		
 		mainDiv.innerHTML = '';
-		var d = document.createElement("div");
-		d.classList.add("list_fill");
-		mainDiv.appendChild(d);
+
 		loadHistory = 0;
 		
 		var div = document.createElement("div");
 		div.classList.add("ranks_history");
 
+		var t = document.createElement("div");
+		t.classList.add("ranks_history_title");
+		t.innerHTML = "Stats from last 10 days:";
+		div.appendChild(t);
+
 		// Add ranks matchup history here
-		for (var key in matchesHistory.rankwinrates){
+		for (var key in matchesHistory.rankwinrates) {
 		    if (matchesHistory.rankwinrates.hasOwnProperty(key)) {
 		    	var val = matchesHistory.rankwinrates[key];
 		    	if (val.t > 0) {
 					var fla = document.createElement("div");
 					fla.classList.add("flex_item");
+					fla.style.flexDirection = "column";
+					fla.style.justifyContent = "center";
+
 					var r = document.createElement("div");
 					r.classList.add("ranks_history_badge");
 					r.style.backgroundPosition = (get_rank_index(val.r, 1)*-48)+"px 0px";
 					r.title = val.r;
+
+					var s = document.createElement("div");
+					s.classList.add("ranks_history_title");
+					s.innerHTML = Math.round(val.w/val.t*100)+"%";
+
 					fla.appendChild(r);
+					fla.appendChild(s);
 					div.appendChild(fla);
 		    	}
 		    }
 		}
 
+		var d = document.createElement("div");
+		d.classList.add("list_fill");
+
 		mainDiv.appendChild(div);
+		mainDiv.appendChild(d);
 		
 	}
 
