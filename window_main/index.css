@@ -259,7 +259,7 @@ span i {
 
 .list_match_title {
     width: -webkit-fill-available;
-    margin-right: 16px;
+    margin-right: 8px;
     line-height: 32px;
     vertical-align: middle;
     text-align: right;
@@ -392,6 +392,16 @@ span i {
     height: 32px;
     background: url(../images/ranks_32.png);
     background-position: 32px 0px;
+}
+
+.ranks_16 {
+    -webkit-app-region: no-drag;
+    margin-right: 16px;
+    align-self: center;
+    width: 16px;
+    height: 16px;
+    background: url(../images/ranks_16.png);
+    background-position: 16px 0px;
 }
 
 .list_fill {
@@ -1128,8 +1138,8 @@ span i {
 
 .ranks_history_badge {
     -webkit-app-region: no-drag;
+    margin: 0px 4px;
     align-self: center;
-    margin-left: 16px;
     width: 48px;
     height: 48px;
     background: url(../images/ranks_48.png);
@@ -1138,8 +1148,6 @@ span i {
 
 .ranks_history_title {
     -webkit-user-select: none;
-    margin-left: 16px;
-    margin-top: 8px;
     align-self: center;
     color: #FAE5D2;
 }

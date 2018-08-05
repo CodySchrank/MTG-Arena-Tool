@@ -377,8 +377,12 @@ function setHistory(loadMore) {
 		    	if (val.t > 0) {
 					var fla = document.createElement("div");
 					fla.classList.add("flex_item");
-					fla.style.flexDirection = "column";
+					//fla.style.flexDirection = "column";
 					fla.style.justifyContent = "center";
+
+					var v = document.createElement("div");
+					v.classList.add("ranks_history_title");
+					v.innerHTML = "Vs.";
 
 					var r = document.createElement("div");
 					r.classList.add("ranks_history_badge");
@@ -389,6 +393,7 @@ function setHistory(loadMore) {
 					s.classList.add("ranks_history_title");
 					s.innerHTML = Math.round(val.w/val.t*100)+"%";
 
+					fla.appendChild(v);
 					fla.appendChild(r);
 					fla.appendChild(s);
 					div.appendChild(fla);
@@ -473,6 +478,12 @@ function setHistory(loadMore) {
 			d.classList.add("list_match_title");
 			d.innerHTML = "vs "+match.opponent.name;
 			fct.appendChild(d);
+
+			var or = document.createElement("div");
+			or.classList.add("ranks_16");
+			or.style.backgroundPosition = (get_rank_index_16(match.opponent.rank)*-16)+"px 0px";
+			or.title = match.opponent.rank+" "+match.opponent.tier;
+			fct.appendChild(or);
 
 			var d = document.createElement("div");
 			d.classList.add("list_match_time");

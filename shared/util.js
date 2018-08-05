@@ -90,6 +90,18 @@ function get_rank_index(_rank, _tier) {
 }
 
 //
+function get_rank_index_16(_rank) {
+    var ii = 0;
+    if (_rank == "Beginner")	ii = 0;
+    if (_rank == "Bronze")      ii = 1;
+    if (_rank == "Silver")   	ii = 2;
+    if (_rank == "Gold")        ii = 3;
+    if (_rank == "Diamond")		ii = 4;
+    if (_rank == "Master")		ii = 5;
+    return ii;
+}
+
+//
 function addCardSeparator(i, element) {
 	var str = "";
 	switch (i) {
@@ -511,26 +523,28 @@ function get_deck_colors_ammount(deck) {
 
 	//var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
 	deck.mainDeck.forEach(function(card) {
-		cardsDb.get(card.id).cost.forEach(function(c) {
-			if (c.color == 1) {
-				colors.w += c.count; colors.total += c.count;
-			}
-			if (c.color == 2) {
-				colors.u += c.count; colors.total += c.count;
-			}
-			if (c.color == 3) {
-				colors.b += c.count; colors.total += c.count;
-			}
-			if (c.color == 4) {
-				colors.r += c.count; colors.total += c.count;
-			}
-			if (c.color == 5) {
-				colors.g += c.count; colors.total += c.count;
-			}
-			if (c.color == 6) {
-				colors.c += c.count; colors.total += c.count;
-			}
-		});
+		if (card.quantity > 0) {
+			cardsDb.get(card.id).cost.forEach(function(c) {
+				if (c.color == 1) {
+					colors.w += c.count; colors.total += c.count;
+				}
+				if (c.color == 2) {
+					colors.u += c.count; colors.total += c.count;
+				}
+				if (c.color == 3) {
+					colors.b += c.count; colors.total += c.count;
+				}
+				if (c.color == 4) {
+					colors.r += c.count; colors.total += c.count;
+				}
+				if (c.color == 5) {
+					colors.g += c.count; colors.total += c.count;
+				}
+				if (c.color == 6) {
+					colors.c += c.count; colors.total += c.count;
+				}
+			});
+		}
 	});
 
 	return colors;
@@ -544,28 +558,30 @@ function get_deck_lands_ammount(deck) {
 	deck.mainDeck.forEach(function(card) {
 		var quantity = card.quantity;
 		var card = cardsDb.get(card.id); 
-		if (card.type.indexOf("Land") != -1 || card.type.indexOf("land") != -1) {
-			if (card.frame.length < 5) {
-				card.frame.forEach(function(c) {
-					if (c == 1) {
-						colors.w += quantity; colors.total += quantity;
-					}
-					if (c == 2) {
-						colors.u += quantity; colors.total += quantity;
-					}
-					if (c == 3) {
-						colors.b += quantity; colors.total += quantity;
-					}
-					if (c == 4) {
-						colors.r += quantity; colors.total += quantity;
-					}
-					if (c == 5) {
-						colors.g += quantity; colors.total += quantity;
-					}
-					if (c == 6) {
-						colors.c += quantity; colors.total += quantity;
-					}
-				});
+		if (quantity > 0) {
+			if (card.type.indexOf("Land") != -1 || card.type.indexOf("land") != -1) {
+				if (card.frame.length < 5) {
+					card.frame.forEach(function(c) {
+						if (c == 1) {
+							colors.w += quantity; colors.total += quantity;
+						}
+						if (c == 2) {
+							colors.u += quantity; colors.total += quantity;
+						}
+						if (c == 3) {
+							colors.b += quantity; colors.total += quantity;
+						}
+						if (c == 4) {
+							colors.r += quantity; colors.total += quantity;
+						}
+						if (c == 5) {
+							colors.g += quantity; colors.total += quantity;
+						}
+						if (c == 6) {
+							colors.c += quantity; colors.total += quantity;
+						}
+					});
+				}
 			}
 		}
 	});

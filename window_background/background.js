@@ -25,7 +25,7 @@ const cardsDb = new Database();
 
 const serverAddress = 'mtgatool.com';
 
-const debugLog = true;
+const debugLog = false;
 const debugLogSpeed = 0.1;
 var timeStart = 0;
 var timeEnd = 0;
