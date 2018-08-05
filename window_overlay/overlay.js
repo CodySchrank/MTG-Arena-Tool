@@ -194,7 +194,13 @@ ipc.on('set_draft_picks', function (event, arg) {
 ipc.on('set_deck', function (event, arg) {
 	$(".overlay_decklist").html('');
 	$(".overlay_deckcolors").html('');
-	$(".overlay_deckname").html(arg.name);
+
+	if (deckMode == 3) {
+		$(".overlay_deckname").html("Played by "+arg.name);
+	}
+	else {
+		$(".overlay_deckname").html(arg.name);
+	}
 
 	arg.colors = get_deck_colors(arg);
 	arg.colors.forEach(function(color) {

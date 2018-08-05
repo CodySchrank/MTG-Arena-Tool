@@ -598,6 +598,32 @@ function get_deck_export(deck) {
 
 
 //
+function get_deck_export_txt(deck) {
+	var str = "";
+	deck.mainDeck.forEach(function(card) {
+		var grpid = card.id;
+		var card_name = cardsDb.get(grpid).name;
+		var card_set = cardsDb.get(grpid).set;
+		var card_cn = cardsDb.get(grpid).cid;
+		
+		str += card.quantity+" "+card_name+"\r\n";
+	});
+
+	str += "\r\n";
+
+	deck.sideboard.forEach(function(card) {
+		var grpid = card.id;
+		var card_name = cardsDb.get(grpid).name;
+		var card_set = cardsDb.get(grpid).set;
+		var card_cn = cardsDb.get(grpid).cid;
+		
+		str += card.quantity+" "+card_name+"\r\n";
+	});
+
+	return str;
+}
+
+//
 function get_frame_class(frame) {
 	if (frame.length == 0) {
 		return "tile_c";

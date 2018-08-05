@@ -2,10 +2,11 @@
 
 const electron = require('electron');
 
-const {app, Menu, Tray, net, clipboard} = require('electron');
+const {dialog, app, Menu, Tray, net, clipboard} = require('electron');
 const path  = require('path');
 const Store = require('./store.js');
 const async = require("async");
+const fs    = require("fs");
 
 const {autoUpdater} = require("electron-updater");
 
@@ -217,6 +218,26 @@ ipc.on('ipc_switch', function (event, method, arg) {
 
         case 'set_clipboard':
             clipboard.writeText(arg);
+            break;
+
+        case 'export_txt':
+            dialog.showSaveDialog({
+                filters: [{
+                    name: 'txt',
+                    extensions: ['txt']
+                }],
+                defaultPath: '~/'+arg.name+'.txt'
+            }, function(file_path) {
+                if (file_path) {
+                    fs.writeFile(file_path, arg.str, function(err) {
+                        if (err) {
+                            dialog.showErrorBox('Error', err);
+                            return;
+                        }
+                    });
+                }
+            });
+
             break;
 
         default:

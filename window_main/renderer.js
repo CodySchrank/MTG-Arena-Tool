@@ -932,7 +932,8 @@ function open_deck(i, type) {
 
 	var stats = $('<div class="stats"></div>');
 
-	$('<div class="button_simple exportDeck">Copy to clipboard</div>').appendTo(stats);
+	$('<div class="button_simple exportDeck">Export to Arena</div>').appendTo(stats);
+	$('<div class="button_simple exportDeckStandard">Export to .txt</div>').appendTo(stats);
 
 	var curvediv = $('<div class="mana_curve"></div>');
 	var curve = get_deck_curve(_deck);
@@ -1061,6 +1062,11 @@ function open_deck(i, type) {
 	    var list = get_deck_export(deck);
 	    ipc_send('set_clipboard', list);
 	});
+	$(".exportDeckStandard").click(function () {
+	    var list = get_deck_export_txt(deck);
+	    ipc_send('export_txt', {str: list, name: _deck.name});
+	});
+
 	//
 	$(".back").click(function () {
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 

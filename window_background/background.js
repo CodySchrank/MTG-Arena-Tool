@@ -40,6 +40,7 @@ var currentChunk = "";
 var currentDeck = {};
 var currentDeckUpdated = {};
 var currentMatchId = null;
+var currentMatchTime = 0;
 var currentEventId = null;
 var matchWincon = "";
 var duringMatch = false;
@@ -640,6 +641,20 @@ function processLogData(data) {
         createMatch(json);
     }
 
+    // Log info
+    strCheck = '==> Log.Info(';
+	json = checkJsonWithStart(data, strCheck, '', '):');
+	if (json != false) {
+		if (json.params.messageName == 'DuelScene.GameStop') {
+	        var mid = json.params.payloadObject.matchId;
+	        var time = json.params.payloadObject.secondsCount;
+	        if (mid == currentMatchId) {
+	        	currentMatchTime = time;
+	        	saveMatch();
+	        }
+		}
+    }
+
     // Draft status / draft start
     strCheck = '<== Event.Draft(';
     json = checkJsonWithStart(data, strCheck, '', ')');
@@ -742,7 +757,7 @@ function processLogData(data) {
             	ipc_send("overlay_close", 1);
             }
         	ipc_send("renderer_show", 1);
-            saveMatch();
+            //saveMatch();
         }
 
         if (json.players != undefined) {
@@ -966,6 +981,7 @@ function createMatch(arg) {
     oppTier = arg.opponentRankingTier;
     currentEventId = arg.eventId;
     currentMatchId = null;
+    currentMatchTime = 0;
     playerWin = 0;
     oppWin = 0;
 
@@ -1113,7 +1129,7 @@ function forceDeckUpdate() {
 function getOppDeck() {
 	var oppDeck = {mainDeck: [], sideboard : []};
 	var doAdd = true;
-    oppDeck.name = "played by "+oppName;
+    oppDeck.name = oppName;
     console.log("Deck "+oppName);
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
@@ -1143,8 +1159,12 @@ function getOppDeck() {
 }
 
 function saveMatch() {
+	if (currentMatchTime == 0) {
+		return;
+	}
     var match = {};
     match.id = currentMatchId;
+    match.duration = currentMatchTime;
     match.opponent = {
         name: oppName,
         rank: oppRank,
