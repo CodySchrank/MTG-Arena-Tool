@@ -11,7 +11,7 @@ var store = new Store({
 		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
 		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
         cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {overlay_sideboard: false, sound_priority: true, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
+		settings: {overlay_sideboard: false, sound_priority: false, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
         matches_index:[],
         draft_index:[],
         gems_history:[],
@@ -25,7 +25,7 @@ const cardsDb = new Database();
 
 const serverAddress = 'mtgatool.com';
 
-const debugLog = false;
+const debugLog = true;
 const debugLogSpeed = 0.1;
 var timeStart = 0;
 var timeEnd = 0;
@@ -236,7 +236,7 @@ function loadPlayerConfig(playerId) {
             windowBounds: { width: 800, height: 600, x: 0, y: 0 },
             overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
             cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {overlay_sideboard: false, sound_priority: true, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
+            settings: {overlay_sideboard: false, sound_priority: false, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
             matches_index:[],
             draft_index:[],
             gems_history:[],
@@ -917,8 +917,8 @@ function gre_to_client(data) {
                             affected.forEach(function(aff) {
                                 if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
                                     if (gameObjs[aff] !== undefined) {
-				                        ipc_send("ipc_log", "("+turnNumber+") Phase: "+turnPhase+" step: "+turnStep);
-                                        ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+aff+") "+cardsDb.get(gameObjs[aff].grpId).name+" Entered "+zones[affector].type);
+				                        //ipc_send("ipc_log", "("+turnNumber+") Phase: "+turnPhase+" step: "+turnStep);
+                                        //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+aff+") "+cardsDb.get(gameObjs[aff].grpId).name+" Entered "+zones[affector].type);
                                         //annotationsRead[obj.id] = true;
                                     }
                                 }
@@ -1187,7 +1187,7 @@ function saveMatch() {
     match.oppDeck = getOppDeck();
     match.date = new Date();
 
-    console.log("Save match:", match.id);
+    console.log("Save match:", match);
     var matches_index = store.get('matches_index');
 
     if (!matches_index.includes(currentMatchId)) {
@@ -1218,7 +1218,7 @@ function saveDraft() {
     draft.date = new Date();
     draft.set = draftSet; 
 
-    console.log("Save draft:", draftId);
+    console.log("Save draft:", draft);
     
 	var draft_index = store.get('draft_index');
 	// add to config
@@ -1413,15 +1413,17 @@ function get_deck_colors(deck) {
     deck.colors = [];
     deck.mainDeck.forEach(function(card) {
         var grpid = card.id;
-        var card_name = cardsDb.get(grpid).name;
-        var card_cost = cardsDb.get(grpid).cost;
-        card_cost.forEach(function(c) {
-            if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
-                deck.colors.push(c.color);
-            }
-        });
+        if (card.quantity > 0) {
+            var card_name = cardsDb.get(grpid).name;
+            var card_cost = cardsDb.get(grpid).cost;
+            card_cost.forEach(function(c) {
+                if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
+                    deck.colors.push(c.color);
+                }
+            });
+        }
     });
-
+    /*
     deck.sideboard.forEach(function(card) {
         var grpid = card.id;
         var card_name = cardsDb.get(grpid).name;
@@ -1432,6 +1434,7 @@ function get_deck_colors(deck) {
             }
         });
     });
+    */
     return deck.colors;
 }
 
