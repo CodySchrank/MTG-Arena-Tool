@@ -1217,6 +1217,7 @@ function saveDraft() {
     draft.id = draftId;
     draft.date = new Date();
     draft.set = draftSet; 
+    draft.owner = playerName; 
 
     console.log("Save draft:", draft);
     

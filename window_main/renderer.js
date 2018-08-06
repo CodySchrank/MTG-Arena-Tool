@@ -1314,12 +1314,23 @@ function open_match(id) {
 		prevIndex = grpId;
 	});
 
+	$('<div class="button_simple exportDeck">Export to Arena</div>').appendTo(odl);
+	$('<div class="button_simple exportDeckStandard">Export to .txt</div>').appendTo(odl);
 
 	dl.appendTo(fld);
 	odl.appendTo(fld);
 	$("#ux_1").append(top);
 	$("#ux_1").append(fld);
 	
+	$(".exportDeck").click(function () {
+	    var list = get_deck_export(deck);
+	    ipc_send('set_clipboard', list);
+	});
+	$(".exportDeckStandard").click(function () {
+	    var list = get_deck_export_txt(deck);
+	    ipc_send('export_txt', {str: list, name: match.opponent.name+"'s deck"});
+	});
+
 	$(".back").click(function () {
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
