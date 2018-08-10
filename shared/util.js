@@ -209,17 +209,18 @@ var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "H
 //
 function get_set_scryfall(set) {
 	switch (set) {
-	    case "Arena": 				return "mtga";
-	    case "Magic 2019": 			return "m19";
-	    case "Dominaria": 			return "dom";
-	    case "Rivals of Ixalan": 	return "rix";
-	    case "Ixalan": 				return "xln";
-	    case "Hour of Devastation": return "hou";
-	    case "Amonkhet": 			return "akh";
-	    case "Aether Revolt": 		return "aer";
-	    case "Kaladesh": 			return "kld";
-	    case "Welcome Deck 2017": 	return "w17";
-	    default: 					return "";
+	    case "Arena": 					return "mtga";
+	    case "Magic 2019": 				return "m19";
+	    case "Dominaria": 				return "dom";
+	    case "Rivals of Ixalan": 		return "rix";
+	    case "Ixalan": 					return "xln";
+	    case "Hour of Devastation": 	return "hou";
+	    case "Amonkhet": 				return "akh";
+	    case "Aether Revolt": 			return "aer";
+	    case "Kaladesh": 				return "kld";
+	    case "Welcome Deck 2017": 		return "w17";
+	    case "Oath of the Gatewatch": 	return "ogw";
+	    default: 						return set;
 	}
 }
 
@@ -236,7 +237,7 @@ function get_set_code(set) {
 	    case "Aether Revolt": 		return "AER";
 	    case "Kaladesh": 			return "KLD";
 	    case "Welcome Deck 2017": 	return "W17";
-	    default: 					return "";
+	    default: 					return set;
 	}
 }
 

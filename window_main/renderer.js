@@ -1920,7 +1920,7 @@ function printCards() {
 	div.append(paging);
 
 	filterName  	= document.getElementById("query_name").value.toLowerCase();
-	filterUnown		= document.getElementById("query_unown");
+	filterUnown		= document.getElementById("query_unown").checked;
 	filterNew   	= document.getElementById("query_new");
 	filterMulti 	= document.getElementById("query_multicolor");
 	filterExclude 	= document.getElementById("query_exclude");
@@ -1998,6 +1998,8 @@ function printCards() {
     	}
 
     	switch (rarity) {
+    		case 'land':
+    			if (!filterCommon.checked) 		doDraw = false; break;
     		case 'common':
     			if (!filterCommon.checked) 		doDraw = false; break;
     		case 'uncommon':
