@@ -504,7 +504,7 @@ function setHistory(loadMore) {
 			}
 		}
 		else {
-			console.log("DRAFT: ", match)
+			//console.log("DRAFT: ", match)
 			var tileGrpid = 67106;
 			if (match.set == "Magic 2019")			tileGrpid = 65947;// Nicol Bolas art
 			if (match.set == "Dominaria")			tileGrpid = 67106;// Karn art
@@ -537,7 +537,8 @@ function setHistory(loadMore) {
 			fct.appendChild(d);
 
 			var d = document.createElement("div");
-			d.classList.add("list_match_result_win");
+			d.classList.add("list_draft_share");
+			d.classList.add(match.id+'dr');
 			flr.appendChild(d);
 
 		}
@@ -549,6 +550,9 @@ function setHistory(loadMore) {
 
 		mainDiv.appendChild(div);
 
+		if (match.type == "draft") {
+			addShare(match);
+		}
 		addHover(match, tileGrpid);
 	}
 
@@ -563,6 +567,57 @@ function setHistory(loadMore) {
 	loadHistory += 20;
 }
 
+//
+function addShare(_match) {
+	$('.'+_match.id+'dr').on('click', function(e) {
+		e.stopPropagation();
+		$('.share_dialog_wrapper').css('opacity', 1);
+		$('.share_dialog_wrapper').css('pointer-events', 'all');
+		$('.share_dialog_wrapper').show();
+		$('.share_dialog').css('width', '500px');
+		$('.share_dialog').css('height', '200px');
+		$('.share_dialog').css('top', 'calc(50% - 100px)');
+	});
+
+	$('.share_dialog_wrapper').on('click', function(e) {
+		console.log('.share_dialog_wrapper on click')
+		//e.stopPropagation();
+		$('.share_dialog_wrapper').css('opacity', 0);
+		$('.share_dialog_wrapper').css('pointer-events', 'none');
+		setTimeout(function() {
+			$('.share_dialog_wrapper').hide();
+			$('.share_dialog').css('width', '400px');
+			$('.share_dialog').css('height', '160px');
+			$('.share_dialog').css('top', 'calc(50% - 80px)');
+		}, 250);
+	});
+
+	$('.share_dialog').on('click', function(e) {
+		e.stopPropagation();
+		console.log('.share_dialog on click')
+	});
+
+	var dialog = $('.share_dialog');
+	dialog.html('');
+	var cont = $('<div class="share_dialog_container"></div>');
+
+	cont.append('<div class="share_title">Link For sharing:</div>');
+	var icd = $('<div class="share_input_container"></div>');
+	var but = $('<div class="button_simple">Copy</div>');
+	var sin = $('<input id="share_input" onClick="this.setSelectionRange(0, this.value.length)" autofocus autocomplete="off" value="https://mtgatool.com/draft/'+_match.id+'" />');
+
+	sin.appendTo(icd);
+	but.appendTo(icd);
+	icd.appendTo(cont);
+	cont.append('<div class="share_subtitle"><i>This link will never expire</i></div>');
+	cont.appendTo(dialog);
+
+	but.click(function () {
+	    ipc_send('set_clipboard', "https://mtgatool.com/draft/"+_match.id);
+	});
+}
+
+//
 function addHover(_match, tileGrpid) {
 	$('.'+_match.id).on('mouseenter', function(e) {
 	    $('.'+_match.id+'t').css('opacity', 1);
@@ -2050,13 +2105,19 @@ function printCards() {
 		}
     }
 
+	var paging_bottom = $('<div class="paging_container"></div>');
+	div.append(paging_bottom);
+
 	if (collectionPage <= 0) {
 		but = $('<div class="paging_button_disabled"> \< </div>');
 	}
 	else {
 		but = $('<div class="paging_button" onClick="setCollectionPage('+(collectionPage-1)+')"> \< </div>');
 	}
+
 	paging.append(but);
+	paging_bottom.append(but.clone());
+
 	var totalPages = Math.ceil(totalCards / 100);
 	for (var n=0; n<totalPages; n++) {
 		but = $('<div class="paging_button" onClick="setCollectionPage('+(n)+')">'+n+'</div>');
@@ -2064,6 +2125,7 @@ function printCards() {
 			but.addClass("paging_active");
 		}
 		paging.append(but);
+		paging_bottom.append(but.clone());
 	}
 	if (collectionPage >= totalPages-1) {
 		but = $('<div class="paging_button_disabled"> \> </div>');
@@ -2072,6 +2134,7 @@ function printCards() {
 		but = $('<div class="paging_button" onClick="setCollectionPage('+(collectionPage+1)+')"> \> </div>');
 	}
 	paging.append(but);
+	paging_bottom.append(but.clone());
 }
 
 

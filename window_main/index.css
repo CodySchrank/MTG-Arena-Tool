@@ -257,6 +257,20 @@ span i {
     color: rgba(183, 200, 158, 1);
 }
 
+.list_draft_share {
+    cursor: pointer;
+    opacity: 0.75;
+    width: 40px;
+    height: 40px;
+    margin: auto 30px auto 0px;
+    background: url(../images/share.png);
+    -webkit-transition: all .2s ease-in;
+}
+
+.list_draft_share:hover {
+    opacity: 0.9;
+}
+
 .list_match_title {
     width: -webkit-fill-available;
     margin-right: 8px;
@@ -679,7 +693,7 @@ span i {
 }
 
 .paging_container {
-    margin: 16px 24px 0 24px;
+    margin: 16px 24px;
     display: flex;
     width: 100%;
     height: 24px;
@@ -883,6 +897,7 @@ span i {
 .input_container input:focus {
     outline-style: none;
 }
+
 
 .settings_page {
     margin: 32px 16px 32px 16px;
@@ -1150,4 +1165,76 @@ span i {
     -webkit-user-select: none;
     align-self: center;
     color: #FAE5D2;
+}
+
+
+
+.share_dialog_wrapper {
+    pointer-events: none;
+    z-index: 50;
+    display: hidden;
+    opacity: 0;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 100%;
+    height: 100%;
+    -webkit-transition: all .15s cubic-bezier(1, 0.35, 0.35, 1);
+}
+
+.share_dialog {
+    z-index: 40;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    top: calc(50% - 80px);
+    margin: auto;
+    width: 400px;
+    height: 160px;
+    background-color: rgba(115, 93, 73, 1);
+    border-radius: 5px;
+    box-shadow: 0px 2px 16px 0px black;
+    -webkit-transition: all .15s cubic-bezier(1, 0.35, 0.35, 1);
+}
+
+.share_dialog_container {
+    margin: 16px;
+}
+
+.share_input_container {
+    display: flex;
+    height: 32px;
+    margin: 8px 0px;
+}
+
+.share_input_container input {
+    display: inline-table;
+    border-radius: 5px;
+    border-style: hidden;
+    height: 32px;
+    width: 100%;
+    font-size: 16px;
+    user-select: none;
+    font-family: Mplantin;
+    margin-right: 16px;
+    padding-left: 4px;
+    color: #33281e;
+    background-color: #f1eade;
+}
+
+.share_input_container input:focus {
+    border: 1px solid #b59579;
+    outline-style: none;
+}
+
+.share_title {
+    color: #d4c6af;
+    margin-bottom: 16px;
+    font-size: 20px;
+}
+
+.share_subtitle {
+    opacity: 0.8;
+    color: #d4c6af;
+    margin: 16px 0px;
+    font-size: 14px;
 }
