@@ -99,7 +99,7 @@ ipc.on('set_history', function (event, arg) {
 ipc.on('set_history_data', function (event, arg) {
 	if (arg != null) {
 		matchesHistory = JSON.parse(arg);
-		console.log(matchesHistory);
+		//console.log(matchesHistory);
 	}
 });
 
@@ -409,11 +409,13 @@ function setHistory(loadMore) {
 		
 	}
 
+	console.log("Load more: ", loadHistory, loadMore, loadHistory+loadMore);
 	for (var loadEnd = loadHistory + loadMore; loadHistory < loadEnd; loadHistory++) {
 		var match_id = matchesHistory.matches[loadHistory];
 		var match = matchesHistory[match_id];
 
 		if (match == undefined) continue;
+		console.log("Match: ", loadHistory, match.type, match)
 
 		var div = document.createElement("div");
 		div.classList.add(match.id);
@@ -563,8 +565,7 @@ function setHistory(loadMore) {
 		}
 	})
 
-	//$("#ux_0").append('<div class="list_fill"></div>');
-	loadHistory += 20;
+	loadHistory = loadEnd;
 }
 
 //
@@ -577,43 +578,43 @@ function addShare(_match) {
 		$('.share_dialog').css('width', '500px');
 		$('.share_dialog').css('height', '200px');
 		$('.share_dialog').css('top', 'calc(50% - 100px)');
-	});
 
-	$('.share_dialog_wrapper').on('click', function(e) {
-		console.log('.share_dialog_wrapper on click')
-		//e.stopPropagation();
-		$('.share_dialog_wrapper').css('opacity', 0);
-		$('.share_dialog_wrapper').css('pointer-events', 'none');
-		setTimeout(function() {
-			$('.share_dialog_wrapper').hide();
-			$('.share_dialog').css('width', '400px');
-			$('.share_dialog').css('height', '160px');
-			$('.share_dialog').css('top', 'calc(50% - 80px)');
-		}, 250);
-	});
+		$('.share_dialog_wrapper').on('click', function(e) {
+			console.log('.share_dialog_wrapper on click')
+			//e.stopPropagation();
+			$('.share_dialog_wrapper').css('opacity', 0);
+			$('.share_dialog_wrapper').css('pointer-events', 'none');
+			setTimeout(function() {
+				$('.share_dialog_wrapper').hide();
+				$('.share_dialog').css('width', '400px');
+				$('.share_dialog').css('height', '160px');
+				$('.share_dialog').css('top', 'calc(50% - 80px)');
+			}, 250);
+		});
 
-	$('.share_dialog').on('click', function(e) {
-		e.stopPropagation();
-		console.log('.share_dialog on click')
-	});
+		$('.share_dialog').on('click', function(e) {
+			e.stopPropagation();
+			console.log('.share_dialog on click')
+		});
 
-	var dialog = $('.share_dialog');
-	dialog.html('');
-	var cont = $('<div class="share_dialog_container"></div>');
+		var dialog = $('.share_dialog');
+		dialog.html('');
+		var cont = $('<div class="share_dialog_container"></div>');
 
-	cont.append('<div class="share_title">Link For sharing:</div>');
-	var icd = $('<div class="share_input_container"></div>');
-	var but = $('<div class="button_simple">Copy</div>');
-	var sin = $('<input id="share_input" onClick="this.setSelectionRange(0, this.value.length)" autofocus autocomplete="off" value="https://mtgatool.com/draft/'+_match.id+'" />');
+		cont.append('<div class="share_title">Link For sharing:</div>');
+		var icd = $('<div class="share_input_container"></div>');
+		var but = $('<div class="button_simple">Copy</div>');
+		var sin = $('<input id="share_input" onClick="this.setSelectionRange(0, this.value.length)" autofocus autocomplete="off" value="https://mtgatool.com/draft/'+_match.id+'" />');
 
-	sin.appendTo(icd);
-	but.appendTo(icd);
-	icd.appendTo(cont);
-	cont.append('<div class="share_subtitle"><i>This link will never expire</i></div>');
-	cont.appendTo(dialog);
+		sin.appendTo(icd);
+		but.appendTo(icd);
+		icd.appendTo(cont);
+		cont.append('<div class="share_subtitle"><i>This link will never expire</i></div>');
+		cont.appendTo(dialog);
 
-	but.click(function () {
-	    ipc_send('set_clipboard', "https://mtgatool.com/draft/"+_match.id);
+		but.click(function () {
+		    ipc_send('set_clipboard', "https://mtgatool.com/draft/"+_match.id);
+		});
 	});
 }
 
