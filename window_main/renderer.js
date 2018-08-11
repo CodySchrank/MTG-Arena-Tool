@@ -2147,6 +2147,15 @@ function printCards() {
 				$('.loader').css("opacity", 0);
 			});
 
+			img.on('click', function(e) {
+				if (cardsDb.get(grpId).dfc == 'SplitHalf')	{
+					card = cardsDb.get(card.dfcId);
+				}
+				let newname = card.name.split(' ').join('-');
+
+				shell.openExternal('https://scryfall.com/card/'+get_set_scryfall(card.set)+'/'+card.cid+'/'+card.name);
+			});
+
 			d.appendTo(div);
 		}
     }

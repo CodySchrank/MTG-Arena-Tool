@@ -39,6 +39,17 @@ function addCardTile(grpId, indent, quantity, element) {
 			});
 		});
 
+		glow.on('click', function(e) {
+			let card = cardsDb.get(grpId);
+
+			if (cardsDb.get(grpId).dfc == 'SplitHalf')	{
+				card = cardsDb.get(card.dfcId);
+			}
+			let newname = card.name.split(' ').join('-');
+
+			shell.openExternal('https://scryfall.com/card/'+get_set_scryfall(card.set)+'/'+card.cid+'/'+card.name);
+		});
+
 		glow.on('mouseleave', function(e) {
 			var domid = $(this).attr('id');
 			$('.main_hover').css("opacity", 0);
