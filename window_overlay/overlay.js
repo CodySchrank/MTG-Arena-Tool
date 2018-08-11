@@ -88,7 +88,7 @@ ipc.on('set_timer', function (event, arg) {
 });
 
 $( window ).resize(function() {
-	let _height = 114;
+	let _height = 178//114;
 	if ($('.top').css('display') == 'none') {
 		_height -= 32;
 	}

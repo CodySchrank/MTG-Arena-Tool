@@ -447,6 +447,7 @@ function setHistory(loadMore) {
 
 		var fcb = document.createElement("div");
 		fcb.classList.add("flex_bottom");
+		fcb.style.marginRight = "14px";
 		flc.appendChild(fcb);
 
 		var flr = document.createElement("div");
@@ -491,6 +492,14 @@ function setHistory(loadMore) {
 			d.classList.add("list_match_time");
 			d.innerHTML = timeSince(new Date(match.date))+' ago.';
 			fcb.appendChild(d);
+
+			var cc = get_deck_colors(match.oppDeck);
+			cc.forEach(function(color) {
+				var m = document.createElement("div");
+				m.classList.add("mana_20");
+				m.classList.add("mana_"+mana[color]);
+				fcb.appendChild(m);
+			});
 
 			if (match.player.win > match.opponent.win) {
 				var d = document.createElement("div");
