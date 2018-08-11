@@ -702,6 +702,39 @@ function setDecks(arg) {
 			d.innerHTML = deck.name;
 			flt.appendChild(d);
 
+			var missingCards = false;
+			deck.mainDeck.forEach(function(card) {
+				var grpId = card.id;
+				var type = cardsDb.get(grpId).type;
+				if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1) {
+					if (cards[grpId] == undefined) {
+						missingCards = true
+					}
+					else if (card.quantity > cards[grpId]) {
+						missingCards = true;
+					}
+				}
+			});
+			deck.sideboard.forEach(function(card) {
+				var grpId = card.id;
+				var type = cardsDb.get(grpId).type;
+				if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1) {
+					if (cards[grpId] == undefined) {
+						missingCards = true
+					}
+					else if (card.quantity > cards[grpId]) {
+						missingCards = true;
+					}
+				}
+			});
+
+			if (missingCards) {
+				var d = document.createElement("div");
+				d.classList.add('decklist_not_owned');
+				flt.appendChild(d);
+			}
+
+
 			deck.colors.forEach(function(color) {
 				var d = document.createElement("div");
 				d.classList.add('mana_20');
@@ -718,6 +751,7 @@ function setDecks(arg) {
 
 				var d = document.createElement("div");
 				d.classList.add('list_deck_winrate');
+				d.style.opacity = 0.6;
 				d.innerHTML = 'Since last edit: '+(wr.lastEdit*100).toFixed(2)+'%';
 				flr.appendChild(d);
 			}
