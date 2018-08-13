@@ -24,7 +24,8 @@
 		"conf": "^2.0.0",
 		"electron-debug": "^1.5.0",
 		"electron-updater": "^2.21.10",
-		"howler": "^2.0.14"
+		"howler": "^2.0.14",
+		"js-sha1": "^0.6.0"
 	},
 	"devDependencies": {
 		"electron-builder": "^20.15.1",

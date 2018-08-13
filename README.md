@@ -14,8 +14,8 @@ An MTG Arena deck tracker and collection manager.
 
 ## Roadmap
 `These are some features I would like to include, not ordered in any way`
-- Log of events (Player X casts Y spell, This targetted that, etc), save the log too
-- Metagame / Arquetypes on decks explorer `this requires more data to be able to play with`
+- Log of events (Player X casts Y spell, This targeted that, etc), save the log too
+- Metagame / Archetypes on decks explorer `this requires more data to be able to play with`
 - Deck editor/modifier, for adding things like specific basic lands and then importing them to MTG Arena.
 
 ### Compiling / Run from source
@@ -34,7 +34,7 @@ Once downloaded the installer should simply install and run immediately. The app
 
 ### Disclaimer
 
-Even trough no official statement has been made about third party software by MTG Arena developers, I am obligued to put a warning about the use of this software.
+Even though no official statement has been made about third party software by MTG Arena developers, I am obliged to put a warning about the use of this software.
 
 It is not stated if it is legal or allowed by Wizards of the Coast to use Deck Trackers and other tools alike while playing MTG Arena, therefore MTG Arena Tool developers are not responsible if your account gets banned, locked or suspended for using this software. `Use at your own risk.`
 

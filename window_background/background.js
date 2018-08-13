@@ -5,27 +5,48 @@ const path  = require('path');
 const Store = require('../store.js');
 const async = require("async");
 
+const defaultCfg = {
+    windowBounds: { width: 800, height: 600, x: 0, y: 0 },
+    overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
+    cards: { cards_time: 0, cards_before:[], cards:[] },
+    settings: {
+        overlay_sideboard: false,
+        sound_priority: false,
+        cards_quality: 'small',
+        show_overlay: true,
+        show_overlay_always: false,
+        startup: true,
+        close_to_tray: true,
+        send_data: true,
+        close_on_match: true,
+        cards_size: 2,
+        overlay_alpha: 1,
+        overlay_top: true,
+        overlay_title: true,
+        overlay_deck: true,
+        overlay_clock: true
+    },
+    deck_changes:[],
+    deck_changes_index:[],
+    matches_index:[],
+    draft_index:[],
+    gems_history:[],
+    gold_history:[],
+    wildcards_history:[]
+}
+
 var store = new Store({
 	configName: 'default',
-	defaults: {
-		windowBounds: { width: 800, height: 600, x: 0, y: 0 },
-		overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
-        cards: { cards_time: 0, cards_before:[], cards:[] },
-		settings: {overlay_sideboard: false, sound_priority: false, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
-        matches_index:[],
-        draft_index:[],
-        gems_history:[],
-        gold_history:[],
-        wildcards_history:[]
-	}
+	defaults: defaultCfg
 });
 
+const sha1 = require('js-sha1');
 const Database = require('../shared/database.js');
 const cardsDb = new Database();
 
 const serverAddress = 'mtgatool.com';
 
-const debugLog = false;
+const debugLog = true;
 const debugLogSpeed = 0.1;
 var timeStart = 0;
 var timeEnd = 0;
@@ -76,6 +97,7 @@ var history = {};
 var drafts = {};
 var topDecks = {};
 var coursesToSubmit = {};
+var decks = [];
 
 var updateAvailable = false;
 var updateState = -1;
@@ -91,6 +113,8 @@ var lastDeckUpdate = new Date();
 var goldHistory = [];
 var gemsHistory = [];
 var wilcardsHistory = [];
+var deck_changes_index = [];
+var deck_changes = [];
 
 ipc_send = function (method, arg) {
     ipc.send('ipc_switch', method, arg);
@@ -226,23 +250,11 @@ ipc.on('set_deck_mode', function (event, state) {
 });
 
 
-
-
 function loadPlayerConfig(playerId) {
 	ipc_send("ipc_log", "Load player ID: "+playerId);
     store = new Store({
         configName: playerId,
-        defaults: {
-            windowBounds: { width: 800, height: 600, x: 0, y: 0 },
-            overlayBounds: { width: 300, height: 600, x: 0, y: 0 },
-            cards: { cards_time: 0, cards_before:[], cards:[] },
-            settings: {overlay_sideboard: false, sound_priority: false, cards_quality: 'small', show_overlay: true, show_overlay_always: false, startup: true, close_to_tray: true, send_data: true, close_on_match: true, cards_size: 2, overlay_alpha: 1, overlay_top: true, overlay_title: true, overlay_deck: true, overlay_clock: true},
-            matches_index:[],
-            draft_index:[],
-            gems_history:[],
-            gold_history:[],
-            wildcards_history:[]
-        }
+        defaults: defaultCfg
     });
 
     history.matches = store.get('matches_index');
@@ -265,7 +277,8 @@ function loadPlayerConfig(playerId) {
 	    }
     }
 
-
+    deck_changes_index = store.get("deck_changes_index");
+    deck_changes = store.get("deck_changes");
     goldHistory = store.get("gold_history");
     gemsHistory = store.get("gems_history");
     wilcardsHistory = store.get("wildcards_history");
@@ -511,12 +524,87 @@ function processLogData(data) {
 
     // Get Decks
     strCheck = '<== Deck.GetDeckLists(';
-    json = checkJsonWithStartNoParse(data, strCheck, '', ')');
+    json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
-        //if (debugLog == true || firstPass == false) {
-            requestHistorySend(0);
-            ipc_send("set_decks", json);
-        //}
+        decks = json;
+        requestHistorySend(0);
+        ipc_send("set_decks", JSON.stringify(json));
+    }
+
+    // Get deck updated
+    strCheck = '<== Deck.UpdateDeck(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        //
+        strCheck = '[UnityCrossThreadLogger]';
+        if (data.indexOf(strCheck) > -1) {
+            var str = dataChop(data, strCheck, 'M')+'M';
+            var logTime = parseWotcTime(str);
+        }
+
+        decks.forEach(function(_deck, index) {
+            if (_deck.id == json.id) {
+                var changeId = sha1(_deck.id+"-"+logTime);
+                var deltaDeck = {id: changeId, deckId: _deck.id, date: logTime, changesMain: [], changesSide: [], previousMain: _deck.mainDeck, previousSide: _deck.sideboard};
+
+                // Check Mainboard
+                _deck.mainDeck.forEach(function(card) {
+                    var cardObj = cardsDb.get(card.id);
+
+                    var diff = 0 - card.quantity;
+                    json.mainDeck.forEach(function(cardB) {
+                        var cardObjB = cardsDb.get(cardB.id);
+                        if (cardObj.name == cardObjB.name) {
+                            cardB.existed = true;
+                            diff = cardB.quantity - card.quantity;
+                        }
+                    });
+
+                    if (diff !== 0) {
+                        deltaDeck.changesMain.push({id: card.id, quantity: diff});
+                    }
+                });
+
+                json.mainDeck.forEach(function(card) {
+                    if (card.existed == undefined) {
+                        let cardObj = cardsDb.get(card.id);
+                        deltaDeck.changesMain.push({id: card.id, quantity: card.quantity});
+                    }
+                });
+                // Check sideboard
+                _deck.sideboard.forEach(function(card) {
+                    var cardObj = cardsDb.get(card.id);
+
+                    var diff = 0 - card.quantity;
+                    json.sideboard.forEach(function(cardB) {
+                        var cardObjB = cardsDb.get(cardB.id);
+                        if (cardObj.name == cardObjB.name) {
+                            cardB.existed = true;
+                            diff = cardB.quantity - card.quantity;
+                        }
+                    });
+
+                    if (diff !== 0) {
+                        deltaDeck.changesSide.push({id: card.id, quantity: diff});
+                    }
+                });
+
+                json.sideboard.forEach(function(card) {
+                    if (card.existed == undefined) {
+                        let cardObj = cardsDb.get(card.id);
+                        deltaDeck.changesSide.push({id: card.id, quantity: card.quantity});
+                    }
+                });
+
+                if (!deck_changes_index.includes(changeId)) {
+                    deck_changes_index.push(changeId);
+                    deck_changes.push(deltaDeck);
+
+                    store.set("deck_changes_index", deck_changes_index);
+                    store.set("deck_changes", deck_changes);
+                }
+            }
+        });
     }
 
     // Get inventory

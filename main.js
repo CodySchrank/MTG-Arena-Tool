@@ -75,6 +75,10 @@ ipc.on('ipc_switch', function (event, method, arg) {
             mainWindow.webContents.send("set_decks", arg);
             break;
 
+        case 'set_deck_updated':
+            mainWindow.webContents.send("set_deck_updated", arg);
+            break;
+
         case 'set_cards':
             mainWindow.webContents.send("set_cards", arg.cards, arg.new);
             break;
@@ -366,14 +370,16 @@ function quit() {
 }
 
 function saveWindowPos() {
-	var obj = {};
-	var bounds = mainWindow.getBounds();
-	var pos = mainWindow.getPosition();
-	obj.width = Math.floor(bounds.width);
-	obj.height = Math.floor(bounds.height);
-	obj.x = Math.floor(pos[0]);
-	obj.y = Math.floor(pos[1]);
-    background.webContents.send('windowBounds', obj);
+    if (!mainWindow.isFullScreen()) {
+        var obj = {};
+        var bounds = mainWindow.getBounds();
+        var pos = mainWindow.getPosition();
+        obj.width = Math.floor(bounds.width);
+        obj.height = Math.floor(bounds.height);
+        obj.x = Math.floor(pos[0]);
+        obj.y = Math.floor(pos[1]);
+        background.webContents.send('windowBounds', obj);
+    }
 }
 
 function saveOverlayPos() {

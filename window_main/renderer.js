@@ -30,7 +30,6 @@ var userName = ""
 var goldHistory = null;
 var gemsHistory = null;
 var wildcardHistory = null;
-//var initialized = false;
 
 const chartjs = require('chart.js');
 const Database = require('../shared/database.js');
@@ -47,11 +46,7 @@ document.addEventListener('DOMContentLoaded', windowReady);
 function windowReady(){
 	ipc_send('renderer_state', 1);
 }
-/*
-setTimeout( function() {
-	ipc_send('renderer_state', 1);
-}, 5000);
-*/
+
 //
 ipc.on('set_username', function (event, arg) {
 	userName = arg;
@@ -74,10 +69,21 @@ ipc.on('set_decks', function (event, arg) {
     try {
         arg = JSON.parse(arg)
     } catch(e) {
-        console.log("Error parsing JSON:", str);
+        console.log("Error parsing JSON:", arg);
         return false;
     }
 	setDecks(arg);
+});
+
+//
+ipc.on('set_deck_updated', function (event, str) {
+    try {
+        deck = JSON.parse(str);
+    } catch(e) {
+        console.log("Error parsing JSON:", str);
+        return false;
+    }
+	
 });
 
 //
