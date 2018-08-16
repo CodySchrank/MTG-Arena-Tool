@@ -26,7 +26,7 @@ const defaultCfg = {
         overlay_deck: true,
         overlay_clock: true
     },
-    deck_changes:[],
+    deck_changes:{},
     deck_changes_index:[],
     matches_index:[],
     draft_index:[],
@@ -46,7 +46,7 @@ const cardsDb = new Database();
 
 const serverAddress = 'mtgatool.com';
 
-const debugLog = true;
+const debugLog = false;
 const debugLogSpeed = 0.1;
 var timeStart = 0;
 var timeEnd = 0;
@@ -114,7 +114,7 @@ var goldHistory = [];
 var gemsHistory = [];
 var wilcardsHistory = [];
 var deck_changes_index = [];
-var deck_changes = [];
+var deck_changes = {};
 
 ipc_send = function (method, arg) {
     ipc.send('ipc_switch', method, arg);
@@ -249,6 +249,10 @@ ipc.on('set_deck_mode', function (event, state) {
     update_deck(true);
 });
 
+ipc.on('get_deck_changes', function (event, arg) {
+    get_deck_changes(arg);
+});
+
 
 function loadPlayerConfig(playerId) {
 	ipc_send("ipc_log", "Load player ID: "+playerId);
@@ -261,8 +265,11 @@ function loadPlayerConfig(playerId) {
     for (let i=0; i<history.matches.length; i++) {
         var id = history.matches[i];
         if (id != null) {
-	        history[id] = store.get(id);
-	        history[id].type = "match";
+            var item = store.get(id);
+            if (item != undefined) {
+                history[id] = item;
+                history[id].type = "match";
+            }
         }
     }
 
@@ -271,9 +278,12 @@ function loadPlayerConfig(playerId) {
         var id = drafts.matches[i];
 
         if (id != null) {
-	        history.matches.push(id);
-	        history[id] = store.get(id);
-	        history[id].type = "draft";
+            var item = store.get(id);
+            if (item != undefined) {
+                history.matches.push(id);
+                history[id] = item;
+                history[id].type = "draft";
+            }
 	    }
     }
 
@@ -334,6 +344,20 @@ function fix_history(_history) {
         }
     }
     return _history;
+}
+
+//
+function get_deck_changes(deckId) {
+    // sends to renderer the selected deck's data
+    var changes = [];
+    deck_changes_index.forEach(function(changeId) {
+        var change = deck_changes[changeId];
+        if (change.deckId == deckId) {
+            changes.push(change);
+        }
+    });
+    
+    ipc_send("set_deck_changes", JSON.stringify(changes));
 }
 
 // Read the log
@@ -598,10 +622,10 @@ function processLogData(data) {
 
                 if (!deck_changes_index.includes(changeId)) {
                     deck_changes_index.push(changeId);
-                    deck_changes.push(deltaDeck);
+                    deck_changes[changeId] = deltaDeck;
 
                     store.set("deck_changes_index", deck_changes_index);
-                    store.set("deck_changes", deck_changes);
+                    store.set("deck_changes."+changeId, deltaDeck);
                 }
             }
         });
@@ -806,7 +830,7 @@ function processLogData(data) {
         if (!store.get('settings.show_overlay_always')) {
 	        ipc_send("overlay_close", 1);
         }
-        ipc_send("renderer_show", 1);
+        //ipc_send("renderer_show", 1);
 
         saveDraft();
     }
@@ -844,7 +868,7 @@ function processLogData(data) {
             if (!store.get('settings.show_overlay_always')) {
             	ipc_send("overlay_close", 1);
             }
-        	ipc_send("renderer_show", 1);
+        	//ipc_send("renderer_show", 1);
             //saveMatch();
         }
 

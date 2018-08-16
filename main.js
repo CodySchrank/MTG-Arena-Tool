@@ -31,7 +31,6 @@ ipc.on('ipc_switch', function (event, method, arg) {
             break;
 
         // to renderer
-
         case 'set_settings':
             //console.log("set settings: ", arg);
             saveSettings(arg);
@@ -46,6 +45,10 @@ ipc.on('ipc_switch', function (event, method, arg) {
         case 'background_set_history_data':
             mainWindow.webContents.send("set_history_data", arg);
             break;
+
+        case 'set_deck_changes':
+            mainWindow.webContents.send("set_deck_changes", arg);
+            break;            
 
         case 'set_economy':
             mainWindow.webContents.send("set_economy", arg);
@@ -96,6 +99,10 @@ ipc.on('ipc_switch', function (event, method, arg) {
             break;
 
         // to background
+        case 'get_deck_changes':
+            background.webContents.send("get_deck_changes", arg);
+            break;
+
         case 'request_explore':
             background.webContents.send("request_explore", arg);
             break;
@@ -370,16 +377,14 @@ function quit() {
 }
 
 function saveWindowPos() {
-    if (!mainWindow.isFullScreen()) {
-        var obj = {};
-        var bounds = mainWindow.getBounds();
-        var pos = mainWindow.getPosition();
-        obj.width = Math.floor(bounds.width);
-        obj.height = Math.floor(bounds.height);
-        obj.x = Math.floor(pos[0]);
-        obj.y = Math.floor(pos[1]);
-        background.webContents.send('windowBounds', obj);
-    }
+    var obj = {};
+    var bounds = mainWindow.getBounds();
+    var pos = mainWindow.getPosition();
+    obj.width = Math.floor(bounds.width);
+    obj.height = Math.floor(bounds.height);
+    obj.x = Math.floor(pos[0]);
+    obj.y = Math.floor(pos[1]);
+    background.webContents.send('windowBounds', obj);
 }
 
 function saveOverlayPos() {

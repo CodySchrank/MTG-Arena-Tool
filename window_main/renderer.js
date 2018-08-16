@@ -3,6 +3,7 @@ var desktopCapturer = electron.desktopCapturer;
 var shell = electron.shell;
 window.ipc = electron.ipcRenderer;
 var decks = null;
+var changes = null;
 var matchesHistory = null;
 var explore = null;
 var cards = {};
@@ -91,7 +92,6 @@ ipc.on('set_history', function (event, arg) {
 	if (arg != null) {
 	    try {
 	        matchesHistory = JSON.parse(arg);
-			console.log(matchesHistory);
 	    } catch(e) {
 	        console.log("Error parsing JSON:", str);
 	        return false;
@@ -105,7 +105,23 @@ ipc.on('set_history', function (event, arg) {
 ipc.on('set_history_data', function (event, arg) {
 	if (arg != null) {
 		matchesHistory = JSON.parse(arg);
-		//console.log(matchesHistory);
+	}
+});
+
+//
+ipc.on('set_deck_changes', function (event, arg) {
+	if (arg != null) {
+	    try {
+	        changes = JSON.parse(arg);
+	        console.log(changes);
+	    } catch(e) {
+	        console.log("Error parsing JSON:", str);
+	        return false;
+	    }
+	}
+
+	if (changes != null) {
+		setChangesTimeline();
 	}
 });
 
@@ -419,6 +435,7 @@ function setHistory(loadMore) {
 	for (var loadEnd = loadHistory + loadMore; loadHistory < loadEnd; loadHistory++) {
 		var match_id = matchesHistory.matches[loadHistory];
 		var match = matchesHistory[match_id];
+		console.log("Load match: ", match_id, match);
 
 		if (match == undefined) continue;
 		console.log("Match: ", loadHistory, match.type, match)
@@ -1012,42 +1029,11 @@ function open_deck(i, type) {
 	var fld = $('<div class="flex_item"></div>');
 
 	var dl = $('<div class="decklist"></div>');
-
-	var deck = _deck;
-	var prevIndex = 0;
-	deck.mainDeck.forEach(function(card) {
-		var grpId = card.id;
-		var type = cardsDb.get(grpId).type;
-		if (prevIndex == 0) {
-			addCardSeparator(get_card_type_sort(type), dl);
-		}
-		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
-				addCardSeparator(get_card_type_sort(type), dl);
-			}
-		}
-
-		if (card.quantity > 0) {
-			addCardTile(grpId, 'a', card.quantity, dl);
-		}
-		
-		prevIndex = grpId;
-	});
-
-	addCardSeparator(99, dl);
-
-	var prevIndex = 0;
-	deck.sideboard.forEach(function(card) {
-		var grpId = card.id;
-		var type = cardsDb.get(grpId).type;
-		if (card.quantity > 0) {
-			addCardTile(grpId, 'a', card.quantity, dl);
-		}
-	});
-
+	drawDeck(dl, _deck);
 
 	var stats = $('<div class="stats"></div>');
 
+	$('<div class="button_simple openHistory">History of changes</div>').appendTo(stats);
 	$('<div class="button_simple exportDeck">Export to Arena</div>').appendTo(stats);
 	$('<div class="button_simple exportDeckStandard">Export to .txt</div>').appendTo(stats);
 
@@ -1114,7 +1100,7 @@ function open_deck(i, type) {
 
 	if (type == 0) {
 		var cont = $('<div class="pie_container_outer"></div>');
-		var wr = getDeckWinrate(deck.id, deck.lastUpdated);
+		var wr = getDeckWinrate(_deck.id, _deck.lastUpdated);
 		if (wr != 0) {
 			wr.winColors.total = wr.winColors.w+wr.winColors.u+wr.winColors.b+wr.winColors.r+wr.winColors.g;
 			wp = wr.winColors.w / wr.winColors.total * 100;
@@ -1174,12 +1160,15 @@ function open_deck(i, type) {
 	$("#ux_1").append(top);
 	$("#ux_1").append(fld);
 	//
+	$(".openHistory").click(function () {
+	    ipc_send('get_deck_changes', _deck.id);
+	});
 	$(".exportDeck").click(function () {
-	    var list = get_deck_export(deck);
+	    var list = get_deck_export(_deck);
 	    ipc_send('set_clipboard', list);
 	});
 	$(".exportDeckStandard").click(function () {
-	    var list = get_deck_export_txt(deck);
+	    var list = get_deck_export_txt(_deck);
 	    ipc_send('export_txt', {str: list, name: _deck.name});
 	});
 
@@ -1187,6 +1176,202 @@ function open_deck(i, type) {
 	$(".back").click(function () {
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
+}
+
+//
+function drawDeck(div, deck) {
+	div.html('');
+	var prevIndex = 0;
+	deck.mainDeck.forEach(function(card) {
+		var grpId = card.id;
+		var type = cardsDb.get(grpId).type;
+		if (prevIndex == 0) {
+			addCardSeparator(get_card_type_sort(type), div);
+		}
+		else if (prevIndex != 0) {
+			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
+				addCardSeparator(get_card_type_sort(type), div);
+			}
+		}
+
+		if (card.quantity > 0) {
+			addCardTile(grpId, 'a', card.quantity, div);
+		}
+		
+		prevIndex = grpId;
+	});
+
+	if (deck.sideboard != undefined) {
+		if (deck.sideboard.length > 0) {
+			addCardSeparator(99, div);
+			var prevIndex = 0;
+			deck.sideboard.forEach(function(card) {
+				var grpId = card.id;
+				var type = cardsDb.get(grpId).type;
+				if (card.quantity > 0) {
+					addCardTile(grpId, 'a', card.quantity, div);
+				}
+			});
+		}
+	}
+}
+
+//
+function setChangesTimeline() {
+	var cont = $(".stats");
+	cont.html('');
+
+	var time = $('<div class="changes_timeline"></div>')
+
+	changes.sort(compare_changes);
+
+	// CURRENT DECK
+	let div = $('<div class="change"></div>');
+	var butbox = $('<div class="change_button_cont" style="transform: scaleY(-1);"></div>');
+	var button = $('<div class="change_button"></div>');
+	button.appendTo(butbox);
+	let datbox = $('<div class="change_data"></div>');
+
+	// title
+	let title = $('<div class="change_data_box"></div>');
+	title.html('Current Deck');
+
+	butbox.appendTo(div);
+	datbox.appendTo(div);
+	title.appendTo(datbox);
+	div.appendTo(time);
+
+	butbox.on('mouseenter', function(e) {
+		button.css('width', '32px');
+		button.css('height', '32px');
+		button.css('top', 'calc(50% - 16px)');
+	});
+
+	butbox.on('mouseleave', function(e) {
+		button.css('width', '24px');
+		button.css('height', '24px');
+		button.css('top', 'calc(50% - 12px)');
+	});
+
+	butbox.on('click', function(e) {
+		var hasc = button.hasClass('change_button_active');
+
+		$(".change_data_box_inside").each(function(index) {
+			$(this).css('height', '0px');
+		});
+
+		$(".change_button").each(function(index) {
+			$(this).removeClass('change_button_active');
+		});
+
+		if (!hasc) {
+			button.addClass('change_button_active');
+		}
+	});
+	//
+
+	changes.forEach(function(change) {
+		let div = $('<div class="change"></div>');
+		var butbox = $('<div class="change_button_cont"></div>');
+		var button = $('<div class="change_button"></div>');
+		button.appendTo(butbox);
+		let datbox = $('<div class="change_data"></div>');
+
+		// title
+		let title = $('<div class="change_data_box"></div>');
+		// inside
+		let data  = $('<div class="change_data_box_inside"></div>');
+		var innherH = 48;
+		let nc = 0;
+		if (change.changesMain.length > 0) {
+			let dd = $('<div class="change_item_box"></div>');
+			let ti = $('<div class="change_title">Mainboard</div>');
+			ti.appendTo(dd);
+			dd.appendTo(data);
+		}
+
+		change.changesMain.forEach(function(c) {
+			innherH += 24;
+			if (c.quantity > 0)	nc += c.quantity;
+			let dd = $('<div class="change_item_box"></div>');
+			if (c.quantity > 0)	{
+				let ic  = $('<div class="change_add"></div>');
+				ic.appendTo(dd);
+			}
+			else {
+				let ic  = $('<div class="change_remove"></div>');
+				ic.appendTo(dd);
+			}
+			let ti = $('<div class="change_title">'+Math.abs(c.quantity)+'x '+cardsDb.get(c.id).name+'</div>');
+			ti.appendTo(dd);
+			dd.appendTo(data);
+		});
+
+		if (change.changesSide.length > 0) {
+			let dd = $('<div class="change_item_box"></div>');
+			let ti = $('<div class="change_title">Sideboard</div>');
+			ti.appendTo(dd);
+			dd.appendTo(data);
+		}
+
+		change.changesSide.forEach(function(c) {
+			innherH += 24;
+			if (c.quantity > 0)	nc += c.quantity;
+			let dd = $('<div class="change_item_box"></div>');
+			if (c.quantity > 0)	{
+				let ic  = $('<div class="change_add"></div>');
+				ic.appendTo(dd);
+			}
+			else {
+				let ic  = $('<div class="change_remove"></div>');
+				ic.appendTo(dd);
+			}
+			let ti = $('<div class="change_title">'+Math.abs(c.quantity)+'x '+cardsDb.get(c.id).name+'</div>');
+			ti.appendTo(dd);
+			dd.appendTo(data);
+		});
+
+		title.html(nc+' changes, '+timeSince(Date.parse(change.date))+' ago.');
+
+		butbox.appendTo(div);
+		datbox.appendTo(div);
+		title.appendTo(datbox);
+		data.appendTo(datbox);
+		div.appendTo(time);
+
+		butbox.on('mouseenter', function(e) {
+			button.css('width', '32px');
+			button.css('height', '32px');
+			button.css('top', 'calc(50% - 16px)');
+		});
+
+		butbox.on('mouseleave', function(e) {
+			button.css('width', '24px');
+			button.css('height', '24px');
+			button.css('top', 'calc(50% - 12px)');
+		});
+
+		butbox.on('click', function(e) {
+			// This requires some UX indicators
+			//drawDeck($('.decklist'), {mainDeck: change.previousMain, sideboard: change.previousSide});
+			var hasc = button.hasClass('change_button_active');
+
+			$(".change_data_box_inside").each(function(index) {
+				$(this).css('height', '0px');
+			});
+
+			$(".change_button").each(function(index) {
+				$(this).removeClass('change_button_active');
+			});
+
+			if (!hasc) {
+				button.addClass('change_button_active');
+				data.css('height', innherH+'px');
+			}
+		});
+	})
+
+	time.appendTo(cont);
 }
 
 //
@@ -1342,36 +1527,7 @@ function open_match(id) {
 	var dl = $('<div class="decklist"></div>');
 	flt.appendTo(dl);
 
-	var deck = match.playerDeck;
-	var prevIndex = 0;
-	deck.mainDeck.forEach(function(card) {
-		var grpId = card.id;
-		var type = cardsDb.get(grpId).type;
-		if (prevIndex == 0) {
-			addCardSeparator(get_card_type_sort(type), dl);
-		}
-		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
-				addCardSeparator(get_card_type_sort(type), dl);
-			}
-		}
-		if (card.quantity > 0) {
-			addCardTile(grpId, 'a', card.quantity, dl);
-		}
-		
-		prevIndex = grpId;
-	});
-
-	addCardSeparator(99, dl);
-
-	var prevIndex = 0;
-	deck.sideboard.forEach(function(card) {
-		var grpId = card.id;
-		var type = cardsDb.get(grpId).type;
-		if (card.quantity > 0) {
-			addCardTile(grpId, 'a', card.quantity, dl);
-		}
-	});
+	drawDeck(dl, match.playerDeck);
 
 	var flt = $('<div class="flex_item" style="flex-direction: row-reverse;"></div>')
 	var fltl = $('<div class="flex_item"></div>')
@@ -1399,25 +1555,7 @@ function open_match(id) {
 	var odl = $('<div class="decklist"></div>');
 	flt.appendTo(odl);
 
-	var deck = match.oppDeck;
-	var prevIndex = 0;
-	deck.mainDeck.forEach(function(card) {
-		var grpId = card.id;
-		var type = cardsDb.get(grpId).type;
-		if (prevIndex == 0) {
-			addCardSeparator(get_card_type_sort(type), odl);
-		}
-		else if (prevIndex != 0) {
-			if (get_card_type_sort(type) != get_card_type_sort(cardsDb.get(prevIndex).type)) {
-				addCardSeparator(get_card_type_sort(type), odl);
-			}
-		}
-		if (card.quantity > 0) {
-			addCardTile(grpId, 'b', card.quantity, odl);
-		}
-		
-		prevIndex = grpId;
-	});
+	drawDeck(odl, match.oppDeck);
 
 	$('<div class="button_simple exportDeck">Export to Arena</div>').appendTo(odl);
 	$('<div class="button_simple exportDeckStandard">Export to .txt</div>').appendTo(odl);
@@ -2448,22 +2586,24 @@ function getDeckWinrate(deckid, lastEdit) {
 	}
 	matchesHistory.matches.forEach(function(matchid, index) {
 		match = matchesHistory[matchid];
-		if (matchid != null && match.type == "match") {
-			if (match.playerDeck.id == deckid) {
-				if (match.player.win > match.opponent.win) {
-					winColors = add_deck_colors(winColors, match.oppDeck.mainDeck);
-					wins++;
-				}
-				else {
-					lossColors = add_deck_colors(lossColors, match.oppDeck.mainDeck);
-					loss++;
-				}
-				if (match.date > lastEdit) {
+		if (matchid != null && match != undefined) {
+			if (match.type == "match") {
+				if (match.playerDeck.id == deckid) {
 					if (match.player.win > match.opponent.win) {
-						winsLastEdit++;
+						winColors = add_deck_colors(winColors, match.oppDeck.mainDeck);
+						wins++;
 					}
 					else {
-						lossLastEdit++;
+						lossColors = add_deck_colors(lossColors, match.oppDeck.mainDeck);
+						loss++;
+					}
+					if (match.date > lastEdit) {
+						if (match.player.win > match.opponent.win) {
+							winsLastEdit++;
+						}
+						else {
+							lossLastEdit++;
+						}
 					}
 				}
 			}
@@ -2500,24 +2640,35 @@ function compare_decks(a, b) {
 }
 
 //
+function compare_changes(a, b) {
+	a = Date.parse(a.date);
+	b = Date.parse(b.date);
+	if (a < b)	return 1;
+	if (a > b)	return -1;
+	return 0;
+}
+
+//
 function sort_history() {
 	matchesHistory.matches.sort(compare_matches); 
 
 	matchesHistory.matches.forEach(function(mid) {
 		var match = matchesHistory[mid];
 
-		if (mid != null && match.type != "draft") {
-			if (match.playerDeck.mainDeck == undefined) {
-				match.playerDeck = JSON.parse('{"deckTileId":67003,"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}');
-			}
-			else {
-				match.playerDeck.colors = get_deck_colors(match.playerDeck);
-			}
+		if (mid != null && match != undefined) {
+			if (match.type != "draft") {
+				if (match.playerDeck.mainDeck == undefined) {
+					match.playerDeck = JSON.parse('{"deckTileId":67003,"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}');
+				}
+				else {
+					match.playerDeck.colors = get_deck_colors(match.playerDeck);
+				}
 
-			match.playerDeck.mainDeck.sort(compare_cards);
+				match.playerDeck.mainDeck.sort(compare_cards);
 
-			match.oppDeck.colors = get_deck_colors(match.oppDeck);
-			match.oppDeck.mainDeck.sort(compare_cards);
+				match.oppDeck.colors = get_deck_colors(match.oppDeck);
+				match.oppDeck.mainDeck.sort(compare_cards);
+			}
 		}
 	});
 }
@@ -2528,8 +2679,15 @@ function compare_matches(a, b) {
 		return -1;
 	if (b == undefined)
 		return 1;
+
 	a = matchesHistory[a];
 	b = matchesHistory[b];
+
+	if (a == undefined)
+		return -1;
+	if (b == undefined)
+		return 1;
+
 	a = Date.parse(a.date);
 	b = Date.parse(b.date);
 	if (a < b)	return 1;
