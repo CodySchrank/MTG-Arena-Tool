@@ -1270,9 +1270,15 @@ function setChangesTimeline() {
 	});
 	//
 
+	cn = 0;
 	changes.forEach(function(change) {
 		let div = $('<div class="change"></div>');
-		var butbox = $('<div class="change_button_cont"></div>');
+		if (cn < changes.length-1) {
+			var butbox = $('<div style="background-size: 100% 100% !important;" class="change_button_cont"></div>');
+		}
+		else {
+			var butbox = $('<div class="change_button_cont"></div>');
+		}
 		var button = $('<div class="change_button"></div>');
 		button.appendTo(butbox);
 		let datbox = $('<div class="change_data"></div>');
@@ -1369,6 +1375,8 @@ function setChangesTimeline() {
 				data.css('height', innherH+'px');
 			}
 		});
+
+		cn++;
 	})
 
 	time.appendTo(cont);

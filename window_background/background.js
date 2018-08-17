@@ -46,7 +46,7 @@ const cardsDb = new Database();
 
 const serverAddress = 'mtgatool.com';
 
-const debugLog = false;
+const debugLog = true;
 const debugLogSpeed = 0.1;
 var timeStart = 0;
 var timeEnd = 0;
@@ -418,7 +418,7 @@ function readLog() {
 
 function processLog(err, bytecount, buff) {
     let rawString = buff.toString('utf-8', 0, bytecount);
-    var splitString = rawString.split('(Filename: ');
+    var splitString = rawString.split('[UnityCrossThread');
     console.log('Reading:', bytecount, 'bytes, ',splitString.length, ' chunks');
 
     var str;
@@ -560,7 +560,7 @@ function processLogData(data) {
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
         //
-        strCheck = '[UnityCrossThreadLogger]';
+        strCheck = 'Logger]';
         if (data.indexOf(strCheck) > -1) {
             var str = dataChop(data, strCheck, 'M')+'M';
             var logTime = parseWotcTime(str);
@@ -636,7 +636,7 @@ function processLogData(data) {
     json = checkJsonWithStart(data, strCheck, '', ')');
     if (json != false) {
         //This checks time, use with caution!
-        strCheck = '[UnityCrossThreadLogger]';
+        strCheck = 'Logger]';
         if (data.indexOf(strCheck) > -1) {
             var str = dataChop(data, strCheck, 'M')+'M';
             var logTime = parseWotcTime(str);
@@ -745,7 +745,7 @@ function processLogData(data) {
     strCheck = ' Event.MatchCreated ';
     json = checkJson(data, strCheck, '');
     if (json != false) {
-        strCheck = '[UnityCrossThreadLogger]';
+        strCheck = 'Logger]';
         if (data.indexOf(strCheck) > -1) {
             var logTime = dataChop(data, strCheck, ' (');
             matchBeginTime = parseWotcTime(logTime);

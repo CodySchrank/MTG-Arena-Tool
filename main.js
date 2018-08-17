@@ -19,7 +19,10 @@ var background;
 var overlay;
 var tray = null;
 var closeToTray = true;
-
+var updateState = 0;
+var updateAvailable = 0;
+var updateProgress = 0;
+var updateSpeed = 0;
 const ipc = electron.ipcMain;
 
 //Debug stuff
