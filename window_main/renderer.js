@@ -1497,10 +1497,12 @@ function open_match(id) {
 	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">'+match.playerDeck.name+'</div></div>');
 	flr = $('<div class="flex_item" style="align-self: center;"></div>');
 
-	match.playerDeck.colors.forEach(function(color) {
-		var m = $('<div class="mana_20 mana_'+mana[color]+'"></div>');
-		flr.append(m);
-	});
+	if (match.playerDeck.colors != undefined) {		
+		match.playerDeck.colors.forEach(function(color) {
+			var m = $('<div class="mana_20 mana_'+mana[color]+'"></div>');
+			flr.append(m);
+		});
+	}
 	top.append(flr);
 
 

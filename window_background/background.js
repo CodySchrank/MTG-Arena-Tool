@@ -46,7 +46,7 @@ const cardsDb = new Database();
 
 const serverAddress = 'mtgatool.com';
 
-const debugLog = true;
+const debugLog = false;
 const debugLogSpeed = 0.1;
 var timeStart = 0;
 var timeEnd = 0;
@@ -324,25 +324,36 @@ function updateSettings(settings, relay) {
 
 //
 function fix_history(_history) {
-    for (let ii = 0; ii < _history.length; ii++) {
-        if (ii > 0) {
-            let dataPrev = _history[ii-1]; let data = _history[ii];
-            let diff = (data.date - dataPrev.date) / (1000*60*60*24);
-            for (let i = 0; i<diff; i++) {
-                _history.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value}); ii++;
-            }
-        }
-    }
-    for (let ii = 0; ii < _history.length; ii++) {
-        if (ii > 0) {
+    var mode = 0;
+    if (mode == 0) {
+        for (let ii = 1; ii < _history.length; ii++) {
             let dataPrev = _history[ii-1]; let data = _history[ii];
             let da = new Date(data.date);
-            let db = new Date(dataPrev.date);
-            if (da.toDateString() == db.toDateString()) {
-                _history.splice(ii-1, 1); ii-=1;
+            if (da < Date.now()) {
+                let diff = (data.date - dataPrev.date) / (1000*60*60*24);
+                for (let i = 0; i<diff; i++) {
+                    _history.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value}); ii++;
+                }
+            }
+        }
+        
+        for (let ii = 1; ii < _history.length; ii++) {
+            let dataPrev = _history[ii-1]; let data = _history[ii];
+            let da = new Date(data.date);
+            if (da < Date.now()) {
+                let db = new Date(dataPrev.date);
+                if (da.toDateString() == db.toDateString()) {
+                    _history.splice(ii-1, 1); ii-=1;
+                }
             }
         }
     }
+
+    for (let ii = 0; ii < _history.length-14; ii++) {
+        _history.splice(ii, 1);
+        ii-=1;
+    }
+    
     return _history;
 }
 
@@ -474,11 +485,13 @@ function dataChop(data, startStr, endStr) {
     return data;
 }
 
+
 function checkJsonWithStart(str, check, chop, start) {
     if (str.indexOf(check) > -1) {
         try {
             str = dataChop(str, check, chop);
             str = dataChop(str, start, chop);
+            str = findFirstJSON(str);
             return JSON.parse(str);
         } catch(e) {
             console.log(str);
@@ -492,9 +505,33 @@ function checkJsonWithStartNoParse(str, check, chop, start) {
     if (str.indexOf(check) > -1) {
 		str = dataChop(str, check, chop);
 		str = dataChop(str, start, chop);
+        str = findFirstJSON(str);
 		return str;
     }
     return false;
+}
+
+function findFirstJSON(str) {
+    //str.replace("Logger]", "");
+    var _br = 0;
+    var _cu = 0;
+    var endpos = 0;
+    for (var i = 0, len = str.length; i < len; i++) {
+        let c = str.charAt(i);
+        if (c == '[')   _br++;
+        else if (c == ']')   _br--;
+        else if (c == '{')   _cu++;
+        else if (c == '}')   _cu--;
+        if (_br == 0 && _cu == 0 && i > 10) {
+            endpos = i+1;
+            break;
+        }
+    }
+
+    //console.log("STR >> ", str);
+    //console.log("ENDPOS >> ", endpos);
+    //console.log("JSON >> ", str.slice(0, endpos));
+    return str.slice(0, endpos);
 }
 
 
@@ -508,8 +545,6 @@ function checkJsonWithStartNoParse(str, check, chop, start) {
 
 
 function processLogData(data) {
-	//console.log("Read log:", data);
-
 	currentChunk = data;
     var strCheck, json;
 
