@@ -229,7 +229,7 @@ ipc.on('no_log', function (event, arg) {
 	$('.sidebar').addClass('hidden');
 	$('.overflow_ux').addClass('hidden');
 	$('.message_center').css('display', 'flex');
-	$('.message_center').html('<div class="message_big red">No Log found</div><div class="message_sub_16 white">check if it exists at '+arg+'</div><div class="message_sub_16 white">if it does, try closing MTG Arena and deleting it.</div>');
+	$('.message_center').html('<div class="message_big red">No Log Found</div><div class="message_sub_16 white">check if it exists at '+arg+'</div><div class="message_sub_16 white">if it does, try closing MTG Arena and deleting it.</div>');
 });
 
 //
@@ -2403,6 +2403,7 @@ function open_settings() {
 
 	div.append('<div class="settings_title">Overlay</div>');
 
+	add_checkbox(div, 'Always on top', 'settings_overlay_ontop', settings.overlay_ontop);
 	add_checkbox(div, 'Show overlay', 'settings_showoverlay', settings.show_overlay);
 	add_checkbox(div, 'Persistent overlay <i>(useful for OBS setup)</i>', 'settings_showoverlayalways', settings.show_overlay_always);
 
@@ -2443,6 +2444,7 @@ function open_settings() {
 	*/
 
 	div.append('<div class="settings_title">Privacy</div>');
+	add_checkbox(div, 'Anonymous sharing <i>(makes your username anonymous on Explore)</i>', 'settings_anon_explore', settings.anon_explore);
 	add_checkbox(div, 'Online sharing <i>(when disabled, blocks any connections with our servers)</i>', 'settings_senddata', settings.send_data);
 
 	// Erase data
@@ -2522,8 +2524,11 @@ function updateSettings() {
 	var showOverlayAlways = document.getElementById("settings_showoverlayalways").checked;
 	var soundPriority = document.getElementById("settings_soundpriority").checked;
 
+	var overlayOnTop = document.getElementById("settings_overlay_ontop").checked;
 	var closeToTray = document.getElementById("settings_closetotray").checked;
 	var sendData = document.getElementById("settings_senddata").checked;
+	var anonExplore = document.getElementById("settings_anon_explore").checked;
+
 	var closeOnMatch = document.getElementById("settings_closeonmatch").checked;
 
 	var overlayTop = document.getElementById("settings_overlay_top").checked;
@@ -2547,7 +2552,9 @@ function updateSettings() {
 		overlay_title: overlayTitle,
 		overlay_deck: overlayDeck,
 		overlay_clock: overlayClock,
-		overlay_sideboard: overlaySideboard
+		overlay_sideboard: overlaySideboard,
+		overlay_ontop: overlayOnTop,
+		anon_explore: anonExplore
 	};
 	cardSize = 100+(cardSizePos*10);
 	ipc_send('save_settings', settings);

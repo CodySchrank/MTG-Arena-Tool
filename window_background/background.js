@@ -18,13 +18,15 @@ const defaultCfg = {
         startup: true,
         close_to_tray: true,
         send_data: true,
+        anon_explore: false,
         close_on_match: true,
         cards_size: 2,
         overlay_alpha: 1,
         overlay_top: true,
         overlay_title: true,
         overlay_deck: true,
-        overlay_clock: true
+        overlay_clock: true,
+        overlay_ontop: true,
     },
     deck_changes:{},
     deck_changes_index:[],
@@ -313,6 +315,9 @@ function updateSettings(settings, relay) {
     if (settings.overlay_title == undefined) settings.overlay_title = true;
     if (settings.overlay_deck  == undefined) settings.overlay_deck  = true;
     if (settings.overlay_clock == undefined) settings.overlay_clock = true;
+    if (settings.overlay_ontop == undefined) settings.overlay_ontop = true;
+
+    ipc_send("overlay_set_ontop", settings.overlay_ontop);
 
     if (settings.show_overlay == false) {
     	ipc_send("overlay_close", 1);
@@ -1589,6 +1594,10 @@ function httpAuth() {
 
 function httpSubmitCourse(_courseId, _course) {
     var _id = makeId(6);
+    if (settings.anon_explore == true) {
+        _course.PlayerId = "000000000000000";
+        _course.PlayerName = "Anonymous";
+    }
     _course = JSON.stringify(_course);
 	httpAsync.push({'reqId': _id, 'method': 'submit_course', 'uid': playerId, 'course': _course, 'courseid': _courseId});
 }

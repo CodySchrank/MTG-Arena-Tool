@@ -225,6 +225,10 @@ ipc.on('ipc_switch', function (event, method, arg) {
             overlay.setBounds(arg);
             break;
 
+        case 'overlay_set_ontop':
+            overlay.setAlwaysOnTop(arg, 'floating');
+            break;
+
         case 'save_overlay_pos':
             saveOverlayPos();
             break;
