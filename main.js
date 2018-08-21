@@ -410,7 +410,7 @@ function createBackgroundWindow() {
         frame: false,
         x: 0,
         y: 0,
-        show: true,
+        show: false,
         width: 100,
         height: 100,
         title: "MTG Arena Tool",
