@@ -443,6 +443,7 @@ span {
 }
 
 .card_tile_container {
+    width: 100%;
     display: flex;
 }
 

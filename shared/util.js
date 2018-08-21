@@ -123,6 +123,7 @@ function addCardSeparator(i, element) {
 		case 5: str = "Artifact"; break;
 		case 6: str = "Enchantment"; break;
 		case 7: str = "Land"; break;
+		case 98: str = "Mainboard"; break;
 		case 99: str = "Sideboard"; break;
 		default: str = ""; break;
 	}
@@ -720,4 +721,14 @@ function daysPast(date) {
 //
 function replaceAll(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
+}
+
+//
+function makeId(length) {
+    var ret = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < length; i++)
+    ret += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return ret;
 }

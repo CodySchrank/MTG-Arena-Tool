@@ -1678,16 +1678,6 @@ function parseWotcTime(str) {
 }
 
 //
-function makeId(length) {
-    var ret = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < length; i++)
-    ret += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return ret;
-}
-
-//
 function fact(arg0) {
     let _f = 1;
     let _i = 1;

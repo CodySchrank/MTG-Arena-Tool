@@ -210,6 +210,11 @@ span i {
     width: 200px;
 }
 
+
+.openDeck {
+    margin: 16px auto !important;
+}
+
 .openHistory {
     margin: 16px auto !important;
 }
@@ -1305,21 +1310,21 @@ span i {
 
 .change_item_box {
     width: 100%;
+    height: 30px;
     display: flex;
 }
 
 .change_add {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
+    width: 30px;
+    height: 30px;
     background: url(../images/added.png) no-repeat center;
 }
 
 .change_remove {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-    background: url(../images/removed.png) no-repeat center;
+    width: 30px;
+    height: 30px;
+    background: url(file:///C:/Users/Manuh/Desktop/MTG%20Arena%20Tool/MTG-Arena-Tool/window_main/../images/removed.png) no-repeat center;
+}
 }
 
 .change_title {

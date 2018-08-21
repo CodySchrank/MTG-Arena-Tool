@@ -25,6 +25,8 @@ var cardQuality = "normal";
 var inputTimer = undefined;
 var loadHistory = 0;
 
+var currentOpenDeck = null;
+
 var rankOffset = 0;
 var rankTitle = "";
 var userName = ""
@@ -1015,6 +1017,7 @@ function open_deck(i, type) {
 	if (type == 1) {
 		_deck = i;
 	}
+	currentOpenDeck = _deck;
 
 	$("#ux_1").html('');
 
@@ -1168,20 +1171,22 @@ function open_deck(i, type) {
 	stats.appendTo(fld);
 	$("#ux_1").append(top);
 	$("#ux_1").append(fld);
+
 	//
 	$(".openHistory").click(function () {
 	    ipc_send('get_deck_changes', _deck.id);
 	});
+
 	$(".exportDeck").click(function () {
 	    var list = get_deck_export(_deck);
 	    ipc_send('set_clipboard', list);
 	});
+
 	$(".exportDeckStandard").click(function () {
 	    var list = get_deck_export_txt(_deck);
 	    ipc_send('export_txt', {str: list, name: _deck.name});
 	});
 
-	//
 	$(".back").click(function () {
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
@@ -1189,6 +1194,7 @@ function open_deck(i, type) {
 
 //
 function drawDeck(div, deck) {
+	var unique = makeId(4);
 	div.html('');
 	var prevIndex = 0;
 	deck.mainDeck.forEach(function(card) {
@@ -1204,7 +1210,7 @@ function drawDeck(div, deck) {
 		}
 
 		if (card.quantity > 0) {
-			addCardTile(grpId, 'a', card.quantity, div);
+			addCardTile(grpId, unique+"a", card.quantity, div);
 		}
 		
 		prevIndex = grpId;
@@ -1218,7 +1224,7 @@ function drawDeck(div, deck) {
 				var grpId = card.id;
 				var type = cardsDb.get(grpId).type;
 				if (card.quantity > 0) {
-					addCardTile(grpId, 'a', card.quantity, div);
+					addCardTile(grpId, unique+"b", card.quantity, div);
 				}
 			});
 		}
@@ -1229,6 +1235,7 @@ function drawDeck(div, deck) {
 function setChangesTimeline() {
 	var cont = $(".stats");
 	cont.html('');
+
 
 	var time = $('<div class="changes_timeline"></div>')
 
@@ -1281,6 +1288,9 @@ function setChangesTimeline() {
 
 	cn = 0;
 	changes.forEach(function(change) {
+		change.changesMain.sort(compare_changes_inner);
+		change.changesSide.sort(compare_changes_inner);
+
 		let div = $('<div class="change"></div>');
 		if (cn < changes.length-1) {
 			var butbox = $('<div style="background-size: 100% 100% !important;" class="change_button_cont"></div>');
@@ -1296,17 +1306,16 @@ function setChangesTimeline() {
 		let title = $('<div class="change_data_box"></div>');
 		// inside
 		let data  = $('<div class="change_data_box_inside"></div>');
-		var innherH = 48;
+		var innherH = 54;
 		let nc = 0;
 		if (change.changesMain.length > 0) {
 			let dd = $('<div class="change_item_box"></div>');
-			let ti = $('<div class="change_title">Mainboard</div>');
-			ti.appendTo(dd);
+			addCardSeparator(98, dd);
 			dd.appendTo(data);
 		}
 
 		change.changesMain.forEach(function(c) {
-			innherH += 24;
+			innherH += 30;
 			if (c.quantity > 0)	nc += c.quantity;
 			let dd = $('<div class="change_item_box"></div>');
 			if (c.quantity > 0)	{
@@ -1317,20 +1326,20 @@ function setChangesTimeline() {
 				let ic  = $('<div class="change_remove"></div>');
 				ic.appendTo(dd);
 			}
-			let ti = $('<div class="change_title">'+Math.abs(c.quantity)+'x '+cardsDb.get(c.id).name+'</div>');
-			ti.appendTo(dd);
+
+			addCardTile(c.id, 'chm'+cn, Math.abs(c.quantity), dd);
 			dd.appendTo(data);
 		});
 
 		if (change.changesSide.length > 0) {
 			let dd = $('<div class="change_item_box"></div>');
-			let ti = $('<div class="change_title">Sideboard</div>');
-			ti.appendTo(dd);
+			addCardSeparator(99, dd);
+			innherH += 30;
 			dd.appendTo(data);
 		}
 
 		change.changesSide.forEach(function(c) {
-			innherH += 24;
+			innherH += 30;
 			if (c.quantity > 0)	nc += c.quantity;
 			let dd = $('<div class="change_item_box"></div>');
 			if (c.quantity > 0)	{
@@ -1341,8 +1350,8 @@ function setChangesTimeline() {
 				let ic  = $('<div class="change_remove"></div>');
 				ic.appendTo(dd);
 			}
-			let ti = $('<div class="change_title">'+Math.abs(c.quantity)+'x '+cardsDb.get(c.id).name+'</div>');
-			ti.appendTo(dd);
+
+			addCardTile(c.id, 'chs'+cn, Math.abs(c.quantity), dd);
 			dd.appendTo(data);
 		});
 
@@ -1388,6 +1397,11 @@ function setChangesTimeline() {
 		cn++;
 	})
 
+	$('<div class="button_simple openDeck">View stats</div>').appendTo(cont);
+
+	$(".openDeck").click(function () {
+		open_deck(currentOpenDeck);
+	});
 	time.appendTo(cont);
 }
 
@@ -2664,6 +2678,27 @@ function compare_changes(a, b) {
 	b = Date.parse(b.date);
 	if (a < b)	return 1;
 	if (a > b)	return -1;
+	return 0;
+}
+
+//
+function compare_changes_inner(a, b) {
+	a = a.quantity;
+	b = b.quantity;
+	if (a > 0 && b > 0) {
+		if (a < b)	return -1;
+		if (a > b)	return 1;
+	}
+	if (a < 0 && b < 0) {
+		if (a < b)	return 1;
+		if (a > b)	return -1;
+	}
+	if (a < 0 && b > 0) {
+		return -1;
+	}
+	if (a > 0 && b < 0) {
+		return 1;
+	}
 	return 0;
 }
 
