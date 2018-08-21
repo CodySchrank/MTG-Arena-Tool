@@ -27,7 +27,7 @@ const ipc = electron.ipcMain;
 
 //Debug stuff
 ipc.on('ipc_switch', function (event, method, arg) {
-    console.log("IPC ", method);
+    //console.log("IPC ", method);
     switch (method) {
         case 'ipc_log':
             console.log("IPC LOG: ", arg);
@@ -68,6 +68,10 @@ ipc.on('ipc_switch', function (event, method, arg) {
         case 'no_log':
             mainWindow.webContents.send("no_log", arg);
             break;
+
+        case 'log_read':
+            mainWindow.webContents.send("log_exists", arg);
+            break;  
 
         case 'set_username':
             mainWindow.webContents.send("set_username", arg);
@@ -406,7 +410,7 @@ function createBackgroundWindow() {
         frame: false,
         x: 0,
         y: 0,
-        show: false,
+        show: true,
         width: 100,
         height: 100,
         title: "MTG Arena Tool",

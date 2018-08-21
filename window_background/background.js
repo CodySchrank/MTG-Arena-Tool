@@ -58,6 +58,7 @@ var tokenAuth = undefined;
 
 var renderer_state = 0;
 var currentChunk = "";
+var oppDeck = {mainDeck: [], sideboard: []};
 var currentDeck = {};
 var currentDeckUpdated = {};
 var currentMatchId = null;
@@ -117,6 +118,9 @@ var deck_changes_index = [];
 var deck_changes = {};
 
 ipc_send = function (method, arg) {
+    if (method == "ipc_log") {
+        console.log("IPC LOG", arg);
+    }
     ipc.send('ipc_switch', method, arg);
 };
 
@@ -393,7 +397,7 @@ function logLoop() {
         if (err) {
             setTimeout( function() {
                 ipc_send("no_log", logUri);
-            }, 1000);
+            }, 100);
             setTimeout(logLoop, 5000);
             console.log("No log file found");
         } else {
@@ -404,6 +408,7 @@ function logLoop() {
 
 function readLog() {
 	//console.log("readLog()");
+    ipc_send("log_read", 1);
     if (debugLog) {
         firstPass = false;
     }
@@ -463,6 +468,7 @@ function checkJson(str, check, chop) {
     if (str.indexOf(check) > -1) {
         try {
             str = dataChop(str, check, chop);
+            str = findFirstJSON(str);
             return JSON.parse(str);
         } catch(e) {
             return false;
@@ -472,6 +478,7 @@ function checkJson(str, check, chop) {
 }
 
 function dataChop(data, startStr, endStr) {
+    // Cuts the string between first ocurrences of the two selected words "start" and "end";
     var start = data.indexOf(startStr)+startStr.length;
     var end = data.length;
     data = data.substring(start, end);
@@ -487,6 +494,8 @@ function dataChop(data, startStr, endStr) {
 
 
 function checkJsonWithStart(str, check, chop, start) {
+    // Cuts the string between "check" and "chop" and after "start", then returns the first JSON found.
+    // If "chop" is empty it will find the whole string, aka, from "check" and after "start" to end.
     if (str.indexOf(check) > -1) {
         try {
             str = dataChop(str, check, chop);
@@ -545,7 +554,8 @@ function findFirstJSON(str) {
 
 
 function processLogData(data) {
-	currentChunk = data;
+    data = data.replace(/[\r\n]/g, "");
+    //console.log(data);
     var strCheck, json;
 
     let timeStart = new Date();
@@ -872,7 +882,7 @@ function processLogData(data) {
 
     // Game Room State Changed
     strCheck = 'MatchGameRoomStateChangedEvent';
-		json = checkJson(data, strCheck, '');
+	json = checkJson(data, strCheck, '');
 	if (json != false) {
         json = json.matchGameRoomStateChangedEvent.gameRoomInfo;
 
@@ -922,7 +932,7 @@ function processLogData(data) {
 
     // Gre to Client Event
     strCheck = 'GreToClientEvent';
-		json = checkJson(data, strCheck, '');
+	json = checkJson(data, strCheck, '');
 	if (json != false) {
         gre_to_client(json.greToClientEvent.greToClientMessages);
     }
@@ -997,7 +1007,7 @@ function gre_to_client(data) {
         if (msg.type == "GREMessageType_SubmitDeckReq") {
             gameObjs = {};
         }
-
+        console.log("Message: "+msg.msgId, msg);
         if (msg.type == "GREMessageType_GameStateMessage") {
             if (msg.gameStateMessage.type == "GameStateType_Full") {
                 if (msg.gameStateMessage.zones != undefined) {
@@ -1020,7 +1030,6 @@ function gre_to_client(data) {
                     if (!firstPass) {
                         ipc.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
                     }
-                    //console.log(msg.msgId, "Turn "+turnNumber, turnPhase, turnStep);
                 }
 
                 if (msg.gameStateMessage.gameInfo != undefined) {
@@ -1056,23 +1065,61 @@ function gre_to_client(data) {
 
                 if (msg.gameStateMessage.annotations != undefined) {
                     msg.gameStateMessage.annotations.forEach(function(obj) {
-                        
                         let affector = obj.affectorId;
                         let affected = obj.affectedIds;
-                        //if (annotationsRead[obj.id] == undefined) {
+
                         if (affected != undefined) {
                             affected.forEach(function(aff) {
                                 if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
                                     if (gameObjs[aff] !== undefined) {
-				                        //ipc_send("ipc_log", "("+turnNumber+") Phase: "+turnPhase+" step: "+turnStep);
-                                        //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+aff+") "+cardsDb.get(gameObjs[aff].grpId).name+" Entered "+zones[affector].type);
-                                        //annotationsRead[obj.id] = true;
+                                        ipc_send("ipc_log", "AnnotationType_EnteredZoneThisTurn - "+gameObjs[aff].name+" / zone: "+affector);
+                                        gameObjs[aff].zoneId = affector;
+                                    }
+                                }
+
+                                if (obj.type.includes("AnnotationType_ZoneTransfer")) {
+                                    var _orig = undefined;
+                                    var _new = undefined;
+                                    obj.details.forEach(function(detail) {
+                                        if (detail.key == "zone_src") {
+                                            _src = detail.valueInt32[0];
+                                        }
+                                        if (detail.key == "zone_dest") {
+                                            _dest = detail.valueInt32[0];
+                                        }
+                                    });
+
+                                    if (_src == undefined || _dest == undefined) {
+                                        console.log("undefined value: ", obj)
+                                    }
+                                    else if (gameObjs[aff] !== undefined) {
+                                        ipc_send("ipc_log", "AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest);
+                                        gameObjs[aff].zoneId = _dest;
                                     }
                                 }
 
 
-                                //if (obj.type.includes("AnnotationType_WinTheGame")) {
-                                //}
+                                if (obj.type.includes("AnnotationType_ObjectIdChanged")) {
+                                    var _orig = undefined;
+                                    var _new = undefined;
+                                    obj.details.forEach(function(detail) {
+                                        if (detail.key == "orig_id") {
+                                            _orig = detail.valueInt32[0];
+                                        }
+                                        if (detail.key == "new_id") {
+                                            _new = detail.valueInt32[0];
+                                        }
+                                    });
+
+                                    if (_orig == undefined || _new == undefined) {
+                                        console.log("undefined value: ", obj)
+                                    }
+                                    else if (gameObjs[_orig] != undefined) {
+                                        ipc_send("ipc_log", "AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
+                                        gameObjs[_new] = JSON.parse(JSON.stringify(gameObjs[_orig]));
+                                        gameObjs[_orig] = undefined;
+                                    }
+                                }
                             });
                         }
                     });
@@ -1086,17 +1133,23 @@ function gre_to_client(data) {
 
                 if (msg.gameStateMessage.gameObjects != undefined) {
                     msg.gameStateMessage.gameObjects.forEach(function(obj) {
+                        name = cardsDb.get(obj.grpId).name;
+                        if (name) {
+                            obj.name = name;
+                        }
+                        obj.zoneName = zones[obj.zoneId].type;
                         gameObjs[obj.instanceId] = obj;
-                        //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") "+cardsDb.get(obj.grpId).name+" created at "+zones[obj.zoneId].type);
+
+                        //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") "++" created at "+zones[obj.zoneId].type);
                     });
                 }
-                /*
+                
                 if (msg.gameStateMessage.diffDeletedInstanceIds != undefined) {
                     msg.gameStateMessage.diffDeletedInstanceIds.forEach(function(obj) {
                         gameObjs[obj] = undefined;
                     });
                 }
-                */
+                
             }
         }
         //
@@ -1106,7 +1159,7 @@ function gre_to_client(data) {
     currentDeckUpdated = JSON.parse(str);
     forceDeckUpdate();
     update_deck(false);
-}0
+}
 
 function createMatch(arg) {
     var obj = store.get('overlayBounds');
@@ -1114,6 +1167,7 @@ function createMatch(arg) {
     annotationsRead = [];
     zones = {};
     gameObjs = {};
+    oppDeck = {mainDeck: [], sideboard: []};
 
     if (!firstPass && store.get("settings").show_overlay == true) {
         if (store.get("settings").close_on_match) {
@@ -1222,6 +1276,12 @@ function forceDeckUpdate() {
     var typeEnc = 0;
     var typeLan = 0;
     if (debugLog == true || firstPass == false) {
+        /*
+        // DEBUG
+        currentDeckUpdated.mainDeck = [];
+        decksize = 0;
+        cardsleft = 0;
+        */
         currentDeckUpdated.mainDeck.forEach(function(card) {
             card.total = card.quantity;
             decksize += card.quantity;
@@ -1232,11 +1292,20 @@ function forceDeckUpdate() {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo" && zones[gameObjs[key].zoneId].type != "ZoneType_Library") {
                 if (gameObjs[key].ownerSeatId == playerSeat && gameObjs[key].type != "GameObjectType_Token" && gameObjs[key].type != "GameObjectType_Ability") {
+                    /*
+                    // DEBUG
+                    if (gameObjs[key].grpId != 3) {
+                        decksize += 1;
+                        cardsleft += 1;
+                        currentDeckUpdated.mainDeck.push({id: gameObjs[key].grpId, quantity: gameObjs[key].zoneId})
+                    }
+                    */
+                    
                 	cardsleft -= 1;
 	                if (currentDeckUpdated.mainDeck != undefined) {
                         currentDeckUpdated.mainDeck.forEach(function(card) {
                             if (card.id == gameObjs[key].grpId) {
-                                //console.log(cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
+                                console.log(cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
                                 card.quantity -= 1;
                             }
                         });
@@ -1274,24 +1343,23 @@ function forceDeckUpdate() {
 }
 
 function getOppDeck() {
-	var oppDeck = {mainDeck: [], sideboard : []};
+	//var oppDeck = {mainDeck: [], sideboard : []};
 	var doAdd = true;
     oppDeck.name = oppName;
     console.log("Deck "+oppName);
     Object.keys(gameObjs).forEach(function(key) {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
-	        	console.log(cardsDb.get(gameObjs[key].grpId), cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type, gameObjs[key]);
+	        	//console.log(cardsDb.get(gameObjs[key].grpId), cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type, gameObjs[key]);
                 if (gameObjs[key].ownerSeatId == oppSeat && gameObjs[key].type != "GameObjectType_Token" && gameObjs[key].type != "GameObjectType_Ability") {
-
+                    
                 	doAdd = true;
                     oppDeck.mainDeck.forEach(function(card) {
                         if (card.id == gameObjs[key].grpId) {
                             doAdd = false;
-                            card.quantity += 1;
+                            //card.quantity += 1;
                         }
                     });
-
                     if (doAdd) {
                         if (cardsDb.get(gameObjs[key].grpId) != false) {
     						oppDeck.mainDeck.push( {id: gameObjs[key].grpId, quantity: 1} );
