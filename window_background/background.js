@@ -1075,12 +1075,15 @@ function gre_to_client(data) {
 
                         if (affected != undefined) {
                             affected.forEach(function(aff) {
+                                /*
                                 if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
                                     if (gameObjs[aff] !== undefined) {
-                                        ipc_send("ipc_log", "AnnotationType_EnteredZoneThisTurn - "+gameObjs[aff].name+" / zone: "+affector);
+                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_EnteredZoneThisTurn - "+gameObjs[aff].name+" / zone: "+affector+" - "+zones[affector].type);
                                         gameObjs[aff].zoneId = affector;
+                                        gameObjs[aff].zoneName = zones[affector].type;
                                     }
                                 }
+                                */
 
                                 if (obj.type.includes("AnnotationType_ZoneTransfer")) {
                                     var _orig = undefined;
@@ -1098,11 +1101,11 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[aff] !== undefined) {
-                                        ipc_send("ipc_log", "AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest);
+                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest+" - "+zones[_dest].type);
                                         gameObjs[aff].zoneId = _dest;
+                                        gameObjs[aff].zoneName = zones[_dest].type;
                                     }
                                 }
-
 
                                 if (obj.type.includes("AnnotationType_ObjectIdChanged")) {
                                     var _orig = undefined;
@@ -1120,7 +1123,7 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[_orig] != undefined) {
-                                        ipc_send("ipc_log", "AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
+                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
                                         gameObjs[_new] = JSON.parse(JSON.stringify(gameObjs[_orig]));
                                         gameObjs[_orig] = undefined;
                                     }
@@ -1131,8 +1134,17 @@ function gre_to_client(data) {
                 }
 
                 if (msg.gameStateMessage.zones != undefined) {
+                    ipc_send("ipc_log", "Zones updated");
                     msg.gameStateMessage.zones.forEach(function(zone) {
                         zones[zone.zoneId] = zone;
+                        if (zone.objectInstanceIds != undefined) {
+                            zone.objectInstanceIds.forEach(function(objId) {
+                                if (gameObjs[objId] != undefined) {
+                                    gameObjs[objId].zoneId = zone.zoneId;
+                                    gameObjs[objId].zoneName = zone.type;
+                                }
+                            });
+                        }
                     });
                 }
 
@@ -1310,7 +1322,7 @@ function forceDeckUpdate() {
 	                if (currentDeckUpdated.mainDeck != undefined) {
                         currentDeckUpdated.mainDeck.forEach(function(card) {
                             if (card.id == gameObjs[key].grpId) {
-                                console.log(cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
+                                console.log(gameObjs[key].instanceId, cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
                                 card.quantity -= 1;
                             }
                         });
@@ -1356,7 +1368,7 @@ function getOppDeck() {
         if (gameObjs[key] != undefined) {
             if (zones[gameObjs[key].zoneId].type != "ZoneType_Limbo") {
 	        	//console.log(cardsDb.get(gameObjs[key].grpId), cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type, gameObjs[key]);
-                if (gameObjs[key].ownerSeatId == oppSeat && gameObjs[key].type != "GameObjectType_Token" && gameObjs[key].type != "GameObjectType_Ability") {
+                if (gameObjs[key].ownerSeatId == oppSeat && gameObjs[key].type != "GameObjectType_SplitLeft" && gameObjs[key].type != "GameObjectType_SplitRight" && gameObjs[key].type != "GameObjectType_Token" && gameObjs[key].type != "GameObjectType_Ability") {
                     
                 	doAdd = true;
                     oppDeck.mainDeck.forEach(function(card) {
