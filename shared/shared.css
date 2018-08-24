@@ -270,14 +270,39 @@ label {
     background-image: url(../images/icon_back_light.png);
 }
 
-
-.main_hover {
+.main_hover_container {
     pointer-events: none;
-    width: 90%;
+    display: flex;
+    justify-content: flex-end;
+    position: absolute;
+    bottom: 0;
+    float: right;
+    width: 100%;
+    z-index: 50;
+}
+
+.loader, .loader_dfc {
+    pointer-events: none;
+    align-self: right;
+    /* width: 90%; */
     max-width: 240px;
     opacity: 0;
     display: block;
-    margin-left: auto;
+    /* margin-left: auto; */
+    margin-right: 24px;
+    margin-bottom: 24px;
+    -webkit-border-radius: 4.75% / 3.5%;
+    -webkit-transition: all .2s ease-in;
+}
+
+.main_hover, .main_hover_dfc {
+    pointer-events: none;
+    align-self: right;
+    /* width: 90%; */
+    max-width: 240px;
+    opacity: 1;
+    display: block;
+    /* margin-left: auto; */
     margin-right: 24px;
     margin-bottom: 24px;
     -webkit-border-radius: 4.75% / 3.5%;

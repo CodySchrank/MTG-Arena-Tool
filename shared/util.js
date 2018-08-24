@@ -15,17 +15,19 @@ function addCardTile(grpId, indent, quantity, element) {
 			cont.append('<div class="card_tile_quantity"><span>'+quantity+'</span></div>');
 		}
 		element.append(cont);
-		
-		var div = $('<div id="t'+grpId+indent+'" style="min-width: calc(100% - '+ww+'px) !important;" class="card_tile '+get_frame_class(cardsDb.get(grpId).frame)+'"></div>');
+		var card = cardsDb.get(grpId);
+		var div = $('<div id="t'+grpId+indent+'" style="min-width: calc(100% - '+ww+'px) !important;" class="card_tile '+get_frame_class(card.frame)+'"></div>');
 		cont.append(div);
 
 		// Glow hover
 		var glow = $('<div id="t'+grpId+indent+'" style="min-width: calc(100% - '+ww+'px) !important; left: calc(0px - 100% + '+ll+'px) !important" class="card_tile_glow"></div>');
 		cont.append(glow);
+
+		addCardHover(glow, card);
 		glow.on('mouseenter', function(e) {
 			var domid = $(this).attr('id');
 		    $('#'+domid).css('margin-top', '0px');
-
+		    /*
 			$('.main_hover').css("opacity", 1);
 			$('.loader').css("opacity", 1);
 			let dfc = '';
@@ -37,12 +39,11 @@ function addCardTile(grpId, indent, quantity, element) {
 			$('.main_hover').on('load', function(){
 				$('.loader').css("opacity", 0);
 			});
+			*/
 		});
 
 		glow.on('click', function(e) {
-			let card = cardsDb.get(grpId);
-
-			if (cardsDb.get(grpId).dfc == 'SplitHalf')	{
+			if (card.dfc == 'SplitHalf')	{
 				card = cardsDb.get(card.dfcId);
 			}
 			let newname = card.name.split(' ').join('-');
@@ -52,19 +53,19 @@ function addCardTile(grpId, indent, quantity, element) {
 
 		glow.on('mouseleave', function(e) {
 			var domid = $(this).attr('id');
-			$('.main_hover').css("opacity", 0);
+			//$('.main_hover').css("opacity", 0);
 		    $('#'+domid).css('margin-top', '3px');
-			$('.loader').css("opacity", 0);
+			//$('.loader').css("opacity", 0);
 		});
 
 		//
 		var fl = $('<div class="flex_item"></div>');
-		fl.append('<div class="card_tile_name">'+cardsDb.get(grpId).name+'</div>');
+		fl.append('<div class="card_tile_name">'+card.name+'</div>');
 		div.append(fl);
 
 		fl = $('<div class="flex_item"></div>"');
 		div.append(fl);
-		cardsDb.get(grpId).cost.forEach(function(cost) {
+		card.cost.forEach(function(cost) {
 			if (cost.color > 0 && cost.color < 7 || cost.color == 8) {
 				for (var i=0; i<cost.count; i++) {
 					fl.append('<div class="mana_16 flex_end mana_'+mana[cost.color]+'"></div>');
@@ -76,7 +77,7 @@ function addCardTile(grpId, indent, quantity, element) {
 		});
 
 		if (renderer == 0) {
-			if (cardsDb.get(grpId).type.indexOf("Basic Land") == -1) {
+			if (card.type.indexOf("Basic Land") == -1) {
 				if (cards[grpId] == undefined) {
 					cont.append('<div class="card_tile_not_owned" title="'+quantity+' missing"></div>');
 				}
@@ -86,6 +87,51 @@ function addCardTile(grpId, indent, quantity, element) {
 			}
 		}
 	}
+}
+
+
+//
+function addCardHover(div, _card) {
+	div.on('mouseenter', function(e) {
+		$('.main_hover').css("opacity", 1);
+		let dfc = '';
+		if (_card.dfc == 'DFC_Back')  dfc = 'a';
+		if (_card.dfc == 'DFC_Front') dfc = 'b';
+		if (_card.dfc == 'SplitHalf') dfc = 'a';
+
+		 // Split cards are readable both halves, no problem
+		if (dfc != '' && _card.dfc != 'SplitHalf' && renderer == 0) {
+			$('.main_hover_dfc').show();
+			$('.loader_dfc').show();
+			$('.main_hover_dfc').css("opacity", 1);
+			$('.loader_dfc').css("opacity", 1);
+			var dfcCard = cardsDb.get(_card.dfcId);
+			dfcf = '';
+			if (dfcCard.dfc == 'DFC_Back')	dfcf = 'a';
+			if (dfcCard.dfc == 'DFC_Front') dfcf = 'b';
+			$('.main_hover_dfc').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(dfcCard.set)+"/"+dfcCard.cid+dfcf+".jpg");
+			$('.main_hover_dfc').on('load', function(){
+				$('.loader_dfc').css("opacity", 0);
+			});
+		}
+		else {
+			$('.main_hover_dfc').hide();
+			$('.loader_dfc').hide();
+		}
+
+		$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(_card.set)+"/"+_card.cid+dfc+".jpg");
+
+		$('.main_hover').on('load', function(){
+			$('.loader').css("opacity", 0);
+		});
+	});
+
+	div.on('mouseleave', function(e) {
+		$('.main_hover').css("opacity", 0);
+		$('.main_hover_dfc').css("opacity", 0);
+		$('.loader').css("opacity", 0);
+		$('.loader_dfc').css("opacity", 0);
+	});
 }
 
 //

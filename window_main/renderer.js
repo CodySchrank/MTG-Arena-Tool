@@ -1450,25 +1450,12 @@ function open_draft(id, tileGrpid, set) {
         if (grpId == pick && draftPosition % 2 == 0) {
         	img.addClass('draft_card_picked');
         }
-		img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+        var card = cardsDb.get(grpId);
+		img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
 		img.appendTo(d);
-		img.on('mouseenter', function(e) {
-			$('.main_hover').css("opacity", 1);
-			$('.loader').css("opacity", 1);
-			let dfc = '';
-			if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
-			if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
-			if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
-			$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
 
-			$('.main_hover').on('load', function(){
-				$('.loader').css("opacity", 0);
-			});
-		});
-		img.on('mouseleave', function(e) {
-			$('.main_hover').css("opacity", 0);
-			$('.loader').css("opacity", 0);
-		});
+		addCardHover(img, card);
+
 		d.appendTo(pd);
 	});
 
@@ -2305,24 +2292,7 @@ function printCards() {
 			img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
 			img.appendTo(d);
 
-			img.on('mouseenter', function(e) {
-				$('.main_hover').css("opacity", 1);
-				let dfc = '';
-				if (card.dfc == 'DFC_Back')	 dfc = 'a';
-				if (card.dfc == 'DFC_Front') dfc = 'b';
-				if (card.dfc == 'SplitHalf') dfc = 'a';
-				console.log("https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
-				$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
-
-				$('.main_hover').on('load', function(){
-					$('.loader').css("opacity", 0);
-				});
-			});
-
-			img.on('mouseleave', function(e) {
-				$('.main_hover').css("opacity", 0);
-				$('.loader').css("opacity", 0);
-			});
+			addCardHover(img, card);
 
 			img.on('click', function(e) {
 				if (cardsDb.get(grpId).dfc == 'SplitHalf')	{
