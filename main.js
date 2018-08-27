@@ -14,6 +14,8 @@ const {autoUpdater} = require("electron-updater");
 require('electron-debug')({showDevTools: false});
 console.log(process.platform);
 
+const debugBack = false;
+
 var mainWindow;
 var background;
 var overlay;
@@ -414,7 +416,7 @@ function createBackgroundWindow() {
         frame: false,
         x: 0,
         y: 0,
-        show: false,
+        show: debugBack,
         width: 100,
         height: 100,
         title: "MTG Arena Tool",

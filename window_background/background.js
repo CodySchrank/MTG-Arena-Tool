@@ -49,6 +49,7 @@ const cardsDb = new Database();
 const serverAddress = 'mtgatool.com';
 
 const debugLog = false;
+const debugNet = false;
 const debugLogSpeed = 0.1;
 var timeStart = 0;
 var timeEnd = 0;
@@ -1101,7 +1102,7 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[aff] !== undefined) {
-                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest+" - "+zones[_dest].type);
+                                        //ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest+" - "+zones[_dest].type);
                                         gameObjs[aff].zoneId = _dest;
                                         gameObjs[aff].zoneName = zones[_dest].type;
                                     }
@@ -1123,7 +1124,7 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[_orig] != undefined) {
-                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
+                                        //ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
                                         gameObjs[_new] = JSON.parse(JSON.stringify(gameObjs[_orig]));
                                         gameObjs[_orig] = undefined;
                                     }
@@ -1134,7 +1135,7 @@ function gre_to_client(data) {
                 }
 
                 if (msg.gameStateMessage.zones != undefined) {
-                    ipc_send("ipc_log", "Zones updated");
+                    //ipc_send("ipc_log", "Zones updated");
                     msg.gameStateMessage.zones.forEach(function(zone) {
                         zones[zone.zoneId] = zone;
                         if (zone.objectInstanceIds != undefined) {
@@ -1531,8 +1532,11 @@ function httpBasic() {
         else {
             var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv4.php', method: 'POST', headers: _headers };
         }
-        //console.log("SEND >> "+index+", "+_headers.method, _headers);
-        //ipc_send("ipc_log", "SEND >> "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
+
+        if (debugNet) {
+            console.log("SEND >> "+index+", "+_headers.method, _headers);
+            ipc_send("ipc_log", "SEND >> "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
+        }
 
         var results = ''; 
         var req = http.request(options, function(res) {
@@ -1540,8 +1544,10 @@ function httpBasic() {
                 results = results + chunk;
             }); 
             res.on('end', function () {
-				//ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
-				//ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+results);
+                if (debugNet) {
+    				ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
+    				ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+results);
+                }
                 try {
                     var parsedResult = JSON.parse(results);
                     if (parsedResult.ok) {
@@ -1567,8 +1573,10 @@ function httpBasic() {
                     callback();
                 }
                 removeFromHttp(_headers.reqId);
-                //var str = ""; httpAsync.forEach( function(h) { str += h.reqId+", "; });
-                //ipc_send("ipc_log", "httpAsync: "+str);
+                if (debugNet) {
+                    var str = ""; httpAsync.forEach( function(h) { str += h.reqId+", "; });
+                    ipc_send("ipc_log", "httpAsync: "+str);
+                }
             }); 
         });
 
@@ -1606,12 +1614,12 @@ function httpAuth() {
 
 function httpSubmitCourse(_courseId, _course) {
     var _id = makeId(6);
-    if (settings.anon_explore == true) {
+    if (store.get("settings").anon_explore == true) {
         _course.PlayerId = "000000000000000";
         _course.PlayerName = "Anonymous";
     }
     _course = JSON.stringify(_course);
-	httpAsync.push({'reqId': _id, 'method': 'submit_course', 'uid': playerId, 'course': _course, 'courseid': _courseId});
+    httpAsync.push({'reqId': _id, 'method': 'submit_course', 'uid': playerId, 'course': _course, 'courseid': _courseId});
 }
 
 function httpSetPlayer(name, rank, tier) {
