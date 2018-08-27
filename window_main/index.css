@@ -1311,3 +1311,89 @@ span i {
     color: rgba(250, 229, 210, 1);
 }
 
+
+@import "compass/css3";
+@import "compass";
+
+.select-hidden {
+    display: none;
+    visibility: hidden;
+    padding-right: 10px;
+}
+
+.select {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    font-size: 14px;
+    color: #FAE5D2;
+    width: 240px;
+    height: 32px;
+}
+
+.select-styled {
+    position: absolute; 
+    border-radius: 6px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color:  #917961;
+    padding: 8px 15px;
+    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+
+.select-styled:after {
+    content:"";
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-color: #FAE5D2 transparent transparent transparent;
+    position: absolute;
+    top: 12px;
+    right: 10px;
+}
+
+.select-styled:hover {
+    background-color: rgba(250, 229, 210, 0.66);
+}
+
+.select-styled:active, .select-styled.active {
+    border-radius: 6px 6px 0px 0px;
+    background-color: rgba(250, 229, 210, 0.66);
+}
+
+
+.select-styled:active:after, .select-styled.active:after {
+    top: 5px;
+    border-color: transparent transparent #FAE5D2 transparent
+}
+
+.select-options {
+    display: none; 
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: 999;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: rgb(115,93,73);
+}
+
+.select-options li {
+    margin: 0;
+    padding: 7px 0;
+    text-indent: 15px;
+    border-top: 1px solid rgb(99, 79, 53);
+    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+
+.select-options li:hover {
+    background: rgba(250, 229, 210, 0.66);
+}
+
+.select-options li[rel="hide"] {
+    display: none;
+}

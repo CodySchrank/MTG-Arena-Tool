@@ -14,6 +14,7 @@ var sidebarActive = -1;
 var arenaRunning = false;
 var renderer = 0;
 var collectionPage = 0;
+var eventFilters = null;
 var filterEvent = '';
 var filteredSets = [];
 var filteredMana = [];
@@ -136,7 +137,6 @@ ipc.on('set_cards', function (event, _cards, _cardsnew) {
 //
 ipc.on('set_explore', function (event, arg) {
 	arg.sort(compare_explore);
-	//console.log(arg);
 	setExplore(arg, 0);
 });
 
@@ -830,8 +830,11 @@ function setDecks(arg) {
 
 //
 function updateExplore() {
-	filterEvent = document.getElementById("query_explore").value;
-	ipc_send('request_explore', filterEvent);
+	filterEvent = document.getElementById("query_select").value;
+	if (filterEvent == "All") {
+		filterEvent = "";
+	}
+	ipc_send('request_explore', filterEvent.toLowerCase());
 }
 
 //
@@ -856,25 +859,39 @@ function setExplore(arg, loadMore) {
 
 		// Search box
 		var icd = $('<div class="input_container"></div>');
-		var label = $('<label style="display: table">Filter by event</label>');
+		var label = $('<label style="display: table; margin-top: 6px !important;">Filter by event</label>');
 		label.appendTo(icd);
-		var input = $('<input type="search" id="query_explore" autocomplete="off" autofocus value="'+filterEvent+'" />');
+		
+		var input = $('<div class="query_explore" style="margin-left: 16px;"></div>');
+		var select = $('<select id="query_select"></select>');
+
+		if (eventFilters == null) {
+			eventFilters = ['All'];
+			for (var i = 0; i < explore.length; i++) {
+				let _deck = explore[i];
+				if (!eventFilters.includes(_deck.event)) {
+					eventFilters.push(_deck.event); 
+				}
+			}
+		}
+		eventFilters.sort(function(a, b){
+			if(a < b) return -1;
+			if(a > b) return 1;
+			return 0;
+		})
+		for (var i=0; i < eventFilters.length; i++) {
+			if (i==0) {
+				select.append('<option value="hide">'+eventFilters[i]+'</option>');
+			}
+			else {
+				select.append('<option value="'+eventFilters[i]+'">'+eventFilters[i]+'</option>');
+			}
+		}
+		select.appendTo(input);
+		selectAdd(select, updateExplore);
+
 		input.appendTo(icd);
 		icd.appendTo($("#ux_0"));
-
-		input.focus();
-		input[0].setSelectionRange(filterEvent.length, filterEvent.length);
-		/*
-		input.on('input', function() {
-			updateExplore();
-		});
-		*/
-
-		input.keypress(function(e) {
-			if (e.which == 13) {
-				updateExplore();
-			}
-		});
 
 		var d = document.createElement("div");
 		d.classList.add("list_fill");
@@ -891,6 +908,7 @@ function setExplore(arg, loadMore) {
 	for (var loadEnd = loadExplore + loadMore; loadExplore < loadEnd; loadExplore++) {
 		let _deck = explore[loadExplore];
 		let index = loadExplore;
+
 
 		if (_deck.deck_colors == undefined) {
 			_deck.deck_colors = [];
