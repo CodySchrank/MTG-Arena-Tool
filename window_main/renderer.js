@@ -884,7 +884,7 @@ function setExplore(arg, loadMore) {
 				select.append('<option value="hide">'+eventFilters[i]+'</option>');
 			}
 			else {
-				select.append('<option value="'+eventFilters[i]+'">'+eventFilters[i]+'</option>');
+				select.append('<option value="'+eventFilters[i]+'">'+getReadableEvent(eventFilters[i])+'</option>');
 			}
 		}
 		select.appendTo(input);
@@ -982,7 +982,7 @@ function setExplore(arg, loadMore) {
 
 		var d = document.createElement("div");
 		d.classList.add("list_deck_name_it");
-		d.innerHTML = _deck.event.replace(/_/g, " ")+" - "+timeSince(_deck.date*1000)+" ago";
+		d.innerHTML = getReadableEvent(_deck.event)+" - "+timeSince(_deck.date*1000)+" ago";
 		flr.appendChild(d);
 
 		div.appendChild(fll);

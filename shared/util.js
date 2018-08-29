@@ -227,6 +227,38 @@ function addCardSeparator(i, element) {
 }
 
 //
+function getReadableEvent(arg) {
+	switch (arg) {
+		case "CompCons_M19_07122018":
+			return "Competitive Constructed M19"; break;
+		case "Constructed_BestOf3":
+			return "Constructed Best of 3"; break;
+
+		case "CompDraft_DOM_09062018":
+			return "Competitive Draft DOM"; break;
+		case "CompDraft_M19_07122018":
+			return "Competitive Draft M19"; break;
+
+		case "QuickDraft_AKH_08092018":
+			return "Quick Draft AKH"; break;
+		case "QuickDraft_DOM_08022018":
+			return "Quick Draft DOM"; break;
+		case "QuickDraft_M19_08162018":
+			return "Quick Draft M19"; break;
+
+		case "QuickExploration_08242018":
+			return "Quick Exploration"; break;
+		case "Quick_Singleton_08092018":
+			return "Quick Singleton"; break;
+		
+		case "Quick_constructed_april_26":
+			return "Quick Constructed"; break;
+		default:
+			return arg; break;
+	}
+}
+
+//
 function get_card_type_sort(a) {
 	var ret = 0;
 	if (a.includes("Creature", 0)) 		ret = 1;
