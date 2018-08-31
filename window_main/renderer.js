@@ -1593,6 +1593,8 @@ function open_match(id) {
 	var odl = $('<div class="decklist"></div>');
 	flt.appendTo(odl);
 
+	match.oppDeck.mainDeck.sort(compare_cards);
+	match.oppDeck.sideboard.sort(compare_cards);
 	drawDeck(odl, match.oppDeck);
 
 	$('<div class="button_simple exportDeck">Export to Arena</div>').appendTo(odl);

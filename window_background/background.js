@@ -1387,7 +1387,7 @@ function getOppDeck() {
             }
         }
     }); 
-
+    
     return oppDeck;
 }
 
