@@ -245,6 +245,9 @@ ipc.on('set_economy', function (event, arg) {
 });
 
 ipc.on('request_explore', function (event, arg) {
+    if (arg == "all" || arg == "All" ) {
+        arg = "";
+    }
     httpGetTopDecks(arg);
 });
 

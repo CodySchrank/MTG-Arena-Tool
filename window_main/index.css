@@ -1330,6 +1330,7 @@ span i {
     color: #FAE5D2;
     width: 240px;
     height: 32px;
+    margin: auto 0;
 }
 
 .select-styled {

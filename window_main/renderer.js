@@ -16,7 +16,7 @@ var renderer = 0;
 var collectionPage = 0;
 var eventFilters = null;
 var sortingAlgorithm = 'Set';
-var filterEvent = '';
+var filterEvent = 'All';
 var filteredSets = [];
 var filteredMana = [];
 var draftPosition = 1;
@@ -852,9 +852,6 @@ function setDecks(arg) {
 //
 function updateExplore() {
 	filterEvent = document.getElementById("query_select").value;
-	if (filterEvent == "All") {
-		filterEvent = "";
-	}
 	ipc_send('request_explore', filterEvent.toLowerCase());
 }
 
@@ -887,13 +884,14 @@ function setExplore(arg, loadMore) {
 		var select = $('<select id="query_select"></select>');
 
 		if (eventFilters == null) {
-			eventFilters = ['All'];
+			eventFilters = [];
+			eventFilters.push('All');
 			for (var i = 0; i < explore.length; i++) {
 				let _deck = explore[i];
 				let evId = _deck.event.replace(/[0-9]/g, ''); 
 
 				if (!eventFilters.includes(evId)) {
-					eventFilters.push(evId); 
+					eventFilters.push(evId);
 				}
 			}
 		}
@@ -903,15 +901,13 @@ function setExplore(arg, loadMore) {
 			return 0;
 		})
 		for (var i=0; i < eventFilters.length; i++) {
-			if (i==0) {
-				select.append('<option value="hide">'+eventFilters[i]+'</option>');
-			}
-			else {
+			if (eventFilters[i] !== filterEvent) {
 				select.append('<option value="'+eventFilters[i]+'">'+getReadableEvent(eventFilters[i])+'</option>');
 			}
 		}
 		select.appendTo(input);
 		selectAdd(select, updateExplore);
+		select.next('div.select-styled').text(getReadableEvent(filterEvent));
 
 		input.appendTo(icd);
 		icd.appendTo($("#ux_0"));
@@ -1868,7 +1864,7 @@ function open_cards() {
 	var flex = $('<div class="inventory_flex"></div>');
 
 
-	var select = $('<select id="query_select"></select>');
+	var select = $('<select id="query_select">'+sortingAlgorithm+'</select>');
 	var sortby = ['Set', 'Name', 'Rarity', 'CMC'];
 	for (var i=0; i < sortby.length; i++) {
 		select.append('<option value="'+sortby[i]+'">'+sortby[i]+'</option>');
