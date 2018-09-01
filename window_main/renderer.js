@@ -15,6 +15,7 @@ var arenaRunning = false;
 var renderer = 0;
 var collectionPage = 0;
 var eventFilters = null;
+var sortingAlgorithm = 'Set';
 var filterEvent = '';
 var filteredSets = [];
 var filteredMana = [];
@@ -1866,6 +1867,15 @@ function open_cards() {
 	flex.appendTo(basicFilters);
 	var flex = $('<div class="inventory_flex"></div>');
 
+
+	var select = $('<select id="query_select"></select>');
+	var sortby = ['Set', 'Name', 'Rarity', 'CMC'];
+	for (var i=0; i < sortby.length; i++) {
+		select.append('<option value="'+sortby[i]+'">'+sortby[i]+'</option>');
+	}
+	select.appendTo(flex);
+	selectAdd(select, sortCollection);
+
 	var exp   = $('<div class="button_simple button_thin" onClick="exportCollection()">Copy to Clipboard</div>');
 	exp.appendTo(flex);
 	var reset = $('<div class="button_simple button_thin" onClick="resetFilters()">Reset</div>');
@@ -2156,6 +2166,11 @@ function printStats() {
 	});
 }
 
+function sortCollection(alg) {
+	sortingAlgorithm = alg;
+	printCards();
+}
+
 //
 function printCards() {
 	var div = $('.inventory_filters');
@@ -2193,11 +2208,14 @@ function printCards() {
 		var list = cards;
 	}
 	
-	
-	var keysSorted = Object.keys(list).sort( collectionSortName );
-	var keysSorted = Object.keys(list).sort( collectionSortSet );
-	var keysSorted = Object.keys(list).sort( collectionSortRarity );
-	var keysSorted = Object.keys(list).sort( collectionSortCmc );
+	if (sortingAlgorithm == 'Set')
+		var keysSorted = Object.keys(list).sort( collectionSortSet );
+	if (sortingAlgorithm == 'Name')
+		var keysSorted = Object.keys(list).sort( collectionSortName );
+	if (sortingAlgorithm == 'Rarity')
+		var keysSorted = Object.keys(list).sort( collectionSortRarity );
+	if (sortingAlgorithm == 'CMC')
+		var keysSorted = Object.keys(list).sort( collectionSortCmc );
 
     for (n=0; n<keysSorted.length; n++) {
 		let key = keysSorted[n];

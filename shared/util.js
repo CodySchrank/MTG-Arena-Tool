@@ -128,7 +128,7 @@ function selectAdd(div, callback) {
 	        $this.val($(this).attr('rel'));
 	        $list.hide();
 	        console.log($this.val());
-	        callback();
+	        callback($this.val());
 	    });
 	  
 	    $(document).click(function() {
@@ -479,8 +479,8 @@ function collectionSortSet(a, b) {
 function collectionSortRarity(a, b) {
 	a = cardsDb.get(a);
 	b = cardsDb.get(b);
-	if (a.set < b.rarity)	return -1;
-	if (a.set > b.rarity)	return 1;
+	if (a.rarity < b.rarity)	return -1;
+	if (a.rarity > b.rarity)	return 1;
 
 	if (a.set < b.set)	return -1;
 	if (a.set > b.set)	return 1;
@@ -494,8 +494,8 @@ function collectionSortRarity(a, b) {
 function collectionSortCmc(a, b) {
 	a = cardsDb.get(a);
 	b = cardsDb.get(b);
-	if (a.set < b.cmc)	return -1;
-	if (a.set > b.cmc)	return 1;
+	if (a.cmc < b.cmc)	return -1;
+	if (a.cmc > b.cmc)	return 1;
 
 	if (a.set < b.set)	return -1;
 	if (a.set > b.set)	return 1;
