@@ -48,6 +48,7 @@
 }
 
 .overlay_clock_container {
+    -webkit-app-region:drag;
     position: absolute;
     display: flex;
     flex-direction: column;

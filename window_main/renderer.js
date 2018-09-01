@@ -246,6 +246,26 @@ $(".list_deck").on('mouseenter mouseleave', function(e) {
     $(".deck_tile").trigger(e.type);
 });
 
+
+//
+ipc.on('popup', function (event, arg) {
+	pop(arg);
+});
+
+var popTimeout = null;
+function pop(str) {
+    $('.popup').css("opacity", 1);
+    $('.popup').html(str);
+    if (popTimeout != null) {
+	    clearTimeout(popTimeout);
+    }
+    popTimeout = setTimeout(function() {
+    	$('.popup').css("opacity", 0);
+    	popTimeout = null;
+    }, 3000);
+}
+
+//
 function installUpdate() {
 	ipc_send('renderer_update_install', 1);
 }
@@ -2172,8 +2192,16 @@ function printCards() {
 	else {
 		var list = cards;
 	}
-    for (n=0; n<Object.keys(list).length; n++) {
-		let key = Object.keys(list)[n];
+	
+	
+	var keysSorted = Object.keys(list).sort( collectionSortName );
+	var keysSorted = Object.keys(list).sort( collectionSortSet );
+	var keysSorted = Object.keys(list).sort( collectionSortRarity );
+	var keysSorted = Object.keys(list).sort( collectionSortCmc );
+
+    for (n=0; n<keysSorted.length; n++) {
+		let key = keysSorted[n];
+	
 		let grpId = key;
 		let card = cardsDb.get(grpId);
     	let doDraw = true;
@@ -2239,6 +2267,7 @@ function printCards() {
     		case 'mythic':
     			if (!filterMythic.checked) 		doDraw = false; break;
 			default:
+				doDraw = false;
     			break;
 		}
 

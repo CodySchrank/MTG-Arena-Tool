@@ -122,8 +122,9 @@ var deck_changes = {};
 
 ipc_send = function (method, arg) {
     if (method == "ipc_log") {
-        console.log("IPC LOG", arg);
+        //console.log("IPC LOG", arg);
     }
+    //console.log("ipc_switch", method, arg);
     ipc.send('ipc_switch', method, arg);
 };
 
@@ -404,7 +405,7 @@ function logLoop() {
             setTimeout( function() {
                 ipc_send("no_log", logUri);
             }, 100);
-            setTimeout(logLoop, 5000);
+            setTimeout(logLoop, 1000);
             console.log("No log file found");
         } else {
             readLog();
@@ -450,6 +451,11 @@ function processLog(err, bytecount, buff) {
 		(function(i, str){
 			setTimeout(function(){
 				processLogData(str);
+                    
+                let popStr = Math.round(100/splitString.length*i)+"%";
+                if (popStr != "0%") {
+                    ipc_send("popup", popStr);
+                }
 			}, i * debugLogSpeed);
 		}(i, str));
     }
@@ -457,6 +463,7 @@ function processLog(err, bytecount, buff) {
     if (firstPass) {
         setTimeout(function(){
             finishLoading();
+            ipc_send("popup", "100%");
         }, (splitString.length + 2) * debugLogSpeed);
     }
 
@@ -561,7 +568,6 @@ function findFirstJSON(str) {
 
 function processLogData(data) {
     data = data.replace(/[\r\n]/g, "");
-    //console.log(data);
     var strCheck, json;
 
     let timeStart = new Date();
@@ -1185,6 +1191,7 @@ function createMatch(arg) {
     annotationsRead = [];
     zones = {};
     gameObjs = {};
+
     oppDeck = {mainDeck: [], sideboard: []};
 
     if (!firstPass && store.get("settings").show_overlay == true) {
@@ -1442,6 +1449,7 @@ function saveMatch() {
     history[currentMatchId].type = "match";
     httpSetMatch(match);
     requestHistorySend(0);
+    ipc_send("popup", "Match saved!");
 }
 
 
@@ -1474,6 +1482,7 @@ function saveDraft() {
     history[draftId].type = "draft";
     httpSetMatch(draft);
     requestHistorySend(0);
+    ipc_send("popup", "Draft saved!");
 }
 
 

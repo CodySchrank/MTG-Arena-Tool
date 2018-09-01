@@ -43,6 +43,10 @@ ipc.on('ipc_switch', function (event, method, arg) {
             overlay.webContents.send("set_settings", arg);
             break;
 
+        case 'popup':
+            mainWindow.webContents.send("popup", arg);
+            break;
+
         case 'background_set_history':
             mainWindow.webContents.send("set_history", arg);
             break;
@@ -310,6 +314,7 @@ autoUpdater.on('update-available', (info) => {
     sendUpdateState();
     console.log('Auto updater:', 'Update available.');
     mainWindow.webContents.send("show_notification", "Update available");
+    mainWindow.webContents.send("popup", "An update is available.");
 })
 
 autoUpdater.on('update-not-available', (info) => {
@@ -324,6 +329,7 @@ autoUpdater.on('error', (err) => {
     updateAvailable = false;
     sendUpdateState();
     console.log('Auto updater:', 'Error in auto-updater. ' + err);
+    mainWindow.webContents.send("popup", "Updater error.");
 })
 
 autoUpdater.on('download-progress', (progressObj) => {
@@ -343,6 +349,7 @@ autoUpdater.on('update-downloaded', (info) => {
     sendUpdateState();
     mainWindow.webContents.send("show_notification", "Update downloaded");
     console.log('Auto updater:', 'Update downloaded');
+    mainWindow.webContents.send("popup", "Update downloaded");
 });
 
 function sendUpdateState() {

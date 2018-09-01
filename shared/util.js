@@ -233,6 +233,8 @@ function getReadableEvent(arg) {
 			return "Competitive Constructed M19"; break;
 		case "Constructed_BestOf":
 			return "Constructed Best of 3"; break;
+		case "Brewers_M_":
+			return "Brewers Delight"; break;
 		case "Pauper_":
 			return "Pauper"; break;
 
@@ -451,6 +453,58 @@ function get_collection_stats() {
 
     return stats;
 }
+
+//
+function collectionSortName(a, b) {
+	a = cardsDb.get(a);
+	b = cardsDb.get(b);
+	if (a.name < b.name)	return -1;
+	if (a.name > b.name)	return 1;
+	return 0;
+}
+
+//
+function collectionSortSet(a, b) {
+	a = cardsDb.get(a);
+	b = cardsDb.get(b);
+	if (a.set < b.set)	return -1;
+	if (a.set > b.set)	return 1;
+
+	if (a.cid < b.cid)	return -1;
+	if (a.cid > b.cid)	return 1;
+	return 0;
+}
+
+//
+function collectionSortRarity(a, b) {
+	a = cardsDb.get(a);
+	b = cardsDb.get(b);
+	if (a.set < b.rarity)	return -1;
+	if (a.set > b.rarity)	return 1;
+
+	if (a.set < b.set)	return -1;
+	if (a.set > b.set)	return 1;
+
+	if (a.cid < b.cid)	return -1;
+	if (a.cid > b.cid)	return 1;
+	return 0;
+}
+
+//
+function collectionSortCmc(a, b) {
+	a = cardsDb.get(a);
+	b = cardsDb.get(b);
+	if (a.set < b.cmc)	return -1;
+	if (a.set > b.cmc)	return 1;
+
+	if (a.set < b.set)	return -1;
+	if (a.set > b.set)	return 1;
+
+	if (a.cid < b.cid)	return -1;
+	if (a.cid > b.cid)	return 1;
+	return 0;
+}
+
 
 //
 function get_collection_export() {
