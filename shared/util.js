@@ -229,29 +229,31 @@ function addCardSeparator(i, element) {
 //
 function getReadableEvent(arg) {
 	switch (arg) {
-		case "CompCons_M19_07122018":
+		case "CompCons_M_":
 			return "Competitive Constructed M19"; break;
-		case "Constructed_BestOf3":
+		case "Constructed_BestOf":
 			return "Constructed Best of 3"; break;
+		case "Pauper_":
+			return "Pauper"; break;
 
-		case "CompDraft_DOM_09062018":
+		case "CompDraft_DOM_":
 			return "Competitive Draft DOM"; break;
-		case "CompDraft_M19_07122018":
+		case "CompDraft_M19_":
 			return "Competitive Draft M19"; break;
 
-		case "QuickDraft_AKH_08092018":
+		case "QuickDraft_AKH_":
 			return "Quick Draft AKH"; break;
-		case "QuickDraft_DOM_08022018":
+		case "QuickDraft_DOM_":
 			return "Quick Draft DOM"; break;
-		case "QuickDraft_M19_08162018":
+		case "QuickDraft_M_":
 			return "Quick Draft M19"; break;
 
-		case "QuickExploration_08242018":
+		case "QuickExploration_":
 			return "Quick Exploration"; break;
-		case "Quick_Singleton_08092018":
+		case "Quick_Singleton_":
 			return "Quick Singleton"; break;
 		
-		case "Quick_constructed_april_26":
+		case "Quick_constructed_april_":
 			return "Quick Constructed"; break;
 		default:
 			return arg; break;

@@ -869,8 +869,10 @@ function setExplore(arg, loadMore) {
 			eventFilters = ['All'];
 			for (var i = 0; i < explore.length; i++) {
 				let _deck = explore[i];
-				if (!eventFilters.includes(_deck.event)) {
-					eventFilters.push(_deck.event); 
+				let evId = _deck.event.replace(/[0-9]/g, ''); 
+
+				if (!eventFilters.includes(evId)) {
+					eventFilters.push(evId); 
 				}
 			}
 		}
