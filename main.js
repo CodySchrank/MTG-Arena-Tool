@@ -498,6 +498,21 @@ function createOverlay() {
     return over;
 }
 
+var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+    if (mainWindow.isVisible()) {
+        if (mainWindow.isMinimized()) {
+            showWindow();
+        }
+    } else {
+        showWindow();
+    }
+});
+
+if (shouldQuit) {
+    app.quit();
+    return;
+}
+
 app.on('window-all-closed', () => {
     quit();
 });
@@ -509,8 +524,8 @@ app.on('activate', () => {
 });
 
 app.on('ready', () => {
-    mainWindow = createMainWindow();
-    overlay = createOverlay();
-    background = createBackgroundWindow();
+    mainWindow  = createMainWindow();
+    overlay     = createOverlay();
+    background  = createBackgroundWindow();
     autoUpdater.checkForUpdatesAndNotify();
 });

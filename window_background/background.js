@@ -456,7 +456,7 @@ function processLog(err, bytecount, buff) {
 				processLogData(str);
                     
                 let popStr = Math.round(100/splitString.length*i)+"%";
-                if (popStr != "0%") {
+                if (popStr != "0%" && firstPass) {
                     ipc_send("popup", popStr);
                 }
 			}, i * debugLogSpeed);

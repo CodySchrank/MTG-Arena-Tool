@@ -1001,7 +1001,8 @@ function setExplore(arg, loadMore) {
 
 		var d = document.createElement("div");
 		d.classList.add("list_deck_name_it");
-		d.innerHTML = getReadableEvent(_deck.event)+" - "+timeSince(_deck.date*1000)+" ago";
+		let ee = _deck.event.replace(/[0-9]/g, ''); 
+		d.innerHTML = getReadableEvent(ee)+" - "+timeSince(_deck.date*1000)+" ago";
 		flr.appendChild(d);
 
 		div.appendChild(fll);
@@ -1931,7 +1932,7 @@ function open_cards() {
 	add_checkbox_search(cont, 'Show unowned', 'query_unown', false);
 	add_checkbox_search(cont, 'Newly aquired only', 'query_new', false);
 	add_checkbox_search(cont, 'Require multicolored', 'query_multicolor', false);
-	add_checkbox_search(cont, 'Exclude unselected', 'query_exclude', false);
+	add_checkbox_search(cont, 'Exclude unselected colors', 'query_exclude', false);
 	cont.appendTo(filters);
 
 	var cont = $('<div class="buttons_container"></div>');
