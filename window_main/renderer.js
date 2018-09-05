@@ -571,15 +571,7 @@ function setHistory(loadMore) {
 		}
 		else {
 			//console.log("DRAFT: ", match)
-			var tileGrpid = 67106;
-			if (match.set == "Magic 2019")			tileGrpid = 65947;// Nicol Bolas art
-			if (match.set == "Dominaria")			tileGrpid = 67106;// Karn art
-			if (match.set == "Rivals of Ixalan")	tileGrpid = 66937;// Huatl art
-			if (match.set == "Ixalan")				tileGrpid = 66433;// Vraska art
-			if (match.set == "Hour of Devastation")	tileGrpid = 65759;// Nicol Bolas art
-			if (match.set == "Amonketh")			tileGrpid = 64827;// Gideon art
-			if (match.set == "Aether Revolt")		tileGrpid = 64647;// Tezzeret art
-			if (match.set == "Kaladesh")			tileGrpid = 63859;// Chandra art
+			var tileGrpid = setsList[match.set].tile;
 
 			var tile = document.createElement("div");
 			tile.classList.add(match.id+"t");

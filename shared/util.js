@@ -349,47 +349,58 @@ function compare_draft_cards(a, b) {
 var setsList = {
 	"Oath of the Gatewatch": {
 		"scryfall": "ogw",
-		"code": "OGW"
+		"code": "OGW",
+		"tile": 67106
 	},
 	"Kaladesh": {
 		"scryfall": "kld",
-		"code": "KLD"
+		"code": "KLD",
+		"tile": 63859
 	},
 	"Aether Revolt": {
 		"scryfall": "aer",
-		"code": "AER"
+		"code": "AER",
+		"tile": 64647
 	},
 	"Welcome Deck 2017": {
 		"scryfall": "w17",
-		"code": "W17"
+		"code": "W17",
+		"tile": 67106
 	},
 	"Amonkhet": {
 		"scryfall": "akh",
-		"code": "AKH"
+		"code": "AKH",
+		"tile": 64827
 	},
 	"Hour of Devastation": {
 		"scryfall": "hou",
-		"code": "hou"
+		"code": "hou",
+		"tile": 65759
 	},
 	"Ixalan": {
 		"scryfall": "xln",
-		"code": "XLN"
+		"code": "XLN",
+		"tile": 66433
 	},
 	"Rivals of Ixalan": {
 		"scryfall": "rix",
-		"code": "RIX"
+		"code": "RIX",
+		"tile": 66937
 	},
 	"Dominaria": {
 		"scryfall": "dom",
-		"code": "DAR"
+		"code": "DAR",
+		"tile": 67106
 	},
 	"Magic 2019": {
 		"scryfall": "m19",
-		"code": "M19"
+		"code": "M19",
+		"tile": 65947
 	},
 	"Arena": {
 		"scryfall": "mtga",
-		"code": "ANA"
+		"code": "ANA",
+		"tile": 67106
 	}
 };
 
@@ -434,7 +445,6 @@ function get_collection_stats() {
 	};
 
 	for (let set in setsList) {
-	//setsList.forEach(function(set) {
 		stats[set] = {
 			totalCards: 0,
 			ownedCards: 0,
@@ -897,25 +907,30 @@ function timeSince(date) {
   var seconds = Math.floor((new Date() - date) / 1000);
 
   var interval = Math.floor(seconds / 31536000);
-  if (interval > 0) {
+  if (interval == 1)
+    return interval + " year";
+  if (interval > 0)
     return interval + " years";
-  }
   interval = Math.floor(seconds / 2592000);
-  if (interval > 0) {
+  if (interval == 1)
+    return interval + " month";
+  if (interval > 0)
     return interval + " months";
-  }
   interval = Math.floor(seconds / 86400);
-  if (interval > 0) {
+  if (interval == 1)
+    return interval + " day";
+  if (interval > 0)
     return interval + " days";
-  }
   interval = Math.floor(seconds / 3600);
-  if (interval > 0) {
+  if (interval == 1)
+    return interval + " hous";
+  if (interval > 0)
     return interval + " hours";
-  }
   interval = Math.floor(seconds / 60);
-  if (interval > 0) {
+  if (interval == 1)
+    return interval + " minute";
+  if (interval > 0)
     return interval + " minutes";
-  }
   return Math.floor(seconds) + " seconds";
 }
 
