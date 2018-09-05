@@ -18,7 +18,7 @@ body {
 label {
     font-family: "Mplantin";
     color: #FAE5D2;
-    margin-top: 2px;
+    margin: auto 0;
 }
 
 @font-face {

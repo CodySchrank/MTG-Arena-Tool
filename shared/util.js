@@ -346,41 +346,65 @@ function compare_draft_cards(a, b) {
 }
 
 
-var setsList = ["Kaladesh", "Aether Revolt", "Welcome Deck 2017", "Amonkhet", "Hour of Devastation", "Ixalan", "Rivals of Ixalan", "Dominaria", "Magic 2019", "Arena"];
+var setsList = {
+	"Oath of the Gatewatch": {
+		"scryfall": "ogw",
+		"code": "OGW"
+	},
+	"Kaladesh": {
+		"scryfall": "kld",
+		"code": "KLD"
+	},
+	"Aether Revolt": {
+		"scryfall": "aer",
+		"code": "AER"
+	},
+	"Welcome Deck 2017": {
+		"scryfall": "w17",
+		"code": "W17"
+	},
+	"Amonkhet": {
+		"scryfall": "akh",
+		"code": "AKH"
+	},
+	"Hour of Devastation": {
+		"scryfall": "hou",
+		"code": "hou"
+	},
+	"Ixalan": {
+		"scryfall": "xln",
+		"code": "XLN"
+	},
+	"Rivals of Ixalan": {
+		"scryfall": "rix",
+		"code": "RIX"
+	},
+	"Dominaria": {
+		"scryfall": "dom",
+		"code": "DAR"
+	},
+	"Magic 2019": {
+		"scryfall": "m19",
+		"code": "M19"
+	},
+	"Arena": {
+		"scryfall": "mtga",
+		"code": "ANA"
+	}
+};
 
 //
 function get_set_scryfall(set) {
-	switch (set) {
-	    case "Arena": 					return "mtga";
-	    case "Magic 2019": 				return "m19";
-	    case "Dominaria": 				return "dom";
-	    case "Rivals of Ixalan": 		return "rix";
-	    case "Ixalan": 					return "xln";
-	    case "Hour of Devastation": 	return "hou";
-	    case "Amonkhet": 				return "akh";
-	    case "Aether Revolt": 			return "aer";
-	    case "Kaladesh": 				return "kld";
-	    case "Welcome Deck 2017": 		return "w17";
-	    case "Oath of the Gatewatch": 	return "ogw";
-	    default: 						return set;
-	}
+	let s = setsList[set].scryfall;
+	if (s == undefined)	s = set;
+	return s;
 }
 
 //
 function get_set_code(set) {
-	switch (set) {
-	    case "Arena": 			return "ANA";
-	    case "Magic 2019": 			return "M19";
-	    case "Dominaria": 			return "DAR";
-	    case "Rivals of Ixalan": 	return "RIX";
-	    case "Ixalan": 				return "XLN";
-	    case "Hour of Devastation": return "HOU";
-	    case "Amonkhet": 			return "AKH";
-	    case "Aether Revolt": 		return "AER";
-	    case "Kaladesh": 			return "KLD";
-	    case "Welcome Deck 2017": 	return "W17";
-	    default: 					return set;
-	}
+	let s = setsList[set].code;
+	if (s == undefined)	s = set;
+	return s;
 }
 
 //
@@ -409,7 +433,8 @@ function get_collection_stats() {
 		ownedSingles: 0
 	};
 
-	setsList.forEach(function(set) {
+	for (let set in setsList) {
+	//setsList.forEach(function(set) {
 		stats[set] = {
 			totalCards: 0,
 			ownedCards: 0,
@@ -422,7 +447,8 @@ function get_collection_stats() {
 			totalRare: 0,
 			totalMythic: 0
 		};
-	});
+	}
+	//});
 
     Object.keys(cardsDb.cards).forEach(function(grpId) {
     	card = cardsDb.get(grpId);
@@ -470,8 +496,8 @@ function collectionSortSet(a, b) {
 	if (a.set < b.set)	return -1;
 	if (a.set > b.set)	return 1;
 
-	if (a.cid < b.cid)	return -1;
-	if (a.cid > b.cid)	return 1;
+	if (parseInt(a.cid) < parseInt(b.cid))	return -1;
+	if (parseInt(a.cid) > parseInt(b.cid))	return 1;
 	return 0;
 }
 
@@ -485,8 +511,8 @@ function collectionSortRarity(a, b) {
 	if (a.set < b.set)	return -1;
 	if (a.set > b.set)	return 1;
 
-	if (a.cid < b.cid)	return -1;
-	if (a.cid > b.cid)	return 1;
+	if (parseInt(a.cid) < parseInt(b.cid))	return -1;
+	if (parseInt(a.cid) > parseInt(b.cid))	return 1;
 	return 0;
 }
 
@@ -494,14 +520,14 @@ function collectionSortRarity(a, b) {
 function collectionSortCmc(a, b) {
 	a = cardsDb.get(a);
 	b = cardsDb.get(b);
-	if (a.cmc < b.cmc)	return -1;
-	if (a.cmc > b.cmc)	return 1;
+	if (parseInt(a.cmc) < parseInt(b.cmc))	return -1;
+	if (parseInt(a.cmc) > parseInt(b.cmc))	return 1;
 
 	if (a.set < b.set)	return -1;
 	if (a.set > b.set)	return 1;
 
-	if (a.cid < b.cid)	return -1;
-	if (a.cid > b.cid)	return 1;
+	if (parseInt(a.cid) < parseInt(b.cid))	return -1;
+	if (parseInt(a.cid) > parseInt(b.cid))	return 1;
 	return 0;
 }
 

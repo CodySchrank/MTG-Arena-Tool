@@ -1886,9 +1886,19 @@ function open_cards() {
 	// "ADVANCED" FILTERS
 	var filters = $('<div class="inventory_filters"></div>');
 
+	var flex = $('<div class="inventory_flex"></div>');
+
+	var icd = $('<div style="padding-bottom: 8px;" class="input_container"></div>');
+	var label = $('<label style="display: table">Type line</label>');
+	label.appendTo(icd);
+	var typeInput = $('<input type="search" id="query_type" autocomplete="off" />');
+	typeInput.appendTo(icd);
+	icd.appendTo(flex);
+	flex.appendTo(filters);
+
 	var sets = $('<div class="sets_container"><label>Filter by set:</label></div>');
-	setsList.forEach(function(set) {
-		var setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(../images/sets/'+get_set_code(set)+'.png)" title="'+set+'"></div>');
+	for (let set in setsList) {
+		let setbutton = $('<div class="set_filter set_filter_on" style="background-image: url(../images/sets/'+setsList[set].code+'.png)" title="'+set+'"></div>');
 		setbutton.appendTo(sets);
 		setbutton.click(function() {
 			if (setbutton.hasClass('set_filter_on')) {
@@ -1903,7 +1913,7 @@ function open_cards() {
 				}
 			}
 		});
-	});
+	}
 	sets.appendTo(filters);
 
 	var manas = $('<div class="sets_container"><label>Filter by color:</label></div>');
@@ -2024,6 +2034,7 @@ function resetFilters() {
 	});
 
 	document.getElementById("query_name").value = "";
+	document.getElementById("query_type").value = "";
 	document.getElementById("query_unown").checked = false;
 	document.getElementById("query_new").checked = false;
 	document.getElementById("query_multicolor").checked = false;
@@ -2064,9 +2075,9 @@ function printStats() {
 	label.appendTo(mainstats);
 
 	// each set stats
-	setsList.forEach(function(set) {
+	for (let set in setsList) {
 		var setdiv = $('<div class="stats_set_completion"></div>');
-		$('<div class="stats_set_icon" style="background-image: url(../images/sets/'+get_set_code(set)+'.png)"><span>'+set+' <i>('+stats[set].ownedCards+'/'+stats[set].totalCards+', '+Math.round(stats[set].ownedCards/stats[set].totalCards*100)+'%)</i></span></div>').appendTo(setdiv);
+		$('<div class="stats_set_icon" style="background-image: url(../images/sets/'+setsList[set].code+'.png)"><span>'+set+' <i>('+stats[set].ownedCards+'/'+stats[set].totalCards+', '+Math.round(stats[set].ownedCards/stats[set].totalCards*100)+'%)</i></span></div>').appendTo(setdiv);
 		$('<div class="stats_set_bar" style="width: '+stats[set].ownedCards/stats[set].totalCards*100+'%"></div>').appendTo(setdiv);
 		setdiv.appendTo(mainstats);
 
@@ -2092,7 +2103,7 @@ function printStats() {
 			$('<div class="stats_set_bar" style="width: '+stats[set].ownedMythic/stats[set].totalMythic*100+'%"></div>').appendTo(setdiv);
 			setdiv.appendTo(substats);
 		});
-	});
+	}
 
 	// Complete collection sats
 	var setdiv = $('<div class="stats_set_completion"></div>');
@@ -2182,6 +2193,7 @@ function printCards() {
 	div.append(paging);
 
 	filterName  	= document.getElementById("query_name").value.toLowerCase();
+	filterType  	= document.getElementById("query_type").value.toLowerCase();
 	filterUnown		= document.getElementById("query_unown").checked;
 	filterNew   	= document.getElementById("query_new");
 	filterMulti 	= document.getElementById("query_multicolor");
@@ -2228,9 +2240,22 @@ function printCards() {
     	let cmc = card.cmc;
     	let set  = card.set;
 
-		if (name.indexOf(filterName) == -1 && type.indexOf(filterName) == -1) {
-			doDraw = false;
-		}
+    	// Filter name
+    	var arr;
+    	arr = filterName.split(" ");
+    	arr.forEach(function(s) {
+			if (name.indexOf(s) == -1) {
+				doDraw = false;
+			}
+    	})
+
+    	// filter type
+    	arr = filterType.split(" ");
+    	arr.forEach(function(s) {
+			if (type.indexOf(s) == -1) {
+				doDraw = false;
+			}
+    	})
 
     	if (filterNew.checked && cardsNew[key] == undefined) {
     		doDraw = false;
