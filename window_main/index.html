@@ -13,65 +13,65 @@
         <script src="renderer.js"></script>
     </head>
     <body>
-        <div class="main_wrapper">
-            <div class="share_dialog_wrapper">
-                <div class="share_dialog">
+        <div class="outer_wrapper">
+            <div class="main_wrapper">
+                <div class="share_dialog_wrapper">
+                    <div class="share_dialog">
+                    </div>
                 </div>
-            </div>
-            <div class="top">
-                <div class="flex_item">
-                    <div class="top_logo"></div>
-                </div>
-                <div class="flex_item">
-                    <div class="notification"></div>
-                    <div class="button settings"></div>
-                    <div class="button minimize"></div>
-                    <div class="button close"></div>
-                </div>
-            </div>
-
-            <div class="wrapper">
-                <div class="sidebar hidden">
+                <div class="top">
                     <div class="flex_item">
+                        <div class="top_logo"></div>
+                    </div>
+                    <div class="flex_item">
+                        <div class="notification"></div>
+                        <div class="button minimize"></div>
+                        <div class="button settings"></div>
+                        <div class="button close"></div>
+                    </div>
+                </div>
+                <div class="top_nav hidden">
+                    <div class="top_nav_separator"></div>
+                    <div class="top_nav_item it0 item_selected">MY DECKS</div>
+                    <div class="top_nav_item it1">HISTORY</div>
+                    <div class="top_nav_item it2">EXPLORE</div>
+                    <div class="top_nav_item it3">ECONOMY</div>
+                    <div class="top_nav_item it4">COLLECTION</div>
+                    <div class="flex_item" style="margin-left: auto;">
                         <div class="top_rank" ></div>
                         <div class="top_username"></div>
                     </div>
-                    <div class="sidebar_separator"></div>
-                    <div class="sidebar_item it0 item_selected">My Decks</div>
-                    <div class="sidebar_item it1">History</div>
-                    <div class="sidebar_item it2">Explore</div>
-                    <div class="sidebar_item it3">Economy</div>
-                    <div class="sidebar_item it4">Collection</div>
-                    <div class="sidebar_item it5">Settings</div>
-                    <div class="sidebar_item it6">About</div>
                 </div>
 
-                <div class="loading_bar init_loading"><div class="loading_color loading_w"></div><div class="loading_color loading_u"></div><div class="loading_color loading_b"></div><div class="loading_color loading_r"></div><div class="loading_color loading_g"></div></div>
+                <div class="popup"></div>
+                <div class="wrapper">
+                    <div class="loading_bar init_loading"><div class="loading_color loading_w"></div><div class="loading_color loading_u"></div><div class="loading_color loading_b"></div><div class="loading_color loading_r"></div><div class="loading_color loading_g"></div></div>
 
-                <div class="overflow_ux hidden">
-                    <div class="moving_ux">
-                        <div class="ux_item" id="ux_0">
-                        </div>
+                    <div class="overflow_ux hidden">
+                        <div class="moving_ux">
+                            <div class="ux_item" id="ux_0">
+                            </div>
 
-                        <div class="ux_item" id="ux_1">
+                            <div class="ux_item" id="ux_1">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="popup"></div><div>
+                    
 
-                <div class="main_hover_container">
-                    <img class="main_hover">
-                    <img class="main_hover_dfc">
-                </div>
-                <div class="main_hover_container">
-                    <img class="loader" src="../images/nocard.png">
-                    <img class="loader_dfc" src="../images/nocard.png">
-                </div>
+                    <div class="main_hover_container">
+                        <img class="main_hover">
+                        <img class="main_hover_dfc">
+                    </div>
+                    <div class="main_hover_container">
+                        <img class="loader" src="../images/nocard.png">
+                        <img class="loader_dfc" src="../images/nocard.png">
+                    </div>
 
-                <div class="message_center">
-                    <div class="message_big red">Loading</div>
-                    <div class="message_sub white">Just a second..</div>
+                    <div class="message_center">
+                        <div class="message_big red">Loading</div>
+                        <div class="message_sub white">Just a second..</div>
+                    </div>
                 </div>
             </div>
         </div>

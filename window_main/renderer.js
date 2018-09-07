@@ -215,10 +215,10 @@ ipc.on('set_economy', function (event, arg) {
 //
 ipc.on('initialize', function (event, arg) {
 	$('.top_username').html(userName);
-	$(".top_rank").css("background-position", (rankOffset*-32)+"px 0px").attr("title", rankTitle);
+	$(".top_rank").css("background-position", (rankOffset*-48)+"px 0px").attr("title", rankTitle);
 	sidebarActive = 0;
 	setDecks(null);
-	$('.sidebar').removeClass('hidden');
+	$('.top_nav').removeClass('hidden');
 	$('.overflow_ux').removeClass('hidden');
 	$('.message_center').css('display', 'none');
 	$('.init_loading').hide();
@@ -227,7 +227,7 @@ ipc.on('initialize', function (event, arg) {
 //
 ipc.on('no_log', function (event, arg) {
 	console.log(arg)
-	$('.sidebar').addClass('hidden');
+	$('.top_nav').addClass('hidden');
 	$('.overflow_ux').addClass('hidden');
 	$('.message_center').css('display', 'flex');
 	$('.message_center').html('<div class="message_big red">No Log Found</div><div class="message_sub_16 white">check if it exists at '+arg+'</div><div class="message_sub_16 white">if it does, try closing MTG Arena and deleting it.</div>');
@@ -235,8 +235,8 @@ ipc.on('no_log', function (event, arg) {
 
 //
 ipc.on('log_read', function (event, arg) {
-	if ($('.sidebar').hasClass('hidden')) {
-		$('.sidebar').removeClass('hidden');
+	if ($('.top_nav').hasClass('hidden')) {
+		$('.top_nav').removeClass('hidden');
 		$('.overflow_ux').removeClass('hidden');
 		$('.message_center').css('display', 'none');
 	}
@@ -273,7 +273,7 @@ function installUpdate() {
 
 function force_open_settings() {
 	sidebarActive = 5;
-	$(".sidebar_item").each(function(index) {
+	$(".top_nav_item").each(function(index) {
 		$(this).removeClass("item_selected");
 		if ($(this).hasClass("it5")) {
 			$(this).addClass("item_selected");
@@ -285,7 +285,7 @@ function force_open_settings() {
 
 function force_open_about() {
 	sidebarActive = 6;
-	$(".sidebar_item").each(function(index) {
+	$(".top_nav_item").each(function(index) {
 		$(this).removeClass("item_selected");
 		if ($(this).hasClass("it6")) {
 			$(this).addClass("item_selected");
@@ -298,14 +298,14 @@ function force_open_about() {
 function arenaCheckLoop() {
 	if (!arenaRunning) {
 		console.log("Arena is NOT running")
-		$('.sidebar').addClass('hidden');
+		$('.top_nav').addClass('hidden');
 		$('.overflow_ux').addClass('hidden');
 		$('.message_center').css('display', 'flex');
 		$('.message_center').html('<div class="message_big red">Open MTG Arena</div><div class="message_sub white">...</div>');
 	}
 	else {
 		console.log("Arena is running")
-		$('.sidebar').removeClass('hidden');
+		$('.top_nav').removeClass('hidden');
 		$('.overflow_ux').removeClass('hidden');
 		$('.message_center').css('display', 'none');
 	}
@@ -350,12 +350,12 @@ $(document).ready(function() {
 	});
 
 	//
-	$(".sidebar_item").click(function () {
+	$(".top_nav_item").click(function () {
 		$("#ux_0").off();
 		if (!$(this).hasClass("item_selected")) {
 			$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 
-			$(".sidebar_item").each(function(index) {
+			$(".top_nav_item").each(function(index) {
 				$(this).removeClass("item_selected");
 			});
 
