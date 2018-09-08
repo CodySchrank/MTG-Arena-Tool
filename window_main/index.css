@@ -56,16 +56,16 @@ span i {
     margin-top: 12px;
     margin-bottom: 12px;
     cursor: pointer;
-    width: 160px;
+    width: 200px;
     height: 32px;
-    border-radius: 6px;
-    color: rgb(99, 79, 53);
+    border-radius: 3px;
+    color: #fae5d2;
     font-size: 18px;
     text-align: center;
     line-height: 32px;
-    border: 1px solid rgba(145, 115, 75, 1);
-    background-color: rgb(195, 172, 130);
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(250, 226, 210, 0.5);
+    background-color: rgba(145, 121, 97, 0.4);
+    /* box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.8); */
     -webkit-transition: all .1s ease-in;
 }
 
@@ -88,14 +88,15 @@ span i {
 }
 
 .button_simple:hover {
-    background-color: rgb(220, 195, 150);
-    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.5);
+    background-color: rgba(145, 121, 97, 1);
+    box-shadow: 0px 6px 15px 0px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(250, 226, 210, 1);
 }
 
 .button_simple:active {
-    background-color: rgb(220, 195, 150);
+    background-color: rgba(145, 121, 97, 1);
     line-height: 34px;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.8);
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.6);
 }
 
 .top_username {
@@ -153,6 +154,7 @@ span i {
     background-repeat: no-repeat;
     background-image: url(../images/nav_hover.png);
     -webkit-transition: all .2s ease-in-out;
+    border-bottom: solid 1px rgba(210, 231, 250, 0);
 }
 
 .top_nav_item:hover {
@@ -638,12 +640,14 @@ span i {
 
 .inventory_card_settings_img {
     -webkit-border-radius: 4.75% / 3.5%;
+    box-shadow: 0 5px 14px 2px rgba(0, 0, 0, 0.25);
 }
 
 
 .inventory_card_img {
     cursor: pointer;
     -webkit-border-radius: 4.75% / 3.5%;
+    box-shadow: 0 5px 14px 2px rgba(0, 0, 0, 0.25);
 }
 
 .inventory_card_img:hover {
@@ -869,16 +873,20 @@ span i {
 }
 
 .input_container input {
+    background-color: rgba(145, 121, 97, 0.35);
+    border: 1px solid rgba(250, 229, 210, 0.5);
     display: inline-table;
     margin-left: 16px;
     border-radius: 5px;
-    border-style: hidden;
+    /* border-style: hidden; */
+    color: #fae5d2;
     height: 24px;
     width: 100%;
     font-size: 14px;
     user-select: none;
     font-family: Mplantin;
     padding-left: 4px;
+}
 }
 
 .input_container input:focus {
@@ -909,6 +917,7 @@ span i {
     cursor: pointer;
     font-size: 16px;
     user-select: none;
+    -webkit-transition: all .15s ease-in-out;
 }
 
 .check_container_but {
@@ -949,17 +958,20 @@ span i {
     left: 0;
     height: 20px;
     width: 20px;
-    background-color: #eee;
+    background-color: rgba(145, 121, 97, 0);
+    border: 1px solid rgba(250, 229, 210, 0.5);
+    -webkit-transition: all .15s ease-in-out;
 }
 
 /* On mouse-over, add a grey background color */
 .check_container:hover input ~ .checkmark {
-    background-color: #ccc;
+    background-color: rgba(145, 121, 97, 0.5);
+    border: 1px solid rgba(250, 229, 210, 1);
 }
 
 /* When the checkbox is checked, add a blue background */
 .check_container input:checked ~ .checkmark {
-    background-color: rgba(145, 115, 75, 1);
+    background-color: rgba(145, 121, 97, 1);
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */
@@ -1177,7 +1189,8 @@ span i {
     margin: auto;
     width: 400px;
     height: 160px;
-    background-color: rgba(115, 93, 73, 1);
+    background-color: rgba(145, 121, 97, 0.5);
+    border: 1px solid rgba(250, 229, 210, 0.5);
     border-radius: 5px;
     box-shadow: 0px 2px 16px 0px black;
     -webkit-transition: all .15s cubic-bezier(1, 0.35, 0.35, 1);
@@ -1337,7 +1350,8 @@ span i {
     right: 0;
     bottom: 0;
     left: 0;
-    background-color:  #917961;
+    background-color: rgba(145, 121, 97, 0.2);
+    border: 1px solid rgba(250, 229, 210, 0.5);
     padding: 8px 15px;
     -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
 }
@@ -1354,12 +1368,14 @@ span i {
 }
 
 .select-styled:hover {
-    background-color: rgba(250, 229, 210, 0.66);
+    background-color: rgba(145, 121, 97, 0.5);
+    border: 1px solid rgba(250, 229, 210, 1);
 }
 
 .select-styled:active, .select-styled.active {
     border-radius: 6px 6px 0px 0px;
-    background-color: rgba(250, 229, 210, 0.66);
+    border-bottom: 0px;
+    background-color: rgba(145, 121, 97, .5);
 }
 
 
@@ -1369,7 +1385,7 @@ span i {
 }
 
 .select-options {
-    display: none; 
+    display: none;
     position: absolute;
     top: 100%;
     right: 0;
@@ -1378,7 +1394,9 @@ span i {
     margin: 0;
     padding: 0;
     list-style: none;
-    background-color: rgb(115,93,73);
+    background-color: hsla(29, 22%, 30%, 1);
+    border: 1px solid rgba(250, 229, 210, 0.5);
+    border-top: 0px;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 10px 16px 0px;
 }
 
@@ -1386,12 +1404,12 @@ span i {
     margin: 0;
     padding: 7px 0;
     text-indent: 15px;
-    border-top: 1px solid rgb(99, 79, 53);
+    border-top: 1px solid rgba(145, 121, 97, 0.5);
     -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
 }
 
 .select-options li:hover {
-    background: rgba(250, 229, 210, 0.66);
+    background: rgba(250, 229, 210, 0.5);
 }
 
 .select-options li[rel="hide"] {
@@ -1408,7 +1426,7 @@ span i {
     text-align: center;
     line-height: 30px;
     width: 190px;
-    border-radius: 4px;
+    border-radius: 3px;
     z-index: 100;
     height: 30px;
     box-shadow: 0 4px 6px 0px rgba(0, 0, 0, 0.3);

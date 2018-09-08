@@ -17,8 +17,17 @@ body {
 
 label {
     font-family: "Mplantin";
-    color: #FAE5D2;
+    color: rgba(250, 229, 210, 1);
     margin: auto 0;
+}
+
+
+.hover_label {
+    color: rgba(250, 229, 210, 0.8) !important;
+}
+
+.hover_label:hover {
+    color: rgba(255, 255, 255, 1) !important;
 }
 
 @font-face {
@@ -65,7 +74,7 @@ label {
     background-color: #B7C89E;
     overflow: hidden;
     width: 100%;
-    height: 8px;
+    height: 4px;
     animation-name: color;
     animation-duration: 2s;
     animation-iteration-count: infinite;
@@ -165,8 +174,17 @@ label {
 }
 
 .main_wrapper {
-    height: 100%;
-    z-index: -5;
+    background: url(../images/Ghitu-Lavarunner-Dominaria-MtG-Art.jpg);
+    position: absolute;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.25);
+    background-blend-mode: darken;
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    z-index: 5;
+    height: calc(100% - 4px);
+    width: calc(100% - 4px);
 }
 
 .wrapper {
@@ -190,32 +208,20 @@ label {
     width: calc(100% - 4px);
 }
 
-.main_wrapper:before, .overlay_wrapper:before {
-    background: url(../images/Ghitu-Lavarunner-Dominaria-MtG-Art.jpg);
-    /*background: url(../images/Mox-Amber-Dominaria-MtG-Art.jpg);*/
-    content: ' ';
-    width: calc(100% - 4px);
-    position: absolute;
-    height: calc(100% - 4px);
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
-    opacity: 0.5;
-    z-index: -5;
-}
 
 .main_wrapper:after, .overlay_wrapper:after {
     background: url(../images/background_overlay.png);
     content: ' ';
-    top: 2px;
-    left: 2px;
-    width: calc(100% - 4px);
-    height: calc(100% - 4px);
+    top: 0;
+    left: 0;
+    width: calc(100% - 0px);
+    height: calc(100% - 0px);
     position: absolute;
+    /* background-color: red; */
     background-size: 100% 100%;
-    opacity: 0.9;
-    z-index: -4;
-    filter: hue-rotate(200deg);
+    /* opacity: 0.9; */
+    /* z-index: -4; */
+    /* filter: hue-rotate(200deg); */
 }
 
 .top {
@@ -330,9 +336,11 @@ label {
 }
 
 .mana_20 {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     margin: 2px;
+    border-radius: 100%;
+    box-shadow: rgba(0, 0, 0, 0.75) -2px 2px;
 }
 
 .mana_16 {
@@ -492,14 +500,14 @@ span {
 }
 
 .card_tile_separator {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(250, 229, 210, 1);
     height: 32px;
     vertical-align: middle;
-    line-height: 32px;k,
-    font-size: 15px;
+    line-height: 32px;
     text-align: center;
     font-family: beleren;
     align-self: center;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
 }
 
 .card_tile_name {

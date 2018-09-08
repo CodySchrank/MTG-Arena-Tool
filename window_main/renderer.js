@@ -1067,7 +1067,7 @@ function open_deck(i, type) {
 	if (cardsDb.get(tileGrpid).dfc == 'DFC_Front')	dfc = 'b';
 	if (cardsDb.get(tileGrpid).dfc == 'SplitHalf')	dfc = 'a';
 
-	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg)");
+	$('.main_wrapper').css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg)");
 	var fld = $('<div class="flex_item"></div>');
 
 	var dl = $('<div class="decklist"></div>');
@@ -1453,7 +1453,7 @@ function open_draft(id, tileGrpid, set) {
 	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">'+set+' Draft</div></div>');
 	flr = $('<div class="flex_item" style="align-self: center;"></div>');
 	top.append(flr);
-	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
+	$('.main_wrapper').css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 
 	var cont = $('<div class="flex_item" style="flex-direction: column;"></div>');
     cont.append('<div class="draft_nav_container"><div class="draft_nav_prev"></div><div class="draft_nav_next"></div></div>');
@@ -1547,7 +1547,7 @@ function open_match(id) {
 
 
 	var tileGrpid = match.playerDeck.deckTileId;
-	top.css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
+	$('.main_wrapper').css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
 	var fld = $('<div class="flex_item"></div>');
 
 	// this is a mess
@@ -1985,7 +1985,7 @@ function open_cards() {
 
 //
 function add_checkbox_search(div, label, iid, def) {
-	var label = $('<label class="check_container">'+label+'</label>');
+	var label = $('<label class="check_container hover_label">'+label+'</label>');
 	var check_new = $('<input type="checkbox" id="'+iid+'" />');
 	check_new.appendTo(label);
 	check_new.prop('checked', def);
@@ -2058,7 +2058,7 @@ function printStats() {
 	stats = get_collection_stats();
 
 	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">Collection Statistics</div></div>');
-	top.css("background-image", "url(http://www.artofmtg.com/wp-content/uploads/2018/04/Urzas-Tome-Dominaria-MtG-Art.jpg)");
+	$('.main_wrapper').css("background-image", "url(http://www.artofmtg.com/wp-content/uploads/2018/04/Urzas-Tome-Dominaria-MtG-Art.jpg)");
 	
 	flex = $('<div class="flex_item"></div>');
 	mainstats = $('<div class="main_stats"></div>');
@@ -2431,7 +2431,7 @@ function setCollectionPage(page) {
 
 //
 function add_checkbox(div, label, iid, def) {
-	var label = $('<label class="check_container">'+label+'</label>');
+	var label = $('<label class="check_container hover_label">'+label+'</label>');
 	label.appendTo(div);
 	var check_new = $('<input type="checkbox" id="'+iid+'" onclick="updateSettings()" />');
 	check_new.appendTo(label);
