@@ -27,6 +27,8 @@ const defaultCfg = {
         overlay_deck: true,
         overlay_clock: true,
         overlay_ontop: true,
+        back_color: "rgba(0,0,0,0.3)",
+        back_url: ''
     },
     deck_changes:{},
     deck_changes_index:[],

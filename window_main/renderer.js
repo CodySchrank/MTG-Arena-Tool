@@ -26,7 +26,7 @@ var cardSize = 140;
 var cardQuality = "normal";
 var inputTimer = undefined;
 var loadHistory = 0;
-
+var defaultBackground = "";
 var currentOpenDeck = null;
 
 var rankOffset = 0;
@@ -40,6 +40,7 @@ const chartjs = require('chart.js');
 const Database = require('../shared/database.js');
 const cardsDb = new Database();
 
+const fs = require("fs");
 
 var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
 
@@ -158,9 +159,20 @@ ipc.on('set_settings', function (event, arg) {
 	settings = arg;
 	cardSizePos = settings.cards_size;
 	overlayAlpha = settings.overlay_alpha;
-	if (settings.cards_quality != undefined) {
-		cardQuality = settings.cards_quality;
-	}
+    if (settings.cards_quality != undefined) {
+        cardQuality = settings.cards_quality;
+    }
+    if (settings.back_color == undefined) {
+        settings.back_color = 'rgba(0,0,0,0.3)';
+    }
+    if (settings.back_url == undefined) {
+        back_url = "";
+    }
+    else {
+        defaultBackground = settings.back_url;
+    }
+    $('.main_wrapper').css('background-color', settings.back_color);
+    change_background("default");
 	cardSize = 100+(cardSizePos*10);
 });
 
@@ -352,6 +364,8 @@ $(document).ready(function() {
 	//
 	$(".top_nav_item").click(function () {
 		$("#ux_0").off();
+		$("#history_column").off();
+        change_background("default");
 		if (!$(this).hasClass("item_selected")) {
 			$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 
@@ -407,6 +421,7 @@ function open_economy_ipc() {
 //
 function setHistory(loadMore) {
 	var mainDiv = document.getElementById("ux_0");
+	mainDiv.classList.add("flex_item");
 	if (loadMore > 0) {
 	}
 	else {
@@ -416,6 +431,10 @@ function setHistory(loadMore) {
 
 		loadHistory = 0;
 		
+		var wrap_l = document.createElement("div");
+		wrap_l.classList.add("wrapper_column");
+		wrap_l.classList.add("sidebar_column");
+
 		var div = document.createElement("div");
 		div.classList.add("ranks_history");
 
@@ -455,14 +474,21 @@ function setHistory(loadMore) {
 		    }
 		}
 
+		var wrap_r = document.createElement("div");
+		wrap_r.classList.add("wrapper_column");
+		wrap_r.setAttribute("id", "history_column");
+
 		var d = document.createElement("div");
 		d.classList.add("list_fill");
 
-		mainDiv.appendChild(div);
-		mainDiv.appendChild(d);
-		
+		wrap_l.appendChild(div);
+		mainDiv.appendChild(wrap_l);
+		mainDiv.appendChild(wrap_r);
+		wrap_r.appendChild(d);
 	}
 
+	mainDiv = document.getElementById("history_column");
+	
 	console.log("Load more: ", loadHistory, loadMore, loadHistory+loadMore);
 	for (var loadEnd = loadHistory + loadMore; loadHistory < loadEnd; loadHistory++) {
 		var match_id = matchesHistory.matches[loadHistory];
@@ -615,7 +641,7 @@ function setHistory(loadMore) {
 	}
 
 	$(this).off();
-	$("#ux_0").on('scroll', function() {
+	$("#history_column").on('scroll', function() {
 		if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
 			setHistory(20);
 		}
@@ -706,6 +732,7 @@ function setDecks(arg) {
 	if (sidebarActive == 0 && decks != null) {
 		sort_decks();
 		var mainDiv = document.getElementById("ux_0");
+		mainDiv.classList.remove("flex_item");
 		mainDiv.innerHTML = '';
 		var d = document.createElement("div");
 		d.classList.add("list_fill");
@@ -855,6 +882,7 @@ function setExplore(arg, loadMore) {
 	}
 
 	var mainDiv = document.getElementById("ux_0");
+	mainDiv.classList.remove("flex_item");
 
 	if (loadMore > 0) {
 	}
@@ -1067,7 +1095,7 @@ function open_deck(i, type) {
 	if (cardsDb.get(tileGrpid).dfc == 'DFC_Front')	dfc = 'b';
 	if (cardsDb.get(tileGrpid).dfc == 'SplitHalf')	dfc = 'a';
 
-	$('.main_wrapper').css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg)");
+	change_background("https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg");
 	var fld = $('<div class="flex_item"></div>');
 
 	var dl = $('<div class="decklist"></div>');
@@ -1218,6 +1246,7 @@ function open_deck(i, type) {
 	});
 
 	$(".back").click(function () {
+        change_background("default");
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
 }
@@ -1453,7 +1482,7 @@ function open_draft(id, tileGrpid, set) {
 	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">'+set+' Draft</div></div>');
 	flr = $('<div class="flex_item" style="align-self: center;"></div>');
 	top.append(flr);
-	$('.main_wrapper').css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
+	change_background("https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg");
 
 	var cont = $('<div class="flex_item" style="flex-direction: column;"></div>');
     cont.append('<div class="draft_nav_container"><div class="draft_nav_prev"></div><div class="draft_nav_next"></div></div>');
@@ -1525,6 +1554,7 @@ function open_draft(id, tileGrpid, set) {
 	});
 	//
 	$(".back").click(function () {
+		change_background("default");
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
 }
@@ -1547,7 +1577,7 @@ function open_match(id) {
 
 
 	var tileGrpid = match.playerDeck.deckTileId;
-	$('.main_wrapper').css("background-image", "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)");
+	change_background("https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg");
 	var fld = $('<div class="flex_item"></div>');
 
 	// this is a mess
@@ -1627,6 +1657,7 @@ function open_match(id) {
 	});
 
 	$(".back").click(function () {
+		change_background("default");
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
 }
@@ -1641,6 +1672,7 @@ function open_economy() {
 	$('<div class="chart_container"><canvas id="gemsChart"></canvas></div>').appendTo(div);
 
 	$("#ux_0").append(div);
+	$("#ux_0").removeClass("flex_item");
 
 	// Set gold chart
 	var labels = [];
@@ -1830,6 +1862,7 @@ function open_economy() {
 function open_cards() {
 	$("#ux_0").html('');
 	$("#ux_1").html('');
+	$("#ux_0").removeClass("flex_item");
 	var div = $('<div class="inventory"></div>');
 	
 	var basicFilters = $('<div class="inventory_filters_basic"></div>');
@@ -2058,7 +2091,7 @@ function printStats() {
 	stats = get_collection_stats();
 
 	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">Collection Statistics</div></div>');
-	$('.main_wrapper').css("background-image", "url(http://www.artofmtg.com/wp-content/uploads/2018/04/Urzas-Tome-Dominaria-MtG-Art.jpg)");
+	change_background("http://www.artofmtg.com/wp-content/uploads/2018/04/Urzas-Tome-Dominaria-MtG-Art.jpg");
 	
 	flex = $('<div class="flex_item"></div>');
 	mainstats = $('<div class="main_stats"></div>');
@@ -2162,6 +2195,7 @@ function printStats() {
 	$("#ux_1").append(flex);
 	//
 	$(".back").click(function () {
+		change_background("default");
 	    $('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
 	});
 }
@@ -2443,7 +2477,14 @@ function add_checkbox(div, label, iid, def) {
 
 //
 function open_settings() {
+    change_background("default");
+	$("#ux_0").off();
+	$("#history_column").off();
 	$("#ux_0").html('');
+/*
+	var wrap_l = $('<div class="wrapper_column sidebar_column"></div>');
+	var wrap_r = $('<div class="wrapper_column"></div>');
+*/
 	var div = $('<div class="settings_page"></div>');
 
 	// Launch on startup
@@ -2467,6 +2508,32 @@ function open_settings() {
 	add_checkbox(div, 'Show sideboard', 'settings_overlay_sideboard', settings.overlay_sideboard);
 
 	div.append('<div class="settings_title">Visual</div>');
+
+    var label = $('<label class="but_container_label">Background URL:</label>');
+    label.appendTo(div);
+
+    var icd = $('<div class="input_container"></div>');
+    //var label = $('<label style="display: table">Search</label>');
+    //label.appendTo(icd);
+    var url_input = $('<input type="search" id="query_image" autocomplete="off" value="'+settings.back_url+'" />');
+    url_input.appendTo(icd);
+    icd.appendTo(label);
+
+    var label = $('<label class="but_container_label">Background shade:</label>');
+    var colorPick = $('<input type="text" id="flat" class="color_picker" />');
+    colorPick.appendTo(label);
+    label.appendTo(div);
+    colorPick.spectrum({
+        showInitial: true,
+        showAlpha: true,
+        showButtons: false
+    });
+    colorPick.spectrum("set", settings.back_color);
+
+    colorPick.on('move.spectrum', function(e, color) {
+        $('.main_wrapper').css('background-color', color.toRgbString());
+        updateSettings();
+    });
 
 	var label = $('<label class="but_container_label">Cards quality:</label>');
 	label.appendTo(div);
@@ -2508,6 +2575,12 @@ function open_settings() {
 
 	$("#ux_0").append(div);
 
+    url_input.on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            updateSettings();
+        }
+    });
+
 	$(".sliderA").off();
 
 	$(".sliderA").on('click mousemove', function() {
@@ -2546,6 +2619,33 @@ function open_settings() {
 }
 
 //
+function change_background(arg) {
+    if (arg == "default") {
+        arg = defaultBackground;
+    }
+    if (arg == "") {
+        $('.main_wrapper').css("background-image", "");
+    }
+    else if (fs.existsSync(arg)) {
+        $('.main_wrapper').css("background-image", "url("+arg+")");
+    }
+    else {
+        $.ajax({
+            url: arg,
+            type:'HEAD',
+            error: function()
+            {
+                $('.main_wrapper').css("background-image", "");
+            },
+            success: function()
+            {
+                $('.main_wrapper').css("background-image", "url("+arg+")");
+            }
+        });
+    }
+}
+
+//
 function changeQuality(dom) {
 	if (cardQuality == "normal") {
 		cardQuality = "large";
@@ -2577,6 +2677,11 @@ function updateSettings() {
 	var showOverlayAlways = document.getElementById("settings_showoverlayalways").checked;
 	var soundPriority = document.getElementById("settings_soundpriority").checked;
 
+    var backColor = $(".color_picker").spectrum("get").toRgbString();
+    var backUrl = document.getElementById("query_image").value;
+    defaultBackground = backUrl;
+    change_background(backUrl);
+
 	var overlayOnTop = document.getElementById("settings_overlay_ontop").checked;
 	var closeToTray = document.getElementById("settings_closetotray").checked;
 	var sendData = document.getElementById("settings_senddata").checked;
@@ -2607,7 +2712,9 @@ function updateSettings() {
 		overlay_clock: overlayClock,
 		overlay_sideboard: overlaySideboard,
 		overlay_ontop: overlayOnTop,
-		anon_explore: anonExplore
+        anon_explore: anonExplore,
+        back_color: backColor,
+        back_url: backUrl,
 	};
 	cardSize = 100+(cardSizePos*10);
 	ipc_send('save_settings', settings);
