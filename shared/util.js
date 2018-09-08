@@ -237,6 +237,8 @@ function getReadableEvent(arg) {
 			return "Brewers Delight"; break;
 		case "Pauper_":
 			return "Pauper"; break;
+		case "TwiceTheLife_":
+			return "Twice the Life"; break;
 
 		case "CompDraft_DOM_":
 			return "Competitive Draft DOM"; break;
