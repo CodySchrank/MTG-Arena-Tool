@@ -17,8 +17,17 @@ body {
 
 label {
     font-family: "Mplantin";
-    color: #FAE5D2;
+    color: rgba(250, 229, 210, 1);
     margin: auto 0;
+}
+
+
+.hover_label {
+    color: rgba(250, 229, 210, 0.8) !important;
+}
+
+.hover_label:hover {
+    color: rgba(255, 255, 255, 1) !important;
 }
 
 @font-face {
@@ -65,7 +74,7 @@ label {
     background-color: #B7C89E;
     overflow: hidden;
     width: 100%;
-    height: 8px;
+    height: 4px;
     animation-name: color;
     animation-duration: 2s;
     animation-iteration-count: infinite;
@@ -164,39 +173,57 @@ label {
     opacity: 0;
 }
 
-.main_wrapper {
-    padding: 2px;
+.main_wrapper, .overlay_wrapper {
+    background: url(../images/Ghitu-Lavarunner-Dominaria-MtG-Art.jpg);
+    position: absolute;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.25);
+    background-blend-mode: darken;
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    z-index: 5;
     height: calc(100% - 4px);
+    width: calc(100% - 4px);
+    transition: background 0.5s ease-in;
 }
 
 .wrapper {
     position: relative;
     opacity: 1;
     display: flex;
-    height: calc(100% - 32px);
+    height: calc(100% - 96px);
+    z-index: 5;
 }
-
+/*
 .overlay_wrapper {
     padding: 2px;
     position: relative;
     height: calc(100% - 4px);
 }
+*/
 
-.wrapper:before, .overlay_wrapper:before {
+.outer_wrapper {
+    padding: 2px;
+    overflow: hidden;
+    height: calc(100% - 4px);
+    width: calc(100% - 4px);
+}
+
+
+.main_wrapper:after, .overlay_wrapper:after {
+    background: url(../images/background_overlay.png);
     content: ' ';
     top: 0;
-    left: 0px;
+    left: 0;
+    width: calc(100% - 0px);
+    height: calc(100% - 0px);
     position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: url(../images/Mox-Amber-Dominaria-MtG-Art.jpg);
-    background-color: #917961;
-    background-size: cover;
-    background-blend-mode: luminosity;
-    background-position: center;
-    opacity: 0.4;
-    z-index: -1;
+    /* background-color: red; */
+    background-size: 100% 100%;
+    /* opacity: 0.9; */
+    z-index: -4; 
+    /* filter: hue-rotate(200deg); */
 }
 
 .top {
@@ -204,10 +231,10 @@ label {
     position: relative;
     z-index: 30;
     height: 32px;
-    background: url(../images/top_bar.png);
+    background-color: rgba(145,121,97,0.6);
     display: flex;
     justify-content: space-between;
-    box-shadow: 0 0px 16px 4px rgba(0, 0, 0, 0.5);
+    z-index: 15;
 }
 
 .top_logo {
@@ -229,21 +256,21 @@ label {
     position: relative;
     left: 0px;
     margin-right: 12px;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     opacity: 0.5;
     background-size: contain;
     -webkit-transition: all .33s ease-in-out;
 }
 
 .button:hover {
-    opacity: 0.2;
+    opacity: 1;
     -webkit-transform: rotate(-90deg);
 }
 
 .button.minimize:hover {
-    opacity: 0.2;
-    -webkit-transform: rotate(-180deg);
+    opacity: 1;
+    -webkit-transform: rotate(0deg);
 }
 
 .button.back:hover {
@@ -299,11 +326,10 @@ label {
 .main_hover, .main_hover_dfc {
     pointer-events: none;
     align-self: right;
-    /* width: 90%; */
     max-width: 240px;
     opacity: 1;
     display: block;
-    /* margin-left: auto; */
+   /*margin-left: auto;*/
     margin-right: 24px;
     margin-bottom: 12px;
     -webkit-border-radius: 4.75% / 3.5%;
@@ -312,9 +338,11 @@ label {
 }
 
 .mana_20 {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     margin: 2px;
+    border-radius: 100%;
+    box-shadow: rgba(0, 0, 0, 0.75) -2px 2px;
 }
 
 .mana_16 {
@@ -474,14 +502,14 @@ span {
 }
 
 .card_tile_separator {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(250, 229, 210, 1);
     height: 32px;
     vertical-align: middle;
-    line-height: 32px;k,
-    font-size: 15px;
+    line-height: 32px;
     text-align: center;
     font-family: beleren;
     align-self: center;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
 }
 
 .card_tile_name {
