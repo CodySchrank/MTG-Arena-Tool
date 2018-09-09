@@ -55,6 +55,11 @@ function windowReady(){
 }
 
 //
+ipc.on('set_db', function (event, arg) {
+	cardsDb.set(arg);
+});
+
+//
 ipc.on('set_username', function (event, arg) {
 	userName = arg;
 	if (sidebarActive != -1) {

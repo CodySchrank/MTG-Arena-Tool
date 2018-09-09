@@ -59,6 +59,11 @@ function updateClock() {
 }
 
 //
+ipc.on('set_db', function (event, arg) {
+	cardsDb.set(arg);
+});
+
+//
 ipc.on('set_timer', function (event, arg) {
 	if (arg == -1) {
 		$(".overlay_clock_container").hide();

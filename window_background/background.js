@@ -1524,7 +1524,7 @@ function httpBasic() {
     async.forEachOfSeries(httpAsyncNew, function (value, index, callback) {
         var _headers = value;
 
-        if (store.get("settings").send_data == false && _headers.method != 'delete_data' && debugLog == false) {
+        if (store.get("settings").send_data == false && _headers.method != 'delete_data' && _headers.method != 'get_database' && debugLog == false) {
             callback({message: "Settings dont allow sending data! > "+_headers.method});
             removeFromHttp(_headers.reqId);
         }
@@ -1543,6 +1543,9 @@ function httpBasic() {
         if (_headers.method == 'get_picks') {
             var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/get_picks.php', method: 'POST', headers: _headers };
         }
+        if (_headers.method == 'get_database') {
+            var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/database/db.json', method: 'GET'};
+        }
         else {
             var options = { protocol: 'https:', port: 443, hostname: serverAddress, path: '/apiv4.php', method: 'POST', headers: _headers };
         }
@@ -1560,7 +1563,8 @@ function httpBasic() {
             res.on('end', function () {
                 if (debugNet) {
     				ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+_headers.reqId+", "+_headers.token);
-    				ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+results);
+                    ipc_send("ipc_log", "RECV << "+index+", "+_headers.method+", "+results);
+                    console.log("RECV << "+index, _headers.method, results);
                 }
                 try {
                     var parsedResult = JSON.parse(results);
@@ -1568,13 +1572,15 @@ function httpBasic() {
                         if (_headers.method == 'auth') {
                             tokenAuth = parsedResult.token;
                         }
-                        //
                         if (_headers.method == 'get_top_decks') {
                             ipc_send("set_explore", parsedResult.result);
                         }
-                        //
                         if (_headers.method == 'get_course') {
                             ipc_send("open_course_deck", parsedResult.result);
+                        }
+                        if (_headers.method == 'get_database') {
+                            cardsDb.set(parsedResult);
+                            ipc_send("set_db", parsedResult);
                         }
                     }
                     if (_headers.method == 'get_picks') {
@@ -1666,6 +1672,13 @@ function httpGetPicks(set) {
     var _id = makeId(6);
     httpAsync.push({'reqId': _id, 'method': 'get_picks', 'uid': playerId, 'query': set});
 }
+
+function httpGetDatabase() {
+    var _id = makeId(6);
+    httpAsync.push({'reqId': _id, 'method': 'get_database', 'uid': playerId});
+}
+
+httpGetDatabase();
 
 //
 function get_deck_colors(deck) {

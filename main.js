@@ -43,6 +43,11 @@ ipc.on('ipc_switch', function (event, method, arg) {
             overlay.webContents.send("set_settings", arg);
             break;
 
+        case 'set_db':
+            mainWindow.webContents.send("set_db", arg);
+            overlay.webContents.send("set_db", arg);
+            break;
+
         case 'popup':
             mainWindow.webContents.send("popup", arg);
             break;
