@@ -431,9 +431,9 @@ function setHistory(loadMore) {
 
 		loadHistory = 0;
 		
-		var wrap_l = document.createElement("div");
-		wrap_l.classList.add("wrapper_column");
-		wrap_l.classList.add("sidebar_column");
+		var wrap_r = document.createElement("div");
+		wrap_r.classList.add("wrapper_column");
+		wrap_r.classList.add("sidebar_column");
 
 		var div = document.createElement("div");
 		div.classList.add("ranks_history");
@@ -474,17 +474,17 @@ function setHistory(loadMore) {
 		    }
 		}
 
-		var wrap_r = document.createElement("div");
-		wrap_r.classList.add("wrapper_column");
-		wrap_r.setAttribute("id", "history_column");
+		var wrap_l = document.createElement("div");
+		wrap_l.classList.add("wrapper_column");
+		wrap_l.setAttribute("id", "history_column");
 
 		var d = document.createElement("div");
 		d.classList.add("list_fill");
 
-		wrap_l.appendChild(div);
+		wrap_r.appendChild(div);
 		mainDiv.appendChild(wrap_l);
 		mainDiv.appendChild(wrap_r);
-		wrap_r.appendChild(d);
+		wrap_l.appendChild(d);
 	}
 
 	mainDiv = document.getElementById("history_column");
@@ -1684,6 +1684,8 @@ function open_economy() {
 		data.push(item.value);
 	});
 
+	Chart.defaults.global.defaultFontColor="rgb(250, 229, 210)";
+
  	var ctx = document.getElementById("goldChart").getContext('2d');
 	var myChart = new Chart(ctx, {
 	    type: 'bar',
@@ -2481,40 +2483,52 @@ function open_settings() {
 	$("#ux_0").off();
 	$("#history_column").off();
 	$("#ux_0").html('');
-/*
+	$("#ux_0").addClass('flex_item');
+
 	var wrap_l = $('<div class="wrapper_column sidebar_column"></div>');
+	$('<div class="settings_nav sn1 nav_selected" style="margin-top: 16px;" >Behaviour</div>').appendTo(wrap_l);
+	$('<div class="settings_nav sn2">Overlay</div>').appendTo(wrap_l);
+	$('<div class="settings_nav sn3">Visual</div>').appendTo(wrap_l);
+	$('<div class="settings_nav sn4">Privacy</div>').appendTo(wrap_l);
+	$('<div class="settings_nav sn5">About</div>').appendTo(wrap_l);
 	var wrap_r = $('<div class="wrapper_column"></div>');
-*/
 	var div = $('<div class="settings_page"></div>');
+	var section;
 
-	// Launch on startup
-	div.append('<div class="settings_title">Behaviour</div>');
+	//
+	section = $('<div class="settings_section ss1"></div>');
+	section.appendTo(div);
+	section.append('<div class="settings_title">Behaviour</div>');
+	
+	add_checkbox(section, 'Launch on startup', 'settings_startup', settings.startup);
+	add_checkbox(section, 'Close main window on match found', 'settings_closeonmatch', settings.close_on_match);
+	add_checkbox(section, 'Close to tray', 'settings_closetotray', settings.close_to_tray);
+	add_checkbox(section, 'Sound when priority changes', 'settings_soundpriority', settings.sound_priority);
 
-	add_checkbox(div, 'Launch on startup', 'settings_startup', settings.startup);
-	add_checkbox(div, 'Close main window on match found', 'settings_closeonmatch', settings.close_on_match);
-	add_checkbox(div, 'Close to tray', 'settings_closetotray', settings.close_to_tray);
-	add_checkbox(div, 'Sound when priority changes', 'settings_soundpriority', settings.sound_priority);
+	//
+	section = $('<div class="settings_section ss2"></div>');
+	section.appendTo(div);
+	section.append('<div class="settings_title">Overlay</div>');
+	
+	add_checkbox(section, 'Always on top', 'settings_overlay_ontop', settings.overlay_ontop);
+	add_checkbox(section, 'Show overlay', 'settings_showoverlay', settings.show_overlay);
+	add_checkbox(section, 'Persistent overlay <i>(useful for OBS setup)</i>', 'settings_showoverlayalways', settings.show_overlay_always);
 
-	div.append('<div class="settings_title">Overlay</div>');
+	add_checkbox(section, 'Show top bar', 'settings_overlay_top', settings.overlay_top);
+	add_checkbox(section, 'Show title', 'settings_overlay_title', settings.overlay_title);
+	add_checkbox(section, 'Show deck/lists', 'settings_overlay_deck', settings.overlay_deck);
+	add_checkbox(section, 'Show clock', 'settings_overlay_clock', settings.overlay_clock);
+	add_checkbox(section, 'Show sideboard', 'settings_overlay_sideboard', settings.overlay_sideboard);
 
-	add_checkbox(div, 'Always on top', 'settings_overlay_ontop', settings.overlay_ontop);
-	add_checkbox(div, 'Show overlay', 'settings_showoverlay', settings.show_overlay);
-	add_checkbox(div, 'Persistent overlay <i>(useful for OBS setup)</i>', 'settings_showoverlayalways', settings.show_overlay_always);
-
-	add_checkbox(div, 'Show top bar', 'settings_overlay_top', settings.overlay_top);
-	add_checkbox(div, 'Show title', 'settings_overlay_title', settings.overlay_title);
-	add_checkbox(div, 'Show deck/lists', 'settings_overlay_deck', settings.overlay_deck);
-	add_checkbox(div, 'Show clock', 'settings_overlay_clock', settings.overlay_clock);
-	add_checkbox(div, 'Show sideboard', 'settings_overlay_sideboard', settings.overlay_sideboard);
-
-	div.append('<div class="settings_title">Visual</div>');
+	//
+	section = $('<div class="settings_section ss3"></div>');
+	section.appendTo(div);
+	section.append('<div class="settings_title">Visual</div>');
 
     var label = $('<label class="but_container_label">Background URL:</label>');
-    label.appendTo(div);
+    label.appendTo(section);
 
     var icd = $('<div class="input_container"></div>');
-    //var label = $('<label style="display: table">Search</label>');
-    //label.appendTo(icd);
     var url_input = $('<input type="search" id="query_image" autocomplete="off" value="'+settings.back_url+'" />');
     url_input.appendTo(icd);
     icd.appendTo(label);
@@ -2522,7 +2536,7 @@ function open_settings() {
     var label = $('<label class="but_container_label">Background shade:</label>');
     var colorPick = $('<input type="text" id="flat" class="color_picker" />');
     colorPick.appendTo(label);
-    label.appendTo(div);
+    label.appendTo(section);
     colorPick.spectrum({
         showInitial: true,
         showAlpha: true,
@@ -2536,12 +2550,12 @@ function open_settings() {
     });
 
 	var label = $('<label class="but_container_label">Cards quality:</label>');
-	label.appendTo(div);
+	label.appendTo(section);
 	var button = $('<div class="button_simple button_long" style="margin-left: 32px;" onclick="changeQuality(this)">'+cardQuality+'</div>');
 	button.appendTo(label);
 
 	var slider = $('<div class="slidecontainer_settings"></div>');
-	slider.appendTo(div);
+	slider.appendTo(section);
 	var sliderlabel = $('<label style="width: 400px; !important" class="card_size_container">Cards size: '+cardSize+'px</label>');
 	sliderlabel.appendTo(slider);
 	var sliderInput = $('<input type="range" min="0" max="20" value="'+cardSizePos+'" class="slider sliderA" id="myRange">');
@@ -2554,26 +2568,53 @@ function open_settings() {
 
 	d.appendTo(slider);
 
-	/*
-	var alphaSlider = $('<div class="slidecontainer_settings"></div>');
-	alphaSlider.appendTo(div);
-	var alphasliderlabel = $('<label style="width: 400px; !important" class="card_size_container">Overlay transparency: '+overlayAlpha+'</label>');
-	alphasliderlabel.appendTo(alphaSlider);
-	var sliderInput = $('<input type="range" min="0" max="10" value="'+overlayAlpha*10+'" class="slider sliderB" id="myRange">');
-	sliderInput.appendTo(alphaSlider);
-	*/
+	//
+	section = $('<div class="settings_section ss4"></div>');
+	section.appendTo(div);
+	section.append('<div class="settings_title">Privacy</div>');
+	add_checkbox(section, 'Anonymous sharing <i>(makes your username anonymous on Explore)</i>', 'settings_anon_explore', settings.anon_explore);
+	add_checkbox(section, 'Online sharing <i>(when disabled, blocks any connections with our servers)</i>', 'settings_senddata', settings.send_data);
 
-	div.append('<div class="settings_title">Privacy</div>');
-	add_checkbox(div, 'Anonymous sharing <i>(makes your username anonymous on Explore)</i>', 'settings_anon_explore', settings.anon_explore);
-	add_checkbox(div, 'Online sharing <i>(when disabled, blocks any connections with our servers)</i>', 'settings_senddata', settings.send_data);
-
-	// Erase data
 	var label = $('<label class="check_container_but"></label>');
-	label.appendTo(div);
+	label.appendTo(section);
 	var button = $('<div class="button_simple button_long" onclick="eraseData()">Erase my shared data</div>');
 	button.appendTo(label);
 
-	$("#ux_0").append(div);
+	div.appendTo(wrap_r);
+	$("#ux_0").append(wrap_l);
+	$("#ux_0").append(wrap_r);
+
+	$(".ss1").show();
+
+	$(".settings_nav").click(function () {
+		if (!$(this).hasClass("nav_selected")) {
+			$(".settings_nav").each(function(index) {
+				$(this).removeClass("nav_selected");
+			});
+			$(".settings_section").each(function(index) {
+				$(this).hide();
+			});
+
+			$(this).addClass("nav_selected");
+
+			if ($(this).hasClass("sn1")) {
+				$(".ss1").show();
+			}
+			if ($(this).hasClass("sn2")) {
+				$(".ss2").show();
+			}
+			if ($(this).hasClass("sn3")) {
+				$(".ss3").show();
+			}
+			if ($(this).hasClass("sn4")) {
+				$(".ss4").show();
+			}
+			if ($(this).hasClass("sn5")) {
+				$(".ss5").show();
+			}
+		}
+	});
+
 
     url_input.on('keyup', function (e) {
         if (e.keyCode == 13) {

@@ -503,14 +503,14 @@ span i {
     align-items: flex-end;
     height: 128px;
     padding: 16px 0 4px 0;
-    border-bottom: 2px solid #917961;
+    border-bottom: 2px solid rgba(250, 229, 210, 0.8);
     width: 100%;
 }
 .mana_curve_column {
     width: 1000px;
     margin: 0px 2px;
     display: flex;
-    background-color: #917961;
+    background-color: rgba(250, 229, 210, 0.8);
 }
 
 .mana_curve_numbers {
@@ -1453,4 +1453,24 @@ span i {
     height: 30px;
     box-shadow: 0 4px 13px 0px rgba(0, 0, 0, 0.3);
     -webkit-transition: all 0.3s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+
+.settings_nav {
+    cursor: pointer;
+    color: rgba(250, 229, 210, 0.5);
+    font-size: 18px;
+    line-height: 42px;
+    height: 42px;
+    font-family: Beleren;
+    margin-left: 16px;
+    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+
+.settings_nav:hover, .nav_selected {
+    color: rgba(250, 229, 210, 1);
+    margin-left: 24px;
+}
+
+.settings_section {
+    display: none;
 }
