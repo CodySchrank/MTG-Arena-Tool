@@ -28,6 +28,7 @@ var inputTimer = undefined;
 var loadHistory = 0;
 var defaultBackground = "";
 var currentOpenDeck = null;
+var lastSettingsSection = 1;
 
 var rankOffset = 0;
 var rankTitle = "";
@@ -180,8 +181,8 @@ ipc.on('set_settings', function (event, arg) {
 ipc.on('set_update', function (event, arg) {
 	updateState = arg;
 
-	if (sidebarActive == 6) {
-		open_about();
+	if (sidebarActive == 9) {
+		open_settings(5);
 	}
 });
 
@@ -292,11 +293,11 @@ function force_open_settings() {
 		}
 	});
 	$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
-	open_settings();
+	open_settings(lastSettingsSection);
 }
 
 function force_open_about() {
-	sidebarActive = 6;
+	sidebarActive = 9;
 	$(".top_nav_item").each(function(index) {
 		$(this).removeClass("item_selected");
 		if ($(this).hasClass("it6")) {
@@ -304,7 +305,7 @@ function force_open_about() {
 		}
 	});
 	$('.moving_ux').animate({'left': '0px'}, 250, 'easeInOutCubic'); 
-	open_about();
+	open_settings(5);
 }
 
 function arenaCheckLoop() {
@@ -400,11 +401,7 @@ $(document).ready(function() {
 			}
 			if ($(this).hasClass("it5")) {
 				sidebarActive = 5;
-				open_settings();
-			}
-			if ($(this).hasClass("it6")) {
-				sidebarActive = 6;
-				open_about();
+				open_settings(lastSettingsSection);
 			}
 		}
 		else {
@@ -2478,7 +2475,7 @@ function add_checkbox(div, label, iid, def) {
 }
 
 //
-function open_settings() {
+function open_settings(openSection) {
     change_background("default");
 	$("#ux_0").off();
 	$("#history_column").off();
@@ -2486,7 +2483,7 @@ function open_settings() {
 	$("#ux_0").addClass('flex_item');
 
 	var wrap_l = $('<div class="wrapper_column sidebar_column"></div>');
-	$('<div class="settings_nav sn1 nav_selected" style="margin-top: 16px;" >Behaviour</div>').appendTo(wrap_l);
+	$('<div class="settings_nav sn1" style="margin-top: 28px;" >Behaviour</div>').appendTo(wrap_l);
 	$('<div class="settings_nav sn2">Overlay</div>').appendTo(wrap_l);
 	$('<div class="settings_nav sn3">Visual</div>').appendTo(wrap_l);
 	$('<div class="settings_nav sn4">Privacy</div>').appendTo(wrap_l);
@@ -2580,11 +2577,65 @@ function open_settings() {
 	var button = $('<div class="button_simple button_long" onclick="eraseData()">Erase my shared data</div>');
 	button.appendTo(label);
 
+	//
+	section = $('<div class="settings_section ss5" style="height: 100%;"></div>');
+	section.appendTo(div);
+	//section.append('<div class="settings_title">About</div>');
+
+	var about = $('<div class="about"></div>');
+	about.append('<div class="top_logo_about"></div>');
+	about.append('<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>');
+	about.append('<div class="message_sub_15 white">Version '+window.electron.remote.app.getVersion()+'</div>');
+
+
+	if (updateState.state == 0) {
+		about.append('<div class="message_updates white">Checking for updates..</div>');
+	}
+	if (updateState.state == 1) {
+		about.append('<div class="message_updates green">Update available.</div>');
+		about.append('<a class="release_notes_link">Release Notes</a>');
+	}
+	if (updateState.state == -1) {
+		about.append('<div class="message_updates green">Client is up to date.</div>');
+	}
+	if (updateState.state == -2) {
+		about.append('<div class="message_updates red">Error updating.</div>');
+	}
+	if (updateState.state == 2) {
+		about.append('<div class="message_updates green">Donwloading ('+updateState.progress+'%)</div>');
+		about.append('<a class="release_notes_link">Release Notes</a>');
+	}
+	if (updateState.state == 3) {
+		about.append('<div class="message_updates green">Download complete.</div>');
+		about.append('<a class="release_notes_link">Release Notes</a>');
+		about.append('<div class="button_simple" onClick="installUpdate()">Install</div>');
+	}
+
+	about.append('<div class="flex_item" style="width: 160px; margin: 64px auto 0px auto;"><div class="twitter_link"></div><div class="git_link"></div></div>');
+	about.appendTo(section);
+
+	$(".top_logo_about").click(function() {
+		shell.openExternal('https://mtgatool.com');
+	});
+
+	$(".twitter_link").click(function() {
+		shell.openExternal('https://twitter.com/MEtchegaray7');
+	});
+
+	$(".git_link").click(function() {
+		shell.openExternal('https://github.com/Manuel-777/MTG-Arena-Tool');
+	});
+
+	$(".release_notes_link").click(function() {
+		shell.openExternal('https://mtgatool.com/release-notes/');
+	});
+
 	div.appendTo(wrap_r);
 	$("#ux_0").append(wrap_l);
 	$("#ux_0").append(wrap_r);
 
-	$(".ss1").show();
+	$(".ss"+lastSettingsSection).show();
+	$(".sn"+lastSettingsSection).addClass("nav_selected");
 
 	$(".settings_nav").click(function () {
 		if (!$(this).hasClass("nav_selected")) {
@@ -2598,18 +2649,28 @@ function open_settings() {
 			$(this).addClass("nav_selected");
 
 			if ($(this).hasClass("sn1")) {
+				sidebarActive = 8;
+				lastSettingsSection = 1;
 				$(".ss1").show();
 			}
 			if ($(this).hasClass("sn2")) {
+				sidebarActive = 8;
+				lastSettingsSection = 2;
 				$(".ss2").show();
 			}
 			if ($(this).hasClass("sn3")) {
+				sidebarActive = 8;
+				lastSettingsSection = 3;
 				$(".ss3").show();
 			}
 			if ($(this).hasClass("sn4")) {
+				sidebarActive = 8;
+				lastSettingsSection = 4;
 				$(".ss4").show();
 			}
 			if ($(this).hasClass("sn5")) {
+				sidebarActive = 9;
+				lastSettingsSection = 5;
 				$(".ss5").show();
 			}
 		}
@@ -2699,7 +2760,7 @@ function changeQuality(dom) {
 	}
 	dom.innerHTML = cardQuality;
 	updateSettings();
-	open_settings();
+	open_settings(lastSettingsSection);
 }
 
 //
@@ -2759,59 +2820,6 @@ function updateSettings() {
 	};
 	cardSize = 100+(cardSizePos*10);
 	ipc_send('save_settings', settings);
-}
-
-//
-function open_about() {
-	var aboutStr = '';
-	aboutStr += '<div class="about">'
-	aboutStr += '	<div class="top_logo_about"></div>'
-	aboutStr += '	<div class="message_sub_15 white">By Manuel Etchegaray, 2018</div>'
-	aboutStr += '	<div class="message_sub_15 white">Version '+window.electron.remote.app.getVersion()+'</div>'
-
-	if (updateState.state == 0) {
-		aboutStr += '	<div class="message_updates white">Checking for updates..</div>'
-	}
-	if (updateState.state == 1) {
-		aboutStr += '	<div class="message_updates green">Update available.</div>'
-		aboutStr += '	<a class="release_notes_link">Release Notes</a>'
-	}
-	if (updateState.state == -1) {
-		aboutStr += '	<div class="message_updates green">Client is up to date.</div>'
-	}
-	if (updateState.state == -2) {
-		aboutStr += '	<div class="message_updates red">Error updating.</div>'
-	}
-	if (updateState.state == 2) {
-		aboutStr += '	<div class="message_updates green">Donwloading ('+updateState.progress+'%)</div>'
-		aboutStr += '	<a class="release_notes_link">Release Notes</a>'
-	}
-	if (updateState.state == 3) {
-		aboutStr += '	<div class="message_updates green">Download complete.</div>'
-		aboutStr += '	<a class="release_notes_link">Release Notes</a>'
-		aboutStr += '	<div class="button_simple" onClick="installUpdate()">Install</div>'
-	}
-
-	aboutStr += '<div class="flex_item" style="width: 160px; margin: 64px auto 0px auto;"><div class="twitter_link"></div><div class="git_link"></div></div>';
-	aboutStr += '</div>';
-
-	$("#ux_0").html(aboutStr);
-
-	$(".top_logo_about").click(function() {
-		shell.openExternal('https://mtgatool.com');
-	});
-
-	$(".twitter_link").click(function() {
-		shell.openExternal('https://twitter.com/MEtchegaray7');
-	});
-
-	$(".git_link").click(function() {
-		shell.openExternal('https://github.com/Manuel-777/MTG-Arena-Tool');
-	});
-
-	$(".release_notes_link").click(function() {
-		shell.openExternal('https://mtgatool.com/release-notes/');
-	});
 }
 
 //

@@ -378,7 +378,7 @@ span i {
 
 .message_sub {
     font-size: 20px;
-    opacity: 0.5;
+    opacity: 0.9;
     font-family: Mplantin-italic;
     text-align: center;
     margin-bottom: 6px;
@@ -386,7 +386,7 @@ span i {
 
 .message_sub_16 {
     font-size: 16px;
-    opacity: 0.5;
+    opacity: 0.9;
     font-family: Mplantin-italic;
     text-align: center;
     margin-bottom: 6px;
@@ -394,7 +394,7 @@ span i {
 
 .message_sub_15 {
     font-size: 15px;
-    opacity: 0.5;
+    opacity: 0.9;
     font-family: Mplantin-italic;
     text-align: center;
     margin-bottom: 6;
@@ -402,7 +402,7 @@ span i {
 
 .message_updates {
     font-size: 18px;
-    opacity: 0.5;
+    opacity: 0.9;
     font-family: Mplantin-italic;
     text-align: center;
     margin-top: 6;
@@ -897,6 +897,7 @@ span i {
 
 
 .settings_page {
+    height: calc(100% - 64px);
     margin: 32px 16px 32px 16px;
 }
 
@@ -1459,16 +1460,16 @@ span i {
     cursor: pointer;
     color: rgba(250, 229, 210, 0.5);
     font-size: 18px;
-    line-height: 42px;
-    height: 42px;
+    line-height: 40px;
+    height: 40px;
     font-family: Beleren;
-    margin-left: 16px;
+    margin-left: 24px;
     -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
 }
 
 .settings_nav:hover, .nav_selected {
-    color: rgba(250, 229, 210, 1);
-    margin-left: 24px;
+    color: rgba(250, 229, 210, 0.9);
+    margin-left: 32px;
 }
 
 .settings_section {
