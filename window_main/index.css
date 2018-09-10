@@ -210,19 +210,7 @@ span i {
 }
 
 
-.openDeck {
-    margin: 16px auto !important;
-}
-
-.openHistory {
-    margin: 16px auto !important;
-}
-
-.exportDeck {
-    margin: 16px auto !important;
-}
-
-.exportDeckStandard {
+.visualView, .openDeck, .openHistory, .exportDeck, .exportDeckStandard {
     margin: 16px auto !important;
 }
 
@@ -1474,4 +1462,44 @@ span i {
 
 .settings_section {
     display: none;
+}
+
+.deck_visual_stats {
+    padding: 0 !important;
+    margin: 32px !important;
+    width: 0px !important;
+    flex-grow: 1;
+}
+
+.deck_visual_tile {
+    display: inline-table;
+    padding: 3px;
+    margin-bottom: 64px;
+}
+
+.deck_visual_card {
+    height: 22px;
+}
+
+.deck_visual_card_img {
+    cursor: pointer;
+    -webkit-border-radius: 4.75% / 3.5%;
+    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+
+.deck_visual_card_img:hover {
+    /*border: 2px solid rgba(250, 229, 210, 0.66);*/
+    box-shadow: 0 5px 14px 2px rgba(0, 0, 0, 0.25);
+    margin: -24px 0 -2px 0px;
+}
+
+
+.deck_visual_tile_side {
+    display: grid;
+    padding: 3px;
+    margin-bottom: 128px;
+}
+
+.deck_visual_card_side {
+    height: 22px;
 }

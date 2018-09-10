@@ -1102,9 +1102,10 @@ function open_deck(i, type) {
 
 	var dl = $('<div class="decklist"></div>');
 	drawDeck(dl, _deck);
-
 	var stats = $('<div class="stats"></div>');
 
+
+	$('<div class="button_simple visualView">Visual View</div>').appendTo(stats);
 	$('<div class="button_simple openHistory">History of changes</div>').appendTo(stats);
 	$('<div class="button_simple exportDeck">Export to Arena</div>').appendTo(stats);
 	$('<div class="button_simple exportDeckStandard">Export to .txt</div>').appendTo(stats);
@@ -1233,6 +1234,11 @@ function open_deck(i, type) {
 	$("#ux_1").append(fld);
 
 	//
+	$(".visualView").click(function () {
+	    drawDeckVisual(dl, stats, _deck);
+	});
+
+	//
 	$(".openHistory").click(function () {
 	    ipc_send('get_deck_changes', _deck.id);
 	});
@@ -1289,6 +1295,108 @@ function drawDeck(div, deck) {
 				}
 			});
 		}
+	}
+}
+
+//
+function drawDeckVisual(_div, _stats, deck) {
+	_stats.hide();
+	_div.css("display", "flex");
+	_div.css("width", "auto");
+	_div.css("margin", "0 auto");
+	_div.html('');
+
+	_div.parent().css("flex-direction", "column-reverse");
+
+	$('<div class="button_simple openDeck">Back to normal view</div>').appendTo(_div.parent());
+
+	$(".openDeck").click(function () {
+		open_deck(currentOpenDeck);
+	});
+
+	var sz = 120;//cardSize;
+	div = $('<div class="visual_mainboard"></div>');
+	div.css("display", "flex");
+	div.css("flex-wrap", "wrap");
+	div.css("align-content", "start");
+	div.css("max-width", (sz+6)*5+"px");
+	div.appendTo(_div);
+
+	var unique = makeId(4);
+	var prevIndex = 0;
+
+	var tileNow;
+	var _n = 0;
+	deck.mainDeck.forEach(function(c) {
+		var grpId = c.id;
+		var card = cardsDb.get(grpId);
+
+		if (c.quantity > 0) {
+			let dfc = '';
+			if (card.dfc == 'DFC_Back')	 dfc = 'a';
+			if (card.dfc == 'DFC_Front') dfc = 'b';
+			if (card.dfc == 'SplitHalf') dfc = 'a';
+			if (dfc != 'b') {
+				for (i=0; i<c.quantity; i++) {
+					if (_n % 4 == 0) {
+						tileNow = $('<div class="deck_visual_tile"></div>');
+						tileNow.appendTo(div);
+					}
+
+			        let d = $('<div style="width: '+sz+'px !important;" class="deck_visual_card"></div>');
+			        let img = $('<img style="width: '+sz+'px !important;" class="deck_visual_card_img"></img>');
+					img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
+					img.appendTo(d);
+					d.appendTo(tileNow);
+
+					addCardHover(img, card);
+					_n++;
+				}
+			}
+		}
+	});
+
+	div = $('<div class="visual_sideboard"></div>');
+	div.css("display", "flex");
+	div.css("flex-wrap", "wrap");
+	div.css("margin-left", "32px");
+	div.css("align-content", "start");
+	div.css("max-width", (sz+6)*1.5+"px");
+	div.appendTo(_div);
+	
+	if (deck.sideboard != undefined) {
+		tileNow = $('<div class="deck_visual_tile_side"></div>');
+		tileNow.css("width", (sz+6)*5+"px");
+		tileNow.appendTo(div);
+
+		var _n = 0;
+		deck.sideboard.forEach(function(c) {
+			var grpId = c.id;
+			var card = cardsDb.get(grpId);
+			if (c.quantity > 0) {
+				let dfc = '';
+				if (card.dfc == 'DFC_Back')	 dfc = 'a';
+				if (card.dfc == 'DFC_Front') dfc = 'b';
+				if (card.dfc == 'SplitHalf') dfc = 'a';
+				if (dfc != 'b') {
+					for (i=0; i<c.quantity; i++) {
+						if (_n % 2 == 1) {
+					        var d = $('<div style="width: '+sz+'px !important;" class="deck_visual_card_side"></div>');
+						}
+						else {
+					        var d = $('<div style="margin-left: 60px; width: '+sz+'px !important;" class="deck_visual_card_side"></div>');
+						}
+				        let img = $('<img style="width: '+sz+'px !important;" class="deck_visual_card_img"></img>');
+						img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
+						img.appendTo(d);
+						d.appendTo(tileNow);
+
+						addCardHover(img, card);
+						_n++;
+					}
+				}
+			}
+		});
 	}
 }
 
