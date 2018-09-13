@@ -1427,6 +1427,7 @@ span i {
 }
 
 .popup {
+    pointer-events: none;
     opacity: 0;
     top: calc(100% - 42px);
     /* top: 100%; */

@@ -1306,15 +1306,15 @@ function drawDeckVisual(_div, _stats, deck) {
 	_div.css("margin", "0 auto");
 	_div.html('');
 
-	_div.parent().css("flex-direction", "column-reverse");
+	_div.parent().css("flex-direction", "column");
 
-	$('<div class="button_simple openDeck">Back to normal view</div>').appendTo(_div.parent());
+	$('<div class="button_simple openDeck">Normal view</div>').appendTo(_div.parent());
 
 	$(".openDeck").click(function () {
 		open_deck(currentOpenDeck);
 	});
 
-	var sz = 120;//cardSize;
+	var sz = cardSize;
 	div = $('<div class="visual_mainboard"></div>');
 	div.css("display", "flex");
 	div.css("flex-wrap", "wrap");
