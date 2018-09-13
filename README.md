@@ -1,7 +1,7 @@
 # MTG Arena Tool
 An MTG Arena deck tracker and collection manager.
 
-![History Screen](/Readme/screenshot_0.png)
+![History Screen](/Readme/screenshot_1.png)
 
 ## Current features
 - In-game overlay
