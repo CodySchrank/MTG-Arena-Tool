@@ -403,7 +403,12 @@ var setsList = {
 		"scryfall": "mtga",
 		"code": "ANA",
 		"tile": 67106
-	}
+	}/*,
+	"Guilds of Ravnica": {
+		"scryfall": "grn",
+		"code": "GRN",
+		"tile": 67106
+	}*/
 };
 
 //

@@ -4,13 +4,37 @@ An MTG Arena deck tracker and collection manager.
 ![History Screen](/Readme/screenshot_0.png)
 
 ## Current features
-- In-game overlay, showing cards left in decks and time elapsed.
-- Track your games and get historic data of all your matches.
-- Collection browser (filter by set, show newly acquired cards, collection statistics, completion %)
-- Individual deck statistics (color pie, mana curve, win/loss ratio, wildcards needed).
-- Support for all game modes (flash events/ draft / constructed / ranked / etc)
-- Online decklists, see what decks are being used on events and how they perform.
-- Draft tracker and replayer
+- In-game overlay
+	- Cards left in library
+	- Odds of drawing next
+	- Full deck with sideboard
+	- Elapsed time / current time clock
+- History of games played
+	- Cards your opponents played
+	- Export decklists
+- Collection browser
+	- Filter cards by set
+	- Show newly aquired cards
+	- Sort by set, name and cmc
+	- Advanced card filtering and search
+	- Show cards unowned
+	- Collection completion statistics
+- Individual deck statistics
+	- Win/loss ratios
+	- Wildcards needed
+	- Show cards missing
+	- mana curve
+	- Winrate vs colors
+	- Visual view
+	- Deck export (to mtga, to .txt)
+- Draft tracker
+	- In-draft overlay
+	- assistant (shows best picks)
+	- replayer
+	- Draft sharing
+- Explore decks
+	- Filter by event
+	- Sorted by wins/losses
 
 ## Roadmap
 `These are some features I would like to include, not ordered in any way`
@@ -50,6 +74,8 @@ Please read about [our Privacy Policy and How we use your data here](https://git
 [Jquery Easing by GSGD](http://gsgd.co.uk/sandbox/jquery/easing/)
 
 [Conic Gradient Polyfill by Lea Verou](https://leaverou.github.io/conic-gradient/)
+
+[Spectrum color picker by Brian Grinstead](http://bgrins.github.io/spectrum/)
 
 [Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse.
 
