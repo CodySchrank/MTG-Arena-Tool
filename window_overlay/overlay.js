@@ -290,7 +290,7 @@ ipc.on("set_turn", function (event, _we, _phase, _step, _number, _active, _prior
 		$('.clock_turn').html("You have priority.");
 	}
 	else {
-		$('.clock_turn').html("Oppenent has priority.");
+		$('.clock_turn').html("Opponent has priority.");
 	}
 });
 
