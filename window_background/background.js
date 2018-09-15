@@ -1580,6 +1580,7 @@ function httpBasic() {
                         }
                         if (_headers.method == 'get_database') {
                             cardsDb.set(parsedResult);
+                            delete parsedResult.ok;
                             ipc_send("set_db", parsedResult);
                         }
                     }

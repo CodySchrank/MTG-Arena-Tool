@@ -54,6 +54,15 @@ function windowReady(){
 	ipc_send('renderer_state', 1);
 }
 
+
+window.onerror = (err) => {
+    ipc_send("ipc_log", "Error: "+err);
+}
+
+process.on('uncaughtException', (err) => {
+    ipc_send("ipc_log", "Exception: "+err);
+})
+
 //
 ipc.on('set_db', function (event, arg) {
 	cardsDb.set(arg);

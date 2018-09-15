@@ -413,6 +413,7 @@ var setsList = {
 
 //
 function get_set_scryfall(set) {
+	if (set == undefined) return "";
 	let s = setsList[set].scryfall;
 	if (s == undefined)	s = set;
 	return s;
@@ -420,6 +421,7 @@ function get_set_scryfall(set) {
 
 //
 function get_set_code(set) {
+	if (set == undefined) return "";
 	let s = setsList[set].code;
 	if (s == undefined)	s = set;
 	return s;
@@ -451,7 +453,8 @@ function get_collection_stats() {
 		ownedSingles: 0
 	};
 
-	for (let set in setsList) {
+	for (var set in setsList) {
+		console.log("set", set);
 		stats[set] = {
 			totalCards: 0,
 			ownedCards: 0,
@@ -470,7 +473,6 @@ function get_collection_stats() {
     Object.keys(cardsDb.cards).forEach(function(grpId) {
     	card = cardsDb.get(grpId);
     	if (card.rarity !== "token" && card.rarity !== "land" && card.set !== "Oath of the Gatewatch" && card.dfc != "DFC_Front" && card.dfc != "SplitCard") {
-
 			// add to totals
 			stats[card.set].totalCards += 4;
 			stats.totalCards += 4;
