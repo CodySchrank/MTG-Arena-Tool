@@ -239,12 +239,16 @@ function getReadableEvent(arg) {
 			return "Pauper"; break;
 		case "TwiceTheLife_":
 			return "Twice the Life"; break;
+		case "QuickDraftExploration_M_":
+			return "Quick Draft Exploration M19"; break;
 
 		case "CompDraft_DOM_":
 			return "Competitive Draft DOM"; break;
-		case "CompDraft_M19_":
+		case "CompDraft_M_":
 			return "Competitive Draft M19"; break;
 
+		case "QuickDraft_RIX_":
+			return "Quick Draft RIX"; break;
 		case "QuickDraft_AKH_":
 			return "Quick Draft AKH"; break;
 		case "QuickDraft_DOM_":
@@ -910,8 +914,8 @@ function get_frame_class(frame) {
 }
 
 //
-function timeSince(date) {
-  var seconds = Math.floor((new Date() - date) / 1000);
+function timeSince(_date) {
+  var seconds = Math.floor((new Date() - _date) / 1000);
 
   var interval = Math.floor(seconds / 31536000);
   if (interval == 1)
@@ -942,9 +946,9 @@ function timeSince(date) {
 }
 
 //
-function daysPast(date) {
+function daysPast(_date) {
 	var firstDate = new Date();
-	var secondDate = new Date(date);
+	var secondDate = new Date(_date);
 	return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(24*60*60*1000)));
 }
 

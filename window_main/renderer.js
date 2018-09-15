@@ -916,12 +916,23 @@ function setExplore(arg, loadMore) {
 		if (eventFilters == null) {
 			eventFilters = [];
 			eventFilters.push('All');
-			for (var i = 0; i < explore.length; i++) {
-				let _deck = explore[i];
-				let evId = _deck.event.replace(/[0-9]/g, ''); 
 
-				if (!eventFilters.includes(evId)) {
-					eventFilters.push(evId);
+			var dateNow = new Date();
+			dateNow = dateNow.getTime()/1000;
+
+			for (var i = 0; i < explore.length; i++) {
+				var _deck = explore[i];
+
+				var ss = Math.floor(dateNow - _deck.date);
+				if (Math.floor(ss / 86400) > 10) {
+					explore.splice(i, 1);
+					i--;
+				}
+				else {
+					let evId = _deck.event.replace(/[0-9]/g, ''); 
+					if (!eventFilters.includes(evId)) {
+						eventFilters.push(evId);
+					}
 				}
 			}
 		}
@@ -956,8 +967,17 @@ function setExplore(arg, loadMore) {
 	//explore.forEach(function(_deck, index) {
 	for (var loadEnd = loadExplore + loadMore; loadExplore < loadEnd; loadExplore++) {
 		let _deck = explore[loadExplore];
+		if (_deck == undefined) {
+			continue;
+		}
 		let index = loadExplore;
 
+		var dateNow = new Date();
+		dateNow = dateNow.getTime()/1000;
+		var ss = Math.floor(dateNow - _deck.date);
+		if (Math.floor(ss / 86400) > 10) {
+			continue;
+		}
 
 		if (_deck.deck_colors == undefined) {
 			_deck.deck_colors = [];

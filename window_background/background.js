@@ -250,6 +250,7 @@ ipc.on('request_explore', function (event, arg) {
     if (arg == "all" || arg == "All" ) {
         arg = "";
     }
+    arg = arg.replace("_m_", "_m19_");// dirty hack :()
     httpGetTopDecks(arg);
 });
 
