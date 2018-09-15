@@ -454,7 +454,6 @@ function get_collection_stats() {
 	};
 
 	for (var set in setsList) {
-		console.log("set", set);
 		stats[set] = {
 			totalCards: 0,
 			ownedCards: 0,
@@ -468,7 +467,6 @@ function get_collection_stats() {
 			totalMythic: 0
 		};
 	}
-	//});
 
     Object.keys(cardsDb.cards).forEach(function(grpId) {
     	card = cardsDb.get(grpId);

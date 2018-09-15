@@ -54,7 +54,6 @@ function windowReady(){
 	ipc_send('renderer_state', 1);
 }
 
-
 window.onerror = (err) => {
     ipc_send("ipc_log", "Error: "+err);
 }
