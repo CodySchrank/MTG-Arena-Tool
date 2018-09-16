@@ -276,7 +276,9 @@ function loadPlayerConfig(playerId) {
     });
 
     history.matches = store.get('matches_index');
+    
     for (let i=0; i<history.matches.length; i++) {
+        ipc_send("popup", "Reading history: "+i+" / "+history.matches.length);
         var id = history.matches[i];
         if (id != null) {
             var item = store.get(id);
@@ -286,9 +288,10 @@ function loadPlayerConfig(playerId) {
             }
         }
     }
-
+    
     drafts.matches = store.get('draft_index');
     for (let i=0; i<drafts.matches.length; i++) {
+        ipc_send("popup", "Reading drafts: "+i+" / "+history.matches.length);
         var id = drafts.matches[i];
 
         if (id != null) {
@@ -299,7 +302,7 @@ function loadPlayerConfig(playerId) {
                 history[id].type = "draft";
             }
 	    }
-    }
+    }    
 
     deck_changes_index = store.get("deck_changes_index");
     deck_changes = store.get("deck_changes");
@@ -315,27 +318,27 @@ function loadPlayerConfig(playerId) {
 }
 
 
-function updateSettings(settings, relay) {
-	//console.log(settings);
+function updateSettings(_settings, relay) {
+	//console.log(_settings);
     const exeName = path.basename(process.execPath);
 
-    if (settings.overlay_top   == undefined) settings.overlay_top   = true;
-    if (settings.overlay_title == undefined) settings.overlay_title = true;
-    if (settings.overlay_deck  == undefined) settings.overlay_deck  = true;
-    if (settings.overlay_clock == undefined) settings.overlay_clock = true;
-    if (settings.overlay_ontop == undefined) settings.overlay_ontop = true;
+    if (_settings.overlay_top   == undefined) _settings.overlay_top   = true;
+    if (_settings.overlay_title == undefined) _settings.overlay_title = true;
+    if (_settings.overlay_deck  == undefined) _settings.overlay_deck  = true;
+    if (_settings.overlay_clock == undefined) _settings.overlay_clock = true;
+    if (_settings.overlay_ontop == undefined) _settings.overlay_ontop = true;
 
-    ipc_send("overlay_set_ontop", settings.overlay_ontop);
+    ipc_send("overlay_set_ontop", _settings.overlay_ontop);
 
-    if (settings.show_overlay == false) {
+    if (_settings.show_overlay == false) {
     	ipc_send("overlay_close", 1);
     }
-    else if (duringMatch || settings.show_overlay_always) {
+    else if (duringMatch || _settings.show_overlay_always) {
         ipc_send("overlay_show", 1);
     }
     
     if (relay) {
-	    ipc_send("set_settings", settings);
+	    ipc_send("set_settings", _settings);
     }
 }
 
@@ -401,18 +404,18 @@ else {
 console.log(logUri);
 
 var file;
-logLoop();
+
+setTimeout(logLoop, 500);
 
 function logLoop() {
     //console.log("logLoop() start");
+    //ipc_send("ipc_log", "logLoop() start");
     fs.open(logUri, 'r', function(err, fd) {
         file = fd;
         if (err) {
-            setTimeout( function() {
-                ipc_send("no_log", logUri);
-            }, 100);
-            setTimeout(logLoop, 100);
+            ipc_send("no_log", logUri);
             console.log("No log file found");
+            setTimeout(logLoop, 100);
         } else {
             readLog();
         }
@@ -421,6 +424,7 @@ function logLoop() {
 
 function readLog() {
 	//console.log("readLog()");
+    //ipc_send("ipc_log", "readLog()");
     ipc_send("log_read", 1);
     if (debugLog) {
         firstPass = false;
@@ -434,7 +438,8 @@ function readLog() {
             fs.read(file, new Buffer(logDiff), 0, logDiff, prevLogSize, processLog);
         }
         else {
-            console.log("fs.close(file) readLog")
+            //console.log("fs.close(file) readLog")
+            //ipc_send("ipc_log", "fs.close(file) readLog");
             fs.close(file);
             setTimeout(logLoop, 500);
         }
@@ -449,6 +454,7 @@ function processLog(err, bytecount, buff) {
     let rawString = buff.toString('utf-8', 0, bytecount);
     var splitString = rawString.split('[UnityCrossThread');
     console.log('Reading:', bytecount, 'bytes, ',splitString.length, ' chunks');
+    ipc_send("ipc_log", 'Reading: '+bytecount+' bytes, '+splitString.length+' chunks');
 
     if (firstPass) {
         splitString.push("%END%");
@@ -456,7 +462,7 @@ function processLog(err, bytecount, buff) {
     splitString.push("%CLOSE%");
 
     async.forEachOfSeries(splitString, function (value, index, callback) {
-        //console.log("Async: ("+index+")");
+        //ipc_send("ipc_log", "Async: ("+index+")");
         if (value == "%END%") {
             finishLoading();
             ipc_send("popup", "100%");
@@ -466,9 +472,8 @@ function processLog(err, bytecount, buff) {
         }
         else {
             processLogData(value);
-            let popStr = Math.round(100/splitString.length*index)+"%";
             if (firstPass) {
-                ipc_send("popup", popStr);
+                ipc_send("popup", "Processing log: "+Math.round(100/splitString.length*index)+"%");
             }
             
             if (debugLog) {
