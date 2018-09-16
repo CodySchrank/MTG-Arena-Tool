@@ -411,7 +411,7 @@ function logLoop() {
             setTimeout( function() {
                 ipc_send("no_log", logUri);
             }, 100);
-            setTimeout(logLoop, 1000);
+            setTimeout(logLoop, 100);
             console.log("No log file found");
         } else {
             readLog();
@@ -434,14 +434,14 @@ function readLog() {
             fs.read(file, new Buffer(logDiff), 0, logDiff, prevLogSize, processLog);
         }
         else {
-            //console.log("fs.close(file) readLog")
+            console.log("fs.close(file) readLog")
             fs.close(file);
-            setTimeout(logLoop, 1000);
+            setTimeout(logLoop, 500);
         }
     }
     else {
         fs.close(file);
-        setTimeout(logLoop, 1000);
+        setTimeout(logLoop, 500);
     }
 }
 
@@ -450,37 +450,43 @@ function processLog(err, bytecount, buff) {
     var splitString = rawString.split('[UnityCrossThread');
     console.log('Reading:', bytecount, 'bytes, ',splitString.length, ' chunks');
 
-    var str;
-    for (var i=0; i<splitString.length; i++) {
-    	str = splitString[i];
-        // iterate trough all 
-		(function(i, str){
-			setTimeout(function(){
-				processLogData(str);
-                    
-                let popStr = Math.round(100/splitString.length*i)+"%";
-                if (popStr != "0%" && firstPass) {
-                    ipc_send("popup", popStr);
-                }
-			}, i * debugLogSpeed);
-		}(i, str));
-    }
-
     if (firstPass) {
-        setTimeout(function(){
+        splitString.push("%END%");
+    }
+    splitString.push("%CLOSE%");
+
+    async.forEachOfSeries(splitString, function (value, index, callback) {
+        //console.log("Async: ("+index+")");
+        if (value == "%END%") {
             finishLoading();
             ipc_send("popup", "100%");
-        }, (splitString.length + 2) * debugLogSpeed);
-    }
+        }
+        else if (value == "%CLOSE%") {
+            fs.close(file);
+        }
+        else {
+            processLogData(value);
+            let popStr = Math.round(100/splitString.length*index)+"%";
+            if (firstPass) {
+                ipc_send("popup", popStr);
+            }
+            
+            if (debugLog) {
+                _time = new Date();
+                while (new Date() - _time < debugLogSpeed) {}
+            }            
+        }
+        callback();
 
-    setTimeout(function(){
-        fs.close(file);
-        //console.log("fs.close(file) processLog")
+    }, function (err) {
+        console.log("Async end");
         setTimeout(logLoop, 1000);
-    }, (splitString.length + 5) * debugLogSpeed);
+        if (err) {
+            console.log("processLog err: "+err.message);
+        }
+    });
 
     prevLogSize+=bytecount;
-    //process.nextTick(readLog);
 }
 
 function checkJson(str, check, chop) {
@@ -510,7 +516,6 @@ function dataChop(data, startStr, endStr) {
 
     return data;
 }
-
 
 function checkJsonWithStart(str, check, chop, start) {
     // Cuts the string between "check" and "chop" and after "start", then returns the first JSON found.
@@ -563,7 +568,6 @@ function findFirstJSON(str) {
 }
 
 
-
 /*
 
     unnecessarily long text to mark a point in the code that is fairly important because I cant remember the line number \^.^/
@@ -571,12 +575,54 @@ function findFirstJSON(str) {
 */
 
 
-
 function processLogData(data) {
     data = data.replace(/[\r\n]/g, "");
     var strCheck, json;
 
-    let timeStart = new Date();
+    // Log info
+    if (data.indexOf('==> Log.Info(') > -1) {
+        if (data.indexOf('DuelScene.GameStop') > -1) {
+            strCheck = '==> Log.Info(';
+            json = checkJsonWithStart(data, strCheck, '', '):');
+            if (json != false) {
+                if (json.params.messageName == 'DuelScene.GameStop') {
+                    var mid = json.params.payloadObject.matchId;
+                    var time = json.params.payloadObject.secondsCount;
+                    if (mid == currentMatchId) {
+                        currentMatchTime = time;
+                        saveMatch();
+                    }
+                }
+                return;
+            }
+        }
+        else {
+            return;
+        }
+    }
+
+    // Gre to Client Event
+    strCheck = 'GreToClientEvent';
+    json = checkJson(data, strCheck, '');
+    if (json != false) {
+        gre_to_client(json.greToClientEvent.greToClientMessages);
+        return;
+    }
+
+    // Get courses
+    strCheck = '<== Event.GetPlayerCourse(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        if (json.Id != "00000000-0000-0000-0000-000000000000") {
+            json._id = json.Id;
+            delete json.Id;
+
+            select_deck(json);
+            json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
+            httpSubmitCourse(json._id, json);
+        }
+        return;
+    }
 
     // Get player Id
     strCheck = '"PlayerId":"';
@@ -584,17 +630,19 @@ function processLogData(data) {
 		playerId = dataChop(data, strCheck, '"');
     }
 
-    strCheck = '==> Authenticate(';
-	if (data.indexOf(strCheck) > -1) {
-		httpAuth();
-		loadPlayerConfig(playerId);
-    }
-
     // Get User name
     strCheck = '"PlayerScreenName":"';
     if (data.indexOf(strCheck) > -1) {
         playerName = dataChop(data, strCheck, '"');
         ipc_send("set_username", playerName);
+        return;
+    }
+
+    strCheck = '==> Authenticate(';
+	if (data.indexOf(strCheck) > -1) {
+		httpAuth();
+		loadPlayerConfig(playerId);
+        return;
     }
 
     // Get Ranks
@@ -607,6 +655,7 @@ function processLogData(data) {
         let rank = get_rank_index(playerRank, playerTier);
 
         ipc_send("set_rank", {rank: rank, str: playerRank+" "+playerTier});
+        return;
     }
 
     // Get Decks
@@ -616,6 +665,7 @@ function processLogData(data) {
         decks = json;
         requestHistorySend(0);
         ipc_send("set_decks", JSON.stringify(json));
+        return;
     }
 
     // Get deck updated
@@ -692,6 +742,8 @@ function processLogData(data) {
                 }
             }
         });
+
+        return;
     }
 
     // Get inventory
@@ -757,6 +809,7 @@ function processLogData(data) {
                 store.set("wildcards_history", wilcardsHistory);
             }
         }
+        return;
     }
 
     // Get Cards
@@ -795,6 +848,7 @@ function processLogData(data) {
         });
 
         ipc_send("set_cards", {cards: json, new: cardsNewlyAdded});
+        return;
     }
 
     // Select deck
@@ -802,6 +856,7 @@ function processLogData(data) {
 	json = checkJsonWithStart(data, strCheck, '', ')');
 	if (json != false) {
         select_deck(json);
+        return;
     }
 
     // Match created
@@ -814,20 +869,7 @@ function processLogData(data) {
             matchBeginTime = parseWotcTime(logTime);
         }
         createMatch(json);
-    }
-
-    // Log info
-    strCheck = '==> Log.Info(';
-	json = checkJsonWithStart(data, strCheck, '', '):');
-	if (json != false) {
-		if (json.params.messageName == 'DuelScene.GameStop') {
-	        var mid = json.params.payloadObject.matchId;
-	        var time = json.params.payloadObject.secondsCount;
-	        if (mid == currentMatchId) {
-	        	currentMatchTime = time;
-	        	saveMatch();
-	        }
-		}
+        return;
     }
 
     // Draft status / draft start
@@ -836,6 +878,7 @@ function processLogData(data) {
     if (json != false) {
         console.log("Draft start")
         draftId = json.Id;
+        return;
     }
 
     //   
@@ -859,6 +902,7 @@ function processLogData(data) {
             currentDraftPack = json.draftPack.slice(0);
             httpGetPicks(draftSet);
         }
+        return;
     }
 
     // make pick (get the whole action)
@@ -870,6 +914,7 @@ function processLogData(data) {
             ipc.send("set_draft_cards", json.draftPack, json.pickedCards, json.packNumber+1, json.pickNumber);
             currentDraftPack = json.draftPack.slice(0);
         }
+        return;
     }
 
     // make pick (get just what we picked)
@@ -882,6 +927,7 @@ function processLogData(data) {
         value.pack = currentDraftPack;
         var key = "pack_"+json.params.packNumber+"pick_"+json.params.pickNumber;
         currentDraft[key] = value;
+        return;
     }
 
     //end draft
@@ -896,6 +942,7 @@ function processLogData(data) {
         //ipc_send("renderer_show", 1);
 
         saveDraft();
+        return;
     }
 
     // Game Room State Changed
@@ -946,27 +993,7 @@ function processLogData(data) {
                 }
             });
         }
-    }
-
-    // Gre to Client Event
-    strCheck = 'GreToClientEvent';
-	json = checkJson(data, strCheck, '');
-	if (json != false) {
-        gre_to_client(json.greToClientEvent.greToClientMessages);
-    }
-
-    // Get courses
-    strCheck = '<== Event.GetPlayerCourse(';
-    json = checkJsonWithStart(data, strCheck, '', ')');
-    if (json != false) {
-        if (json.Id != "00000000-0000-0000-0000-000000000000") {
-            json._id = json.Id;
-            delete json.Id;
-
-            select_deck(json);
-            json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
-            httpSubmitCourse(json._id, json);
-        }
+        return;
     }
 
     // Get sideboard changes
@@ -1011,11 +1038,7 @@ function processLogData(data) {
 
         //console.log(JSON.stringify(currentDeck));
         //console.log(currentDeck);
-    }
-
-    let timeEnd = new Date();
-    if (timeEnd - timeStart > 10) {
-        //console.log("DELTA: ", timeEnd - timeStart, data);
+        return;
     }
 }
 
@@ -1025,7 +1048,7 @@ function gre_to_client(data) {
         if (msg.type == "GREMessageType_SubmitDeckReq") {
             gameObjs = {};
         }
-        console.log("Message: "+msg.msgId, msg);
+        //console.log("Message: "+msg.msgId, msg);
         if (msg.type == "GREMessageType_GameStateMessage") {
             if (msg.gameStateMessage.type == "GameStateType_Full") {
                 if (msg.gameStateMessage.zones != undefined) {
@@ -1306,7 +1329,7 @@ function forceDeckUpdate() {
     var typeArt = 0;
     var typeEnc = 0;
     var typeLan = 0;
-    if (debugLog == true || firstPass == false) {
+    if ((debugLog == true || firstPass == false) && currentDeckUpdated.mainDeck != undefined) {
         /*
         // DEBUG
         currentDeckUpdated.mainDeck = [];
@@ -1336,7 +1359,7 @@ function forceDeckUpdate() {
 	                if (currentDeckUpdated.mainDeck != undefined) {
                         currentDeckUpdated.mainDeck.forEach(function(card) {
                             if (card.id == gameObjs[key].grpId) {
-                                console.log(gameObjs[key].instanceId, cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
+                                //console.log(gameObjs[key].instanceId, cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
                                 card.quantity -= 1;
                             }
                         });
@@ -1346,7 +1369,7 @@ function forceDeckUpdate() {
         }
     });
 
-    if (debugLog == true || firstPass == false) {
+    if ((debugLog == true || firstPass == false) && currentDeckUpdated.mainDeck != undefined) {
         currentDeckUpdated.mainDeck.forEach(function(card) {
             var c = cardsDb.get(card.id);
             if (c) {
@@ -1458,7 +1481,6 @@ function saveMatch() {
     ipc_send("popup", "Match saved!");
 }
 
-
 function saveDraft() {
     var draft = currentDraft;
     draft.id = draftId;
@@ -1490,7 +1512,6 @@ function saveDraft() {
     requestHistorySend(0);
     ipc_send("popup", "Draft saved!");
 }
-
 
 function finishLoading() {
 	firstPass = false;

@@ -27,257 +27,274 @@ var updateProgress = 0;
 var updateSpeed = 0;
 const ipc = electron.ipcMain;
 
-//Debug stuff
-ipc.on('ipc_switch', function (event, method, arg) {
-    //console.log("IPC ", method);
-    switch (method) {
-        case 'ipc_log':
-            console.log("IPC LOG: ", arg);
-            break;
+app.on('ready', () => {
+    mainWindow  = createMainWindow();
+    overlay     = createOverlay();
+    background  = createBackgroundWindow();
+    autoUpdater.checkForUpdatesAndNotify();
 
-        // to renderer
-        case 'set_settings':
-            //console.log("set settings: ", arg);
-            saveSettings(arg);
-            mainWindow.webContents.send("set_settings", arg);
-            overlay.webContents.send("set_settings", arg);
-            break;
+    ipc.on('ipc_switch', function (event, method, arg) {
+        //console.log("IPC ", method);
+        switch (method) {
+            case 'ipc_log':
+                console.log("IPC LOG: ", arg);
+                break;
 
-        case 'set_db':
-            mainWindow.webContents.send("set_db", arg);
-            overlay.webContents.send("set_db", arg);
-            break;
+            // to renderer
+            case 'set_settings':
+                //console.log("set settings: ", arg);
+                saveSettings(arg);
+                mainWindow.webContents.send("set_settings", arg);
+                overlay.webContents.send("set_settings", arg);
+                break;
 
-        case 'popup':
-            mainWindow.webContents.send("popup", arg);
-            break;
+            case 'set_db':
+                mainWindow.webContents.send("set_db", arg);
+                overlay.webContents.send("set_db", arg);
+                break;
 
-        case 'background_set_history':
-            mainWindow.webContents.send("set_history", arg);
-            break;
+            case 'popup':
+                mainWindow.webContents.send("popup", arg);
+                break;
 
-        case 'background_set_history_data':
-            mainWindow.webContents.send("set_history_data", arg);
-            break;
+            case 'background_set_history':
+                mainWindow.webContents.send("set_history", arg);
+                break;
 
-        case 'set_deck_changes':
-            mainWindow.webContents.send("set_deck_changes", arg);
-            break;            
+            case 'background_set_history_data':
+                mainWindow.webContents.send("set_history_data", arg);
+                break;
 
-        case 'set_economy':
-            mainWindow.webContents.send("set_economy", arg);
-            break;
+            case 'set_deck_changes':
+                mainWindow.webContents.send("set_deck_changes", arg);
+                break;            
 
-        case 'renderer_set_bounds':
-            mainWindow.setBounds(arg);
-            break;
+            case 'set_economy':
+                mainWindow.webContents.send("set_economy", arg);
+                break;
 
-        case 'renderer_window_minimize':
-            mainWindow.minimize();
-            break;
+            case 'renderer_set_bounds':
+                mainWindow.setBounds(arg);
+                break;
 
-        case 'no_log':
-            mainWindow.webContents.send("no_log", arg);
-            break;
+            case 'renderer_window_minimize':
+                mainWindow.minimize();
+                break;
 
-        case 'log_read':
-            mainWindow.webContents.send("log_exists", arg);
-            break;  
+            case 'no_log':
+                mainWindow.webContents.send("no_log", arg);
+                break;
 
-        case 'set_username':
-            mainWindow.webContents.send("set_username", arg);
-            break;
+            case 'log_read':
+                mainWindow.webContents.send("log_exists", arg);
+                break;  
 
-        case 'set_rank':
-            mainWindow.webContents.send("set_rank", arg.rank, arg.str);
-            break;
+            case 'set_username':
+                mainWindow.webContents.send("set_username", arg);
+                break;
 
-        case 'set_decks':
-            mainWindow.webContents.send("set_decks", arg);
-            break;
+            case 'set_rank':
+                mainWindow.webContents.send("set_rank", arg.rank, arg.str);
+                break;
 
-        case 'set_deck_updated':
-            mainWindow.webContents.send("set_deck_updated", arg);
-            break;
+            case 'set_decks':
+                mainWindow.webContents.send("set_decks", arg);
+                break;
 
-        case 'set_cards':
-            mainWindow.webContents.send("set_cards", arg.cards, arg.new);
-            break;
+            case 'set_deck_updated':
+                mainWindow.webContents.send("set_deck_updated", arg);
+                break;
 
-        case 'initialize':
-            mainWindow.webContents.send("initialize", arg);
-            break;
+            case 'set_cards':
+                mainWindow.webContents.send("set_cards", arg.cards, arg.new);
+                break;
 
-        case 'set_explore':
-            mainWindow.webContents.send("set_explore", arg);
-            break;
+            case 'initialize':
+                mainWindow.webContents.send("initialize", arg);
+                break;
 
-        case 'open_course_deck':
-            mainWindow.webContents.send("open_course_deck", arg);
-            break;
+            case 'set_explore':
+                mainWindow.webContents.send("set_explore", arg);
+                break;
 
-        // to background
-        case 'get_deck_changes':
-            background.webContents.send("get_deck_changes", arg);
-            break;
+            case 'open_course_deck':
+                mainWindow.webContents.send("open_course_deck", arg);
+                break;
 
-        case 'request_explore':
-            background.webContents.send("request_explore", arg);
-            break;
+            // to background
+            case 'get_deck_changes':
+                background.webContents.send("get_deck_changes", arg);
+                break;
 
-        case 'renderer_get_economy':
-            background.webContents.send("set_economy", 1);
-            break;
+            case 'request_explore':
+                background.webContents.send("request_explore", arg);
+                break;
 
-        case 'renderer_state':
-            showWindow();
-            background.webContents.send("set_renderer_state", arg);
-            break;
+            case 'renderer_get_economy':
+                background.webContents.send("set_economy", 1);
+                break;
 
-        case 'save_settings':
-            saveSettings(arg);
-            background.webContents.send("save_settings", arg);
-            overlay.webContents.send("set_settings", arg);
-            break;
+            case 'renderer_state':
+                showWindow();
+                background.webContents.send("set_renderer_state", arg);
+                break;
 
-        case 'renderer_erase_data':
-            background.webContents.send("delete_data", 1);
-            httpDeleteData();
-            break;
+            case 'save_settings':
+                saveSettings(arg);
+                background.webContents.send("save_settings", arg);
+                overlay.webContents.send("set_settings", arg);
+                break;
 
-        case 'renderer_update_install':
-            background.webContents.send("update_install", 1);
-            break;
+            case 'renderer_erase_data':
+                background.webContents.send("delete_data", 1);
+                httpDeleteData();
+                break;
 
-        case 'renderer_request_history':
-            background.webContents.send("request_history", arg);
-            break;
+            case 'renderer_update_install':
+                background.webContents.send("update_install", 1);
+                break;
 
-        case 'renderer_request_explore':
-            background.webContents.send("request_explore", arg);
-            break;
+            case 'renderer_request_history':
+                background.webContents.send("request_history", arg);
+                break;
 
-        case 'renderer_request_course':
-            background.webContents.send("request_course", arg);
-            break;
+            case 'renderer_request_explore':
+                background.webContents.send("request_explore", arg);
+                break;
 
-        case 'overlay_set_deck_mode':
-            background.webContents.send("set_deck_mode", arg);
-            break;
+            case 'renderer_request_course':
+                background.webContents.send("request_course", arg);
+                break;
 
-        // to overlay
+            case 'overlay_set_deck_mode':
+                background.webContents.send("set_deck_mode", arg);
+                break;
 
-        case 'set_deck':
-            overlay.webContents.send("set_deck", arg);
-            break;
+            // to overlay
 
-        case 'set_draft':
-            overlay.webContents.send("set_draft", arg);
-            break;
+            case 'set_deck':
+                overlay.webContents.send("set_deck", arg);
+                break;
 
-        case 'set_draft_picks':
-            overlay.webContents.send("set_draft_picks", arg);
-            break;
+            case 'set_draft':
+                overlay.webContents.send("set_draft", arg);
+                break;
 
-        case 'set_timer':
-            overlay.webContents.send("set_timer", arg);
-            break;
+            case 'set_draft_picks':
+                overlay.webContents.send("set_draft_picks", arg);
+                break;
 
-        case 'set_opponent':
-            overlay.webContents.send("set_opponent", arg);
-            break;
+            case 'set_timer':
+                overlay.webContents.send("set_timer", arg);
+                break;
 
-        case 'set_opponent_rank':
-            overlay.webContents.send("set_opponent_rank", arg.rank, arg.str);
-            break;
+            case 'set_opponent':
+                overlay.webContents.send("set_opponent", arg);
+                break;
 
-        // to main js / window handling
+            case 'set_opponent_rank':
+                overlay.webContents.send("set_opponent_rank", arg.rank, arg.str);
+                break;
 
-        case 'show_background':
-            background.show();
-            break;
+            // to main js / window handling
 
-        case 'renderer_show':
-            showWindow();
-            break;
+            case 'show_background':
+                background.show();
+                break;
 
-        case 'renderer_hide':
-            hideWindow();
-            break;
+            case 'renderer_show':
+                showWindow();
+                break;
 
-        case 'renderer_window_close':
-            if (closeToTray) {
+            case 'renderer_hide':
                 hideWindow();
-            }
-            else {
-                quit();
-            }
-            break;
+                break;
 
-        case 'set_close_to_tray':
-            closeToTray = arg;
-            break;
-
-        case 'overlay_show':
-            if (!overlay.isVisible()) {
-                overlay.show();
-            }
-            break;
-
-        case 'overlay_close':
-            overlay.hide();
-            break;
-
-        case 'overlay_minimize':
-            overlay.minimize();
-            break;
-
-        case 'overlay_set_bounds':
-            overlay.setBounds(arg);
-            break;
-
-        case 'overlay_set_ontop':
-            overlay.setAlwaysOnTop(arg, 'floating');
-            break;
-
-        case 'save_overlay_pos':
-            saveOverlayPos();
-            break;
-
-        case 'force_open_settings':
-            mainWindow.webContents.send("force_open_settings", true);
-            showWindow();
-            break;
-
-        case 'set_clipboard':
-            clipboard.writeText(arg);
-            break;
-
-        case 'export_txt':
-            dialog.showSaveDialog({
-                filters: [{
-                    name: 'txt',
-                    extensions: ['txt']
-                }],
-                defaultPath: '~/'+arg.name+'.txt'
-            }, function(file_path) {
-                if (file_path) {
-                    fs.writeFile(file_path, arg.str, function(err) {
-                        if (err) {
-                            dialog.showErrorBox('Error', err);
-                            return;
-                        }
-                    });
+            case 'renderer_window_close':
+                if (closeToTray) {
+                    hideWindow();
                 }
-            });
+                else {
+                    quit();
+                }
+                break;
 
-            break;
+            case 'set_close_to_tray':
+                closeToTray = arg;
+                break;
 
-        default:
-            console.log("IPC Switch unknown method ", method);
-            break;
-    }
+            case 'overlay_show':
+                if (!overlay.isVisible()) {
+                    overlay.show();
+                }
+                break;
+
+            case 'overlay_close':
+                overlay.hide();
+                break;
+
+            case 'overlay_minimize':
+                overlay.minimize();
+                break;
+
+            case 'overlay_set_bounds':
+                overlay.setBounds(arg);
+                break;
+
+            case 'overlay_set_ontop':
+                overlay.setAlwaysOnTop(arg, 'floating');
+                break;
+
+            case 'save_overlay_pos':
+                saveOverlayPos();
+                break;
+
+            case 'force_open_settings':
+                mainWindow.webContents.send("force_open_settings", true);
+                showWindow();
+                break;
+
+            case 'set_clipboard':
+                clipboard.writeText(arg);
+                break;
+
+            case 'export_txt':
+                dialog.showSaveDialog({
+                    filters: [{
+                        name: 'txt',
+                        extensions: ['txt']
+                    }],
+                    defaultPath: '~/'+arg.name+'.txt'
+                }, function(file_path) {
+                    if (file_path) {
+                        fs.writeFile(file_path, arg.str, function(err) {
+                            if (err) {
+                                dialog.showErrorBox('Error', err);
+                                return;
+                            }
+                        });
+                    }
+                });
+
+                break;
+
+            default:
+                console.log("IPC Switch unknown method ", method);
+                break;
+        }
+    });
+
+    //
+    ipc.on('set_draft_cards', function(event, pack, picks, packn, pickn) {
+        overlay.webContents.send("set_draft_cards", pack, picks, packn, pickn);
+    });
+
+    //
+    ipc.on('set_turn', function(event, playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision) {
+        overlay.webContents.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
+    });
 });
+
 
 function saveSettings(settings) {
     app.setLoginItemSettings({
@@ -285,16 +302,6 @@ function saveSettings(settings) {
     });
     closeToTray = settings.close_to_tray;
 }
-
-//
-ipc.on('set_draft_cards', function(event, pack, picks, packn, pickn) {
-    overlay.webContents.send("set_draft_cards", pack, picks, packn, pickn);
-});
-
-//
-ipc.on('set_turn', function(event, playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision) {
-    overlay.webContents.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
-});
 
 
 // Catch exceptions
@@ -526,11 +533,4 @@ app.on('activate', () => {
     if (!mainWindow) {
         mainWindow = createMainWindow();
     }
-});
-
-app.on('ready', () => {
-    mainWindow  = createMainWindow();
-    overlay     = createOverlay();
-    background  = createBackgroundWindow();
-    autoUpdater.checkForUpdatesAndNotify();
 });

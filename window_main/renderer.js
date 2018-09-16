@@ -80,7 +80,7 @@ ipc.on('set_rank', function (event, offset, rank) {
 	rankOffset = offset;
 	rankTitle = rank;
 	if (sidebarActive != -1) {
-		$(".top_rank").css("background-position", (rankOffset*-32)+"px 0px").attr("title", rankTitle);
+		$(".top_rank").css("background-position", (rankOffset*-48)+"px 0px").attr("title", rankTitle);
 	}
 });
 
@@ -751,6 +751,10 @@ function setDecks(arg) {
 		decks.forEach(function(deck, index) {
 			var tileGrpid = deck.deckTileId;
 
+			if (cardsDb.get(tileGrpid).set == undefined) {
+				tileGrpid = 67003;
+			}
+
 			var tile = document.createElement("div");
 			tile.classList.add(deck.id+'t');
 			tile.classList.add('deck_tile');
@@ -988,7 +992,7 @@ function setExplore(arg, loadMore) {
 		}
 
 		var tileGrpid = _deck.deck_tile;
-		if (!cardsDb.get(tileGrpid)) {
+		if (cardsDb.get(tileGrpid).set == undefined) {
 			tileGrpid = 67003;
 		}
 
