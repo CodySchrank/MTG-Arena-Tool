@@ -241,6 +241,8 @@ function getReadableEvent(arg) {
 			return "Twice the Life"; break;
 		case "QuickDraftExploration_M_":
 			return "Quick Draft Exploration M19"; break;
+		case "Momir_":
+			return "Momir Mardness"; break;
 
 		case "CompDraft_DOM_":
 			return "Competitive Draft DOM"; break;

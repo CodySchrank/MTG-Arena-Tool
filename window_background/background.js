@@ -250,7 +250,7 @@ ipc.on('request_explore', function (event, arg) {
     if (arg == "all" || arg == "All" ) {
         arg = "";
     }
-    arg = arg.replace("_m_", "_m19_");// dirty hack :()
+    arg = arg.replace("_m_", "_m19_");// dirty hack :(
     httpGetTopDecks(arg);
 });
 
@@ -281,6 +281,7 @@ function loadPlayerConfig(playerId) {
         ipc_send("popup", "Reading history: "+i+" / "+history.matches.length);
         var id = history.matches[i];
         if (id != null) {
+            // this is the guilty of all slowdowns
             var item = store.get(id);
             if (item != undefined) {
                 history[id] = item;
@@ -297,6 +298,7 @@ function loadPlayerConfig(playerId) {
         if (id != null) {
             var item = store.get(id);
             if (item != undefined) {
+                // this one too
                 history.matches.push(id);
                 history[id] = item;
                 history[id].type = "draft";
