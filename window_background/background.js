@@ -267,7 +267,6 @@ ipc.on('get_deck_changes', function (event, arg) {
     get_deck_changes(arg);
 });
 
-
 function loadPlayerConfig(playerId) {
 	ipc_send("ipc_log", "Load player ID: "+playerId);
     store = new Store({
@@ -275,14 +274,15 @@ function loadPlayerConfig(playerId) {
         defaults: defaultCfg
     });
 
+    // Preload config, if we use store.get turned out to be SLOOOW
+    var entireConfig = store.get();
     history.matches = store.get('matches_index');
     
     for (let i=0; i<history.matches.length; i++) {
         ipc_send("popup", "Reading history: "+i+" / "+history.matches.length);
         var id = history.matches[i];
         if (id != null) {
-            // this is the guilty of all slowdowns
-            var item = store.get(id);
+            var item = entireConfig[id];
             if (item != undefined) {
                 history[id] = item;
                 history[id].type = "match";
@@ -296,9 +296,8 @@ function loadPlayerConfig(playerId) {
         var id = drafts.matches[i];
 
         if (id != null) {
-            var item = store.get(id);
+            var item = entireConfig[id];
             if (item != undefined) {
-                // this one too
                 history.matches.push(id);
                 history[id] = item;
                 history[id].type = "draft";
@@ -306,11 +305,11 @@ function loadPlayerConfig(playerId) {
 	    }
     }    
 
-    deck_changes_index = store.get("deck_changes_index");
-    deck_changes = store.get("deck_changes");
-    goldHistory = store.get("gold_history");
-    gemsHistory = store.get("gems_history");
-    wilcardsHistory = store.get("wildcards_history");
+    deck_changes_index = entireConfig["deck_changes_index"];
+    deck_changes = entireConfig["deck_changes"];
+    goldHistory = entireConfig["gold_history"];
+    gemsHistory = entireConfig["gems_history"];
+    wilcardsHistory = entireConfig["wildcards_history"];
     var economy = {gold: goldHistory, gems: gemsHistory, wildcards: wilcardsHistory, open: false};    
     ipc_send("set_economy", economy);
 
