@@ -1,6 +1,7 @@
 This is meant as a guide to help you locate and resolve the most common issues running MTG Arena Tool. **Please** only follow these steps if you encounter one of the issues mentioned.
 
 ### If the app freezes in loading "Just a second" page:
+This is probably caused by an error reading the user configuration, probably due to an unhandled exception or new data added from MTGA that mtgatool is not handling properly. Bear in mind this issue is **not** because of a bad or improper installation, so reinstalling will make no difference. Altrough, you can roll back to a previous version safely if an update caused it.
 
 Locate your log and config files;
 - Close MTG Arena and MTG Arena Tool.
