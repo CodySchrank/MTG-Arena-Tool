@@ -86,7 +86,7 @@ app.on('ready', () => {
                 break;
 
             case 'log_read':
-                mainWindow.webContents.send("log_exists", arg);
+                mainWindow.webContents.send("log_read", arg);
                 break;  
 
             case 'set_username':

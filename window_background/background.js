@@ -427,7 +427,9 @@ function logLoop() {
 function readLog() {
 	//console.log("readLog()");
     //ipc_send("ipc_log", "readLog()");
-    ipc_send("log_read", 1);
+    if (!firstPass)  {
+        ipc_send("log_read", 1);
+    }
     if (debugLog) {
         firstPass = false;
     }
