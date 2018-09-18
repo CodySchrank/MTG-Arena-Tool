@@ -128,6 +128,9 @@ ipc.on('set_settings', function (event, settings) {
 	$('.overlay_clock_container').css('display', '');
 	$('.overlay_deck_container').attr('style', '');
 	$('.overlay_draft_container').attr('style', '');
+	$('.overlay_deckname').attr('style', '');
+	$('.overlay_deckcolors').attr('style', '');
+	$('.overlay_separator').attr('style', '');
 
 	if (!settings.overlay_top) {
 		hideDiv('.top');
@@ -166,8 +169,9 @@ ipc.on('set_settings', function (event, settings) {
 });
 
 function hideDiv(div) {
-	let style = $(div).attr('style');	style += 'display: none !important;';
-	$(div).attr('style', style);
+	let _style = $(div).attr('style');
+	_style += 'display: none !important;';
+	$(div).attr('style', _style);
 }
 
 
