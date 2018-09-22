@@ -210,7 +210,7 @@ span i {
 }
 
 
-.visualView, .openDeck, .openHistory, .exportDeck, .exportDeckStandard {
+.visualView, .openDeck, .openHistory, .exportDeck, .exportDeckStandard, .centered {
     margin: 16px auto !important;
 }
 
@@ -342,9 +342,14 @@ span i {
 }
 
 .about a {
+    cursor: pointer;
     text-align: center;
     margin: 4px;
     color: rgb(220, 195, 150);
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 .message_center {
@@ -395,6 +400,19 @@ span i {
     text-align: center;
     margin-top: 6;
     margin-bottom: 6;
+}
+
+.message_small {
+    text-align: center;
+    margin-bottom: 6;
+    color: #fae5d2;
+}
+
+.message_small a {
+    cursor: pointer;
+    text-align: center;
+    margin: 4px;
+    color: rgb(220, 195, 150);
 }
 
 .opp_rank {
@@ -877,10 +895,39 @@ span i {
     font-family: Mplantin;
     padding-left: 4px;
 }
-}
 
 .input_container input:focus {
     outline-style: none;
+}
+
+
+.input_login_container {
+    display: flex;
+    height: 24px;
+    width: 100%;
+    padding: 12px 0;
+}
+
+.input_login_container input {
+    background-color: rgba(145, 121, 97, 0.35);
+    border: 1px solid rgba(250, 229, 210, 0.5);
+    display: inline-table;
+    border-radius: 5px;
+    color: #fae5d2;
+    height: 24px;
+    width: 100%;
+    font-size: 14px;
+    user-select: none;
+    font-family: Mplantin;
+    padding-left: 4px;
+}
+
+.input_login_container input:focus {
+    outline-style: none;
+}
+
+.input_login_container label {
+
 }
 
 
@@ -1503,4 +1550,14 @@ span i {
 
 .deck_visual_card_side {
     height: 22px;
+}
+
+.authenticate {
+    display: none;
+    position: relative;
+    top: calc(50% - 150px);
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    margin: 0 auto;
 }

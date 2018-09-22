@@ -276,7 +276,7 @@ function loadPlayerConfig(playerId) {
 
     // Preload config, if we use store.get turned out to be SLOOOW
     var entireConfig = store.get();
-    history.matches = store.get('matches_index');
+    history.matches = entireConfig['matches_index'];
     
     for (let i=0; i<history.matches.length; i++) {
         ipc_send("popup", "Reading history: "+i+" / "+history.matches.length);
@@ -406,6 +406,7 @@ console.log(logUri);
 
 var file;
 
+var logLoopMode = 0;
 setTimeout(logLoop, 500);
 
 function logLoop() {
@@ -438,7 +439,12 @@ function readLog() {
         var logDiff = logSize - prevLogSize;
 
         if (logSize > prevLogSize+1) {
-            fs.read(file, new Buffer(logDiff), 0, logDiff, prevLogSize, processLog);
+            if (logLoopMode == 0) {
+                fs.read(file, new Buffer(logDiff), 0, logDiff, prevLogSize, processLogUser);
+            }
+            else {
+                fs.read(file, new Buffer(logDiff), 0, logDiff, prevLogSize, processLog);
+            }
         }
         else {
             //console.log("fs.close(file) readLog")
@@ -489,6 +495,54 @@ function processLog(err, bytecount, buff) {
     }, function (err) {
         console.log("Async end");
         setTimeout(logLoop, 1000);
+        if (err) {
+            console.log("processLog err: "+err.message);
+        }
+    });
+
+    prevLogSize+=bytecount;
+}
+
+function processLogUser(err, bytecount, buff) {
+    let rawString = buff.toString('utf-8', 0, bytecount);
+    var splitString = rawString.split('[UnityCrossThread');
+    console.log('Reading:', bytecount, 'bytes, ',splitString.length, ' chunks');
+    ipc_send("ipc_log", 'Reading: '+bytecount+' bytes, '+splitString.length+' chunks');
+
+    if (firstPass) {
+        splitString.push("%END%");
+    }
+    splitString.push("%CLOSE%");
+
+    async.forEachOfSeries(splitString, function (value, index, callback) {
+        //ipc_send("ipc_log", "Async: ("+index+")");
+        if (value == "%END%") {
+            ipc_send("popup", "100%");
+        }
+        else if (value == "%CLOSE%") {
+            fs.close(file);
+        }
+        else {
+            // Get player Id
+            strCheck = '"PlayerId":"';
+            if (value.indexOf(strCheck) > -1) {
+                playerId = dataChop(value, strCheck, '"');
+            }
+
+            // Get User name
+            strCheck = '"PlayerScreenName":"';
+            if (value.indexOf(strCheck) > -1) {
+                playerName = dataChop(value, strCheck, '"');
+                ipc_send("init_login", playerName);
+            }
+
+            if (firstPass) {
+                ipc_send("popup", "Processing log: "+Math.round(100/splitString.length*index)+"%");
+            }      
+        }
+        callback();
+
+    }, function (err) {
         if (err) {
             console.log("processLog err: "+err.message);
         }

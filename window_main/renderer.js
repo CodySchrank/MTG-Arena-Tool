@@ -239,6 +239,13 @@ ipc.on('set_economy', function (event, arg) {
 });
 
 //
+ipc.on('init_login', function (event, arg) {
+	$('.authenticate').show();
+	$('.message_center').css('display', 'none');
+	$('.init_loading').hide();
+});
+
+//
 ipc.on('initialize', function (event, arg) {
 	$('.top_username').html(userName);
 	$(".top_rank").css("background-position", (rankOffset*-48)+"px 0px").attr("title", rankTitle);
@@ -360,6 +367,10 @@ function isArenaRunning() {
 }
 
 $(document).ready(function() {
+	$(".signup_link").click(function() {
+		shell.openExternal('https://mtgatool.com/signup/');
+	});
+
 	//
 	$(".close").click(function () {
 	    ipc_send('renderer_window_close', 1);

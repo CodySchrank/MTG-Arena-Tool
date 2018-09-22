@@ -109,6 +109,10 @@ app.on('ready', () => {
                 mainWindow.webContents.send("set_cards", arg.cards, arg.new);
                 break;
 
+            case 'init_login':
+                mainWindow.webContents.send("init_login", arg);
+                break;
+
             case 'initialize':
                 mainWindow.webContents.send("initialize", arg);
                 break;
