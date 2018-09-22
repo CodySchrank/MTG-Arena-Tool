@@ -2621,6 +2621,7 @@ function add_checkbox(div, label, iid, def) {
 
 //
 function open_settings(openSection) {
+	lastSettingsSection = openSection;
     change_background("default");
 	$("#ux_0").off();
 	$("#history_column").off();
@@ -2779,8 +2780,8 @@ function open_settings(openSection) {
 	$("#ux_0").append(wrap_l);
 	$("#ux_0").append(wrap_r);
 
-	$(".ss"+lastSettingsSection).show();
-	$(".sn"+lastSettingsSection).addClass("nav_selected");
+	$(".ss"+openSection).show();
+	$(".sn"+openSection).addClass("nav_selected");
 
 	$(".settings_nav").click(function () {
 		if (!$(this).hasClass("nav_selected")) {
