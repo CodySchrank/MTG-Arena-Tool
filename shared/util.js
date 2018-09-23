@@ -272,15 +272,14 @@ function getReadableEvent(arg) {
 
 //
 function get_card_type_sort(a) {
-	var ret = 0;
-	if (a.includes("Creature", 0)) 		ret = 1;
-	if (a.includes("Planeswalker", 0)) 	ret = 2;
-	if (a.includes("Instant", 0)) 		ret = 3;
-	if (a.includes("Sorcery", 0)) 		ret = 4;
-	if (a.includes("Artifact", 0)) 		ret = 5;
-	if (a.includes("Enchantment", 0)) 	ret = 6;
-	if (a.includes("Land", 0))			ret = 7;
-	return ret;
+	if (a.includes("Creature", 0)) 		return 1;
+	if (a.includes("Planeswalker", 0)) 	return 2;
+	if (a.includes("Instant", 0)) 		return 3;
+	if (a.includes("Sorcery", 0)) 		return 4;
+	if (a.includes("Artifact", 0)) 		return 5;
+	if (a.includes("Enchantment", 0)) 	return 6;
+	if (a.includes("Land", 0))			return 7;
+	return 0;
 }
 
 //
@@ -317,7 +316,6 @@ function compare_cards(a, b) {
 
 	return 0;
 }
-
 //
 function compare_draft_cards(a, b) {
 	// Yeah this is lazy.. I know

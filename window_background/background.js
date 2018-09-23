@@ -895,14 +895,13 @@ function processLogData(data) {
     if (json != false) {
         console.log("Draft status");
         if (json.eventName != undefined) {
-            if (json.eventName.indexOf("M19") !== -1)   draftSet = "Magic 2019";
-            if (json.eventName.indexOf("DOM") !== -1)   draftSet = "Dominaria";
-            if (json.eventName.indexOf("HOU") !== -1)   draftSet = "Hour of Devastation";
-            if (json.eventName.indexOf("AKH") !== -1)   draftSet = "Amonketh";
-            if (json.eventName.indexOf("XLN") !== -1)   draftSet = "Ixalan";
-            if (json.eventName.indexOf("RIX") !== -1)   draftSet = "Rivals of Ixalan";
-            if (json.eventName.indexOf("KLD") !== -1)   draftSet = "Kaladesh";
-            if (json.eventName.indexOf("AER") !== -1)   draftSet = "Aether Revolt";
+            // TEST THIS
+            for (var set in setsList) {
+                var setCode = setsList[set]["code"];
+                if (json.eventName.indexOf(setCode) !== -1) {
+                    draftSet = set;
+                }
+            }
         }
         if (json.packNumber == 0 && json.pickNumber == 0) {
             createDraft();
