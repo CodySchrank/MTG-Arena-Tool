@@ -406,7 +406,6 @@ console.log(logUri);
 
 var file;
 
-setTimeout(logLoop, 500);
 
 function logLoop() {
     //console.log("logLoop() start");
@@ -1546,6 +1545,7 @@ function finishLoading() {
 
 var httpAsync = [];
 httpBasic();
+httpGetDatabase();
 
 function httpBasic() {
     var httpAsyncNew = httpAsync.slice(0);
@@ -1609,7 +1609,9 @@ function httpBasic() {
                         }
                         if (_headers.method == 'get_database') {
                             cardsDb.set(parsedResult);
+                            setTimeout(logLoop, 1);
                             delete parsedResult.ok;
+                            setsList = parsedResult.sets;
                             ipc_send("set_db", parsedResult);
                         }
                     }
@@ -1705,10 +1707,9 @@ function httpGetPicks(set) {
 
 function httpGetDatabase() {
     var _id = makeId(6);
+    ipc_send("popup", "Downloading metadata");
     httpAsync.push({'reqId': _id, 'method': 'get_database', 'uid': playerId});
 }
-
-httpGetDatabase();
 
 //
 function get_deck_colors(deck) {

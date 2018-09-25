@@ -352,68 +352,8 @@ function compare_draft_cards(a, b) {
 }
 
 
-var setsList = {
-	"Oath of the Gatewatch": {
-		"scryfall": "ogw",
-		"code": "OGW",
-		"tile": 67106
-	},
-	"Kaladesh": {
-		"scryfall": "kld",
-		"code": "KLD",
-		"tile": 63859
-	},
-	"Aether Revolt": {
-		"scryfall": "aer",
-		"code": "AER",
-		"tile": 64647
-	},
-	"Welcome Deck 2017": {
-		"scryfall": "w17",
-		"code": "W17",
-		"tile": 67106
-	},
-	"Amonkhet": {
-		"scryfall": "akh",
-		"code": "AKH",
-		"tile": 64827
-	},
-	"Hour of Devastation": {
-		"scryfall": "hou",
-		"code": "hou",
-		"tile": 65759
-	},
-	"Ixalan": {
-		"scryfall": "xln",
-		"code": "XLN",
-		"tile": 66433
-	},
-	"Rivals of Ixalan": {
-		"scryfall": "rix",
-		"code": "RIX",
-		"tile": 66937
-	},
-	"Dominaria": {
-		"scryfall": "dom",
-		"code": "DAR",
-		"tile": 67106
-	},
-	"Magic 2019": {
-		"scryfall": "m19",
-		"code": "M19",
-		"tile": 65947
-	},
-	"Arena": {
-		"scryfall": "mtga",
-		"code": "ANA",
-		"tile": 67106
-	}/*,
-	"Guilds of Ravnica": {
-		"scryfall": "grn",
-		"code": "GRN",
-		"tile": 67106
-	}*/
-};
+//
+var setsList = null;
 
 //
 function get_set_scryfall(set) {
@@ -476,6 +416,7 @@ function get_collection_stats() {
     	card = cardsDb.get(grpId);
     	if (card.rarity !== "token" && card.rarity !== "land" && card.set !== "Oath of the Gatewatch" && card.dfc != "DFC_Front" && card.dfc != "SplitCard") {
 			// add to totals
+			//console.log(card, card.set);
 			stats[card.set].totalCards += 4;
 			stats.totalCards += 4;
 			stats.totalSingles += 1;

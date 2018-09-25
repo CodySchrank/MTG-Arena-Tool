@@ -64,6 +64,8 @@ process.on('uncaughtException', (err) => {
 
 //
 ipc.on('set_db', function (event, arg) {
+	setsList = arg.sets;
+	delete arg.sets;
 	cardsDb.set(arg);
 });
 
@@ -1332,6 +1334,36 @@ function drawDeck(div, deck) {
 
 //
 function drawDeckVisual(_div, _stats, deck) {
+	// attempt at sorting visually.. 
+	var newMainDeck = [];
+
+	for (var cmc = 0; cmc < 21; cmc++) {
+		for (var qq = 4; qq > -1; qq--) {
+			deck.mainDeck.forEach(function(c) {
+				var grpId = c.id;
+				var card = cardsDb.get(grpId);
+				if (card.type.indexOf("Land") == -1) {
+					if (card.cmc == cmc) {
+						var quantity = c.quantity;
+
+						if (quantity == qq) {
+							newMainDeck.push(c);
+						}
+					}
+				}
+				else if (cmc == 20) {
+					var quantity = c.quantity;
+					if (qq == 0 && quantity > 4) {
+						newMainDeck.push(c);
+					}
+					if (quantity == qq) {
+						newMainDeck.push(c);
+					}
+				}
+			});
+		}
+	}
+
 	_stats.hide();
 	_div.css("display", "flex");
 	_div.css("width", "auto");
@@ -1359,7 +1391,7 @@ function drawDeckVisual(_div, _stats, deck) {
 
 	var tileNow;
 	var _n = 0;
-	deck.mainDeck.forEach(function(c) {
+	newMainDeck.forEach(function(c) {
 		var grpId = c.id;
 		var card = cardsDb.get(grpId);
 
