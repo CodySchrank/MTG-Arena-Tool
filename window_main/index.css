@@ -102,12 +102,21 @@ span i {
 .top_username {
     color: #FAE5D2;
     font-size: 20px;
-    margin-right: 32px;
     margin-left: 16px;
     align-self: center;
     font-family: Beleren;
     cursor: default;
 }
+
+.top_username_id {
+    color: rgba(250, 229, 210, 0.5);
+    font-size: 20px;
+    margin-right: 32px;
+    align-self: center;
+    font-family: Beleren;
+    cursor: default;
+}
+
 
 .top_rank {
     -webkit-app-region: no-drag;
@@ -1140,11 +1149,19 @@ span i {
     overflow-y: auto;
 }
 
-.sidebar_column {
+.sidebar_column_r {
     width: 30% !important;
     max-width: 220px;
     border-width: 2px;
     border-style: none solid none none;
+    border-image: linear-gradient(to bottom, rgba(250, 229, 210, 0) 10px, rgba(250, 229, 210, 0.5) 10px, rgba(250, 229, 210, 0)) 1 100%;
+}
+
+.sidebar_column_l {
+    width: 30% !important;
+    max-width: 220px;
+    border-width: 2px;
+    border-style: none none none solid;
     border-image: linear-gradient(to bottom, rgba(250, 229, 210, 0) 10px, rgba(250, 229, 210, 0.5) 10px, rgba(250, 229, 210, 0)) 1 100%;
 }
 

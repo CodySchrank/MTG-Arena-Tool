@@ -187,7 +187,7 @@ ipc.on('set_hover', function (event, arg) {
 
 //
 ipc.on('set_opponent', function (event, arg) {
-	$('.top_username').html(arg);
+	$('.top_username').html(arg.slice(0, -6));
 });
 
 //
@@ -207,7 +207,7 @@ ipc.on('set_deck', function (event, arg) {
 	$(".overlay_deckcolors").html('');
 
 	if (deckMode == 3) {
-		$(".overlay_deckname").html("Played by "+arg.name);
+		$(".overlay_deckname").html("Played by "+arg.name.slice(0, -6));
 	}
 	else {
 		$(".overlay_deckname").html(arg.name);
@@ -215,7 +215,7 @@ ipc.on('set_deck', function (event, arg) {
 
 	arg.colors = get_deck_colors(arg);
 	arg.colors.forEach(function(color) {
-		$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
+		$(".overlay_deckcolors").append('<div class="mana_s20 mana_'+mana[color]+'"></div>');
 	});
 
 	arg.mainDeck.sort(compare_cards); 
@@ -308,7 +308,7 @@ function setDraft() {
 	if (draftMode == 0) {
 		var colors = get_ids_colors(draftPick);
 		colors.forEach(function(color) {
-			$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
+			$(".overlay_deckcolors").append('<div class="mana_s20 mana_'+mana[color]+'"></div>');
 		});
 
 		draftPick.sort(compare_draft_cards); 
@@ -320,7 +320,7 @@ function setDraft() {
 	else if (draftMode == 1) {
 		var colors = get_ids_colors(draftPack);
 		colors.forEach(function(color) {
-			$(".overlay_deckcolors").append('<div class="mana_20 mana_'+mana[color]+'"></div>');
+			$(".overlay_deckcolors").append('<div class="mana_s20 mana_'+mana[color]+'"></div>');
 		});
 
 		draftPack.sort(compare_draft_picks); 

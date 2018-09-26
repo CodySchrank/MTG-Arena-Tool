@@ -73,7 +73,8 @@ ipc.on('set_db', function (event, arg) {
 ipc.on('set_username', function (event, arg) {
 	userName = arg;
 	if (sidebarActive != -1) {
-		$('.top_username').html(userName);
+		$('.top_username').html(userName.slice(0, -6));
+		$('.top_username_id').html(userName.slice(-6));
 	}
 });
 
@@ -242,7 +243,9 @@ ipc.on('set_economy', function (event, arg) {
 
 //
 ipc.on('initialize', function (event, arg) {
-	$('.top_username').html(userName);
+	$('.top_username').html(userName.slice(0, -6));
+	$('.top_username_id').html(userName.slice(-6));
+
 	$(".top_rank").css("background-position", (rankOffset*-48)+"px 0px").attr("title", rankTitle);
 	sidebarActive = 0;
 	setDecks(null);
@@ -445,7 +448,7 @@ function setHistory(loadMore) {
 		
 		var wrap_r = document.createElement("div");
 		wrap_r.classList.add("wrapper_column");
-		wrap_r.classList.add("sidebar_column");
+		wrap_r.classList.add("sidebar_column_l");
 
 		var div = document.createElement("div");
 		div.classList.add("ranks_history");
@@ -572,7 +575,7 @@ function setHistory(loadMore) {
 
 			var d = document.createElement("div");
 			d.classList.add("list_match_title");
-			d.innerHTML = "vs "+match.opponent.name;
+			d.innerHTML = "vs "+match.opponent.name.slice(0, -6);
 			fct.appendChild(d);
 
 			var or = document.createElement("div");
@@ -1770,7 +1773,7 @@ function open_match(id) {
 	var tier = match.player.tier;
 	r.css("background-position", (get_rank_index(rank, tier)*-48)+"px 0px").attr("title", rank+" "+tier);
 
-	var name = $('<div class="list_match_player_left">'+match.player.name+' ('+match.player.win+')</div>');
+	var name = $('<div class="list_match_player_left">'+match.player.name.slice(0, -6)+' ('+match.player.win+')</div>');
 	name.appendTo(fltrt);
 
 	if (match.player.win > match.opponent.win) {
@@ -1798,7 +1801,7 @@ function open_match(id) {
 	var tier = match.opponent.tier;
 	r.css("background-position", (get_rank_index(rank, tier)*-48)+"px 0px").attr("title", rank+" "+tier);
 
-	var name = $('<div class="list_match_player_right">'+match.opponent.name+' ('+match.opponent.win+')</div>');
+	var name = $('<div class="list_match_player_right">'+match.opponent.name.slice(0, -6)+' ('+match.opponent.win+')</div>');
 	name.appendTo(fltrt);
 
 	if (match.player.win < match.opponent.win) {
@@ -1827,7 +1830,7 @@ function open_match(id) {
 	});
 	$(".exportDeckStandard").click(function () {
 	    var list = get_deck_export_txt(deck);
-	    ipc_send('export_txt', {str: list, name: match.opponent.name+"'s deck"});
+	    ipc_send('export_txt', {str: list, name: match.opponent.name.slice(0, -6)+"'s deck"});
 	});
 
 	$(".back").click(function () {
@@ -2695,7 +2698,7 @@ function open_settings(openSection) {
 	$("#ux_0").html('');
 	$("#ux_0").addClass('flex_item');
 
-	var wrap_l = $('<div class="wrapper_column sidebar_column"></div>');
+	var wrap_l = $('<div class="wrapper_column sidebar_column_r"></div>');
 	$('<div class="settings_nav sn1" style="margin-top: 28px;" >Behaviour</div>').appendTo(wrap_l);
 	$('<div class="settings_nav sn2">Overlay</div>').appendTo(wrap_l);
 	$('<div class="settings_nav sn3">Visual</div>').appendTo(wrap_l);
