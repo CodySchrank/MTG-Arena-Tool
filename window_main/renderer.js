@@ -505,9 +505,9 @@ function setHistory(loadMore) {
 	for (var loadEnd = loadHistory + loadMore; loadHistory < loadEnd; loadHistory++) {
 		var match_id = matchesHistory.matches[loadHistory];
 		var match = matchesHistory[match_id];
-		console.log("Load match: ", match_id, match);
 
 		if (match == undefined) continue;
+		console.log("Load match: ", match_id, match);
 		console.log("Match: ", loadHistory, match.type, match)
 
 		var div = document.createElement("div");
@@ -565,7 +565,7 @@ function setHistory(loadMore) {
 
 			match.playerDeck.colors.forEach(function(color) {
 				var m = document.createElement("div");
-				m.classList.add("mana_20");
+				m.classList.add("mana_s20");
 				m.classList.add("mana_"+mana[color]);
 				flb.appendChild(m);
 			});
@@ -589,7 +589,7 @@ function setHistory(loadMore) {
 			var cc = get_deck_colors(match.oppDeck);
 			cc.forEach(function(color) {
 				var m = document.createElement("div");
-				m.classList.add("mana_20");
+				m.classList.add("mana_s20");
 				m.classList.add("mana_"+mana[color]);
 				fcb.appendChild(m);
 			});
@@ -836,7 +836,7 @@ function setDecks(arg) {
 
 			deck.colors.forEach(function(color) {
 				var d = document.createElement("div");
-				d.classList.add('mana_20');
+				d.classList.add('mana_s20');
 				d.classList.add('mana_'+mana[color]);
 				flb.appendChild(d);
 			});
@@ -1045,7 +1045,7 @@ function setExplore(arg, loadMore) {
 		
 		_deck.deck_colors.forEach(function(color) {
 			var d = document.createElement("div");
-			d.classList.add("mana_20");
+			d.classList.add("mana_s20");
 			d.classList.add("mana_"+mana[color]);
 			flb.appendChild(d);
 		});
@@ -1119,7 +1119,7 @@ function open_deck(i, type) {
 	flr = $('<div class="flex_item" style="align-self: center;"></div>');
 
 	_deck.colors.forEach(function(color) {
-		var m = $('<div class="mana_20 mana_'+mana[color]+'"></div>');
+		var m = $('<div class="mana_s20 mana_'+mana[color]+'"></div>');
 		flr.append(m);
 	});
 	top.append(flr);
@@ -1163,7 +1163,7 @@ function open_deck(i, type) {
 	curvediv.appendTo(stats);
 	var curvediv = $('<div class="mana_curve_numbers"></div>');
 	for (let i=0; i<curve.length; i++) {
-		curvediv.append($('<div class="mana_curve_column_number"><div style="margin: 0 auto !important" class="mana_16 mana_g'+i+'"></div></div>'))
+		curvediv.append($('<div class="mana_curve_column_number"><div style="margin: 0 auto !important" class="mana_s16 mana_'+i+'"></div></div>'))
 	}
 	curvediv.appendTo(stats);
 
@@ -1743,7 +1743,7 @@ function open_match(id) {
 
 	if (match.playerDeck.colors != undefined) {		
 		match.playerDeck.colors.forEach(function(color) {
-			var m = $('<div class="mana_20 mana_'+mana[color]+'"></div>');
+			var m = $('<div class="mana_s20 mana_'+mana[color]+'"></div>');
 			flr.append(m);
 		});
 	}
@@ -2520,6 +2520,40 @@ function printCards() {
 			let s = [];
 			let generic = false;
 			cost.forEach(function(m) {
+				if (m.indexOf('w') !== -1) {
+					if (filterExclude.checked && !filteredMana.includes(1)) {
+						doDraw = false;
+					}
+					s[1] = 1;
+				}
+				if (m.indexOf('u') !== -1) {
+					if (filterExclude.checked && !filteredMana.includes(2)) {
+						doDraw = false;
+					}
+					s[2] = 1;
+				}
+				if (m.indexOf('b') !== -1) {
+					if (filterExclude.checked && !filteredMana.includes(3)) {
+						doDraw = false;
+					}
+					s[3] = 1;
+				}
+				if (m.indexOf('r') !== -1) {
+					if (filterExclude.checked && !filteredMana.includes(4)) {
+						doDraw = false;
+					}
+					s[4] = 1;
+				}
+				if (m.indexOf('g') !== -1) {
+					if (filterExclude.checked && !filteredMana.includes(5)) {
+						doDraw = false;
+					}
+					s[5] = 1;
+				}
+				if (parseInt(m) > 0) {
+					generic = true;
+				}
+				/*
 				if (m.color < 6 && m.color > 0) {
 					s[m.color] = 1;
 					if (filterExclude.checked && !filteredMana.includes(m.color)) {
@@ -2529,6 +2563,7 @@ function printCards() {
 				if (m.color > 6) {
 					generic = true;
 				}
+				*/
 			});
 			let ms = s.reduce((a, b) => a + b, 0);
 			if ((generic && ms == 0) && filterExclude.checked) {

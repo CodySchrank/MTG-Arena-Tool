@@ -337,7 +337,7 @@ label {
     -webkit-transition: all .2s ease-in;
 }
 
-.mana_20 {
+.mana_s20 {
     width: 18px;
     height: 18px;
     margin: 2px;
@@ -345,7 +345,7 @@ label {
     box-shadow: rgba(0, 0, 0, 0.75) -2px 2px;
 }
 
-.mana_16 {
+.mana_s16 {
     z-index: 15;
     pointer-events: none;
     width: 20px;
@@ -360,34 +360,46 @@ label {
 .mana_green     { background: url(../images/g20.png) center;}
 .mana_colorless { background: url(../images/c20.png) center;}
 
-.mana_16.mana_white    { background: url(../images/16sh/w.png) center;}
-.mana_16.mana_blue     { background: url(../images/16sh/u.png) center;}
-.mana_16.mana_black    { background: url(../images/16sh/b.png) center;}
-.mana_16.mana_red      { background: url(../images/16sh/r.png) center;}
-.mana_16.mana_green    { background: url(../images/16sh/g.png) center;}
-.mana_16.mana_colorless{ background: url(../images/16sh/c.png) center;}
-.mana_16.mana_x        { background: url(../images/16sh/x.png) center;}
-.mana_16.mana_g0       { background: url(../images/16sh/0.png) center;}
-.mana_16.mana_g1       { background: url(../images/16sh/1.png) center;}
-.mana_16.mana_g2       { background: url(../images/16sh/2.png) center;}
-.mana_16.mana_g3       { background: url(../images/16sh/3.png) center;}
-.mana_16.mana_g4       { background: url(../images/16sh/4.png) center;}
-.mana_16.mana_g5       { background: url(../images/16sh/5.png) center;}
-.mana_16.mana_g6       { background: url(../images/16sh/6.png) center;}
-.mana_16.mana_g7       { background: url(../images/16sh/7.png) center;}
-.mana_16.mana_g8       { background: url(../images/16sh/8.png) center;}
-.mana_16.mana_g9       { background: url(../images/16sh/9.png) center;}
-.mana_16.mana_g10      { background: url(../images/16sh/10.png) center;}
-.mana_16.mana_g11      { background: url(../images/16sh/11.png) center;}
-.mana_16.mana_g12      { background: url(../images/16sh/12.png) center;}
-.mana_16.mana_g13      { background: url(../images/16sh/13.png) center;}
-.mana_16.mana_g14      { background: url(../images/16sh/14.png) center;}
-.mana_16.mana_g15      { background: url(../images/16sh/15.png) center;}
-.mana_16.mana_g16      { background: url(../images/16sh/16.png) center;}
-.mana_16.mana_g17      { background: url(../images/16sh/17.png) center;}
-.mana_16.mana_g18      { background: url(../images/16sh/18.png) center;}
-.mana_16.mana_g19      { background: url(../images/16sh/19.png) center;}
-.mana_16.mana_g20      { background: url(../images/16sh/20.png) center;}
+.mana_w     { background: url(../images/16sh/w.png) center;}
+.mana_u     { background: url(../images/16sh/u.png) center;}
+.mana_b     { background: url(../images/16sh/b.png) center;}
+.mana_r     { background: url(../images/16sh/r.png) center;}
+.mana_g     { background: url(../images/16sh/g.png) center;}
+.mana_c     { background: url(../images/16sh/c.png) center;}
+
+.mana_wu    { background: url(../images/16sh/wu.png) center;}
+.mana_wb    { background: url(../images/16sh/wb.png) center;}
+.mana_ur    { background: url(../images/16sh/ur.png) center;}
+.mana_ub    { background: url(../images/16sh/ub.png) center;}
+.mana_br    { background: url(../images/16sh/br.png) center;}
+.mana_bg    { background: url(../images/16sh/bg.png) center;}
+.mana_gw    { background: url(../images/16sh/gw.png) center;}
+.mana_gu    { background: url(../images/16sh/gu.png) center;}
+.mana_rw    { background: url(../images/16sh/rw.png) center;}
+.mana_rg    { background: url(../images/16sh/rg.png) center;}
+
+.mana_x     { background: url(../images/16sh/x.png) center;}
+.mana_0     { background: url(../images/16sh/0.png) center;}
+.mana_1     { background: url(../images/16sh/1.png) center;}
+.mana_2     { background: url(../images/16sh/2.png) center;}
+.mana_3     { background: url(../images/16sh/3.png) center;}
+.mana_4     { background: url(../images/16sh/4.png) center;}
+.mana_5     { background: url(../images/16sh/5.png) center;}
+.mana_6     { background: url(../images/16sh/6.png) center;}
+.mana_7     { background: url(../images/16sh/7.png) center;}
+.mana_8     { background: url(../images/16sh/8.png) center;}
+.mana_9     { background: url(../images/16sh/9.png) center;}
+.mana_10    { background: url(../images/16sh/10.png) center;}
+.mana_11    { background: url(../images/16sh/11.png) center;}
+.mana_12    { background: url(../images/16sh/12.png) center;}
+.mana_13    { background: url(../images/16sh/13.png) center;}
+.mana_14    { background: url(../images/16sh/14.png) center;}
+.mana_15    { background: url(../images/16sh/15.png) center;}
+.mana_16    { background: url(../images/16sh/16.png) center;}
+.mana_17    { background: url(../images/16sh/17.png) center;}
+.mana_18    { background: url(../images/16sh/18.png) center;}
+.mana_19    { background: url(../images/16sh/19.png) center;}
+.mana_20    { background: url(../images/16sh/20.png) center;}
 
 .tile_w {     -webkit-border-image: url(../images/w.png) 0 15 0 15 stretch;}
 .tile_u {     -webkit-border-image: url(../images/u.png) 0 15 0 15 stretch;}

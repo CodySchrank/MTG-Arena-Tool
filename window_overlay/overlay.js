@@ -60,6 +60,8 @@ function updateClock() {
 
 //
 ipc.on('set_db', function (event, arg) {
+	setsList = arg.sets;
+	delete arg.sets;
 	cardsDb.set(arg);
 });
 

@@ -73,6 +73,7 @@ var matchWincon = "";
 var duringMatch = false;
 var matchBeginTime = 0;
 
+var arenaVersion = '';
 var playerName = null;
 var playerRank = null;
 var playerTier = null;
@@ -454,7 +455,9 @@ function readLog() {
 
 function processLog(err, bytecount, buff) {
     let rawString = buff.toString('utf-8', 0, bytecount);
-    var splitString = rawString.split('[UnityCrossThread');
+    //var splitString = rawString.split('[UnityCrossThread');
+    var splitString = rawString.split(/(\[UnityCrossThread|\[Client GRE\])+/);
+
     console.log('Reading:', bytecount, 'bytes, ',splitString.length, ' chunks');
     ipc_send("ipc_log", 'Reading: '+bytecount+' bytes, '+splitString.length+' chunks');
 
@@ -634,7 +637,13 @@ function processLogData(data) {
     // Get player Id
     strCheck = '"PlayerId":"';
     if (data.indexOf(strCheck) > -1) {
-		playerId = dataChop(data, strCheck, '"');
+        playerId = dataChop(data, strCheck, '"');
+    }
+
+    // Get Client Version
+    strCheck = '"clientVersion":"';
+    if (data.indexOf(strCheck) > -1) {
+        arenaVersion = dataChop(data, strCheck, '"');
     }
 
     // Get User name
@@ -875,7 +884,9 @@ function processLogData(data) {
             var logTime = dataChop(data, strCheck, ' (');
             matchBeginTime = parseWotcTime(logTime);
         }
-        createMatch(json);
+        if (json.eventId != "NPE") {
+            createMatch(json);
+        }
         return;
     }
 
@@ -959,10 +970,11 @@ function processLogData(data) {
 
         if (json.gameRoomConfig != undefined) {
             currentMatchId = json.gameRoomConfig.matchId;
+            eventId = json.gameRoomConfig.eventId;
             duringMatch = true;
         }
 
-        if (json.stateType == "MatchGameRoomStateType_MatchCompleted") {
+        if (json.stateType == "MatchGameRoomStateType_MatchCompleted" && eventId != "NPE") {
             playerWin = 0;
             oppWin = 0;
         	json.finalMatchResult.resultList.forEach(function(res) {
@@ -1143,7 +1155,7 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[aff] !== undefined) {
-                                        //ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest+" - "+zones[_dest].type);
+                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest+" - "+zones[_dest].type);
                                         gameObjs[aff].zoneId = _dest;
                                         gameObjs[aff].zoneName = zones[_dest].type;
                                     }
@@ -1165,7 +1177,7 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[_orig] != undefined) {
-                                        //ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
+                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
                                         gameObjs[_new] = JSON.parse(JSON.stringify(gameObjs[_orig]));
                                         gameObjs[_orig] = undefined;
                                     }
@@ -1199,7 +1211,7 @@ function gre_to_client(data) {
                         obj.zoneName = zones[obj.zoneId].type;
                         gameObjs[obj.instanceId] = obj;
 
-                        //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") "++" created at "+zones[obj.zoneId].type);
+                        ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") created at "+zones[obj.zoneId].type);
                     });
                 }
                 
@@ -1661,7 +1673,7 @@ function removeFromHttp(req) {
 
 function httpAuth() {
     var _id = makeId(6);
-	httpAsync.push({'reqId': _id, 'method': 'auth', 'uid': playerId});
+	httpAsync.push({'reqId': _id, 'method': 'auth', 'uid': playerId, 'version': arenaVersion});
 }
 
 function httpSubmitCourse(_courseId, _course) {
