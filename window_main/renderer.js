@@ -510,8 +510,9 @@ function setHistory(loadMore) {
 		var match = matchesHistory[match_id];
 
 		if (match == undefined) continue;
+		if (match.opponent.userid.indexOf("Familiar") !== -1) continue;
 		console.log("Load match: ", match_id, match);
-		console.log("Match: ", loadHistory, match.type, match)
+		console.log("Match: ", loadHistory, match.type, match);
 
 		var div = document.createElement("div");
 		div.classList.add(match.id);
@@ -575,6 +576,9 @@ function setHistory(loadMore) {
 
 			var d = document.createElement("div");
 			d.classList.add("list_match_title");
+			if (match.opponent.name == null) {
+				match.opponent.name = "-";
+			}
 			d.innerHTML = "vs "+match.opponent.name.slice(0, -6);
 			fct.appendChild(d);
 

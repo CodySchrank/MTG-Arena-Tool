@@ -237,6 +237,9 @@ function getReadableEvent(arg) {
 		case "Momir_":
 			return "Momir Mardness"; break;
 
+		case "Sealed_GRN_":
+			return "Guilds of Ravnica Sealed"; break;
+
 		case "CompDraft_DOM_":
 			return "Competitive Draft DOM"; break;
 		case "CompDraft_M_":
@@ -255,6 +258,8 @@ function getReadableEvent(arg) {
 			return "Quick Exploration"; break;
 		case "Quick_Singleton_":
 			return "Quick Singleton"; break;
+		case "Welcome_Weekend_Singleton":
+			return "Welcome Weekend Singleton"; break;
 		
 		case "Quick_constructed_april_":
 			return "Quick Constructed"; break;
@@ -265,6 +270,7 @@ function getReadableEvent(arg) {
 
 //
 function get_card_type_sort(a) {
+	if (a == undefined)	return 0;
 	if (a.includes("Creature", 0)) 		return 1;
 	if (a.includes("Planeswalker", 0)) 	return 2;
 	if (a.includes("Instant", 0)) 		return 3;
@@ -509,15 +515,18 @@ function get_deck_colors(deck) {
 	deck.mainDeck.forEach(function(card) {
 		var grpid = card.id;
 		if (card.quantity > 0) {
-			var card_name = cardsDb.get(grpid).name;
-			var card_cost = cardsDb.get(grpid).cost;
-			card_cost.forEach(function(c) {
-				if (c.indexOf('w') !== -1 && !deck.colors.includes(1))	deck.colors.push(1);
-				if (c.indexOf('u') !== -1 && !deck.colors.includes(2))	deck.colors.push(2);
-				if (c.indexOf('b') !== -1 && !deck.colors.includes(3))	deck.colors.push(3);
-				if (c.indexOf('r') !== -1 && !deck.colors.includes(4))	deck.colors.push(4);
-				if (c.indexOf('g') !== -1 && !deck.colors.includes(5))	deck.colors.push(5);
-			});
+			var cdb = cardsDb.get(grpid);
+			if (cdb) {
+				var card_name = cdb.name;
+				var card_cost = cdb.cost;
+				card_cost.forEach(function(c) {
+					if (c.indexOf('w') !== -1 && !deck.colors.includes(1))	deck.colors.push(1);
+					if (c.indexOf('u') !== -1 && !deck.colors.includes(2))	deck.colors.push(2);
+					if (c.indexOf('b') !== -1 && !deck.colors.includes(3))	deck.colors.push(3);
+					if (c.indexOf('r') !== -1 && !deck.colors.includes(4))	deck.colors.push(4);
+					if (c.indexOf('g') !== -1 && !deck.colors.includes(5))	deck.colors.push(5);
+				});
+			}
 		}
 	});
 	/*
@@ -539,16 +548,18 @@ function get_deck_colors(deck) {
 function get_ids_colors(list) {
 	var colors = [];
 	list.forEach(function(grpid) {
-		var card_name = cardsDb.get(grpid).name;
-		var card_cost = cardsDb.get(grpid).cost;
-
-		card_cost.forEach(function(c) {
-			if (c.indexOf('w') !== -1 && !colors.includes(1))	colors.push(1);
-			if (c.indexOf('u') !== -1 && !colors.includes(2))	colors.push(2);
-			if (c.indexOf('b') !== -1 && !colors.includes(3))	colors.push(3);
-			if (c.indexOf('r') !== -1 && !colors.includes(4))	colors.push(4);
-			if (c.indexOf('g') !== -1 && !colors.includes(5))	colors.push(5);
-		});
+		var cdb = cardsDb.get(grpid);
+		if (cdb) {
+			var card_name = cdb.name;
+			var card_cost = cdb.cost;
+			card_cost.forEach(function(c) {
+				if (c.indexOf('w') !== -1 && !colors.includes(1))	colors.push(1);
+				if (c.indexOf('u') !== -1 && !colors.includes(2))	colors.push(2);
+				if (c.indexOf('b') !== -1 && !colors.includes(3))	colors.push(3);
+				if (c.indexOf('r') !== -1 && !colors.includes(4))	colors.push(4);
+				if (c.indexOf('g') !== -1 && !colors.includes(5))	colors.push(5);
+			});
+		}
 	});
 
 	return colors;
