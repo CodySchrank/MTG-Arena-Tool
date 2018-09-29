@@ -559,7 +559,8 @@ function setHistory(loadMore) {
 			var tile = document.createElement("div");
 			tile.classList.add(match.id+"t");
 			tile.classList.add("deck_tile");
-			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
+
+			tile.style.backgroundImage = "url(https://img.scryfall.com/cards"+cardsDb.get(tileGrpid).images["art_crop"]+")";
 			fltl.appendChild(tile);
 
 			var d = document.createElement("div");
@@ -621,7 +622,8 @@ function setHistory(loadMore) {
 			var tile = document.createElement("div");
 			tile.classList.add(match.id+"t");
 			tile.classList.add("deck_tile");
-			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg)";
+
+			tile.style.backgroundImage = "url(https://img.scryfall.com/cards"+cardsDb.get(tileGrpid).images["art_crop"]+")";
 			fltl.appendChild(tile);
 
 			var d = document.createElement("div");
@@ -768,11 +770,7 @@ function setDecks(arg) {
 			tile.classList.add(deck.id+'t');
 			tile.classList.add('deck_tile');
 
-			let dfc = '';
-			if (cardsDb.get(tileGrpid).dfc == 'DFC_Back')	dfc = 'a';
-			if (cardsDb.get(tileGrpid).dfc == 'DFC_Front')	dfc = 'b';
-			if (cardsDb.get(tileGrpid).dfc == 'SplitHalf')	dfc = 'a';
-			tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg)";
+			tile.style.backgroundImage = "url(https://img.scryfall.com/cards"+cardsDb.get(tileGrpid).images["art_crop"]+")";
 
 			var div = document.createElement("div");
 			div.classList.add(deck.id);
@@ -1009,11 +1007,7 @@ function setExplore(arg, loadMore) {
 		tile.classList.add(index+"t");
 		tile.classList.add("deck_tile");
 
-		let dfc = '';
-		if (cardsDb.get(tileGrpid).dfc == 'DFC_Back')	dfc = 'a';
-		if (cardsDb.get(tileGrpid).dfc == 'DFC_Front')	dfc = 'b';
-		if (cardsDb.get(tileGrpid).dfc == 'SplitHalf')	dfc = 'a';
-		tile.style.backgroundImage = "url(https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg)";
+		tile.style.backgroundImage = "url(https://img.scryfall.com/cards"+cardsDb.get(tileGrpid).images["art_crop"]+")";
 
 		var div = document.createElement("div");
 		div.classList.add(index);
@@ -1131,14 +1125,8 @@ function open_deck(i, type) {
 	});
 	top.append(flr);
 
-
 	var tileGrpid = _deck.deckTileId;
-	let dfc = '';
-	if (cardsDb.get(tileGrpid).dfc == 'DFC_Back')	dfc = 'a';
-	if (cardsDb.get(tileGrpid).dfc == 'DFC_Front')	dfc = 'b';
-	if (cardsDb.get(tileGrpid).dfc == 'SplitHalf')	dfc = 'a';
-
-	change_background("https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+dfc+".jpg");
+	change_background("https://img.scryfall.com/cards"+cardsDb.get(tileGrpid).images["art_crop"]);
 	var fld = $('<div class="flex_item"></div>');
 
 	var dl = $('<div class="decklist"></div>');
@@ -1416,7 +1404,8 @@ function drawDeckVisual(_div, _stats, deck) {
 
 			        let d = $('<div style="width: '+sz+'px !important;" class="deck_visual_card"></div>');
 			        let img = $('<img style="width: '+sz+'px !important;" class="deck_visual_card_img"></img>');
-					img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
+
+			        img.attr("src", "https://img.scryfall.com/cards"+card.images[cardQuality]);
 					img.appendTo(d);
 					d.appendTo(tileNow);
 
@@ -1458,7 +1447,8 @@ function drawDeckVisual(_div, _stats, deck) {
 					        var d = $('<div style="margin-left: 60px; width: '+sz+'px !important;" class="deck_visual_card_side"></div>');
 						}
 				        let img = $('<img style="width: '+sz+'px !important;" class="deck_visual_card_img"></img>');
-						img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
+				        img.attr("src", "https://img.scryfall.com/cards"+card.images[cardQuality]);
+						//img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
 						img.appendTo(d);
 						d.appendTo(tileNow);
 
@@ -1663,7 +1653,8 @@ function open_draft(id, tileGrpid, set) {
 	var top = $('<div class="decklist_top"><div class="button back"></div><div class="deck_name">'+set+' Draft</div></div>');
 	flr = $('<div class="flex_item" style="align-self: center;"></div>');
 	top.append(flr);
-	change_background("https://img.scryfall.com/cards/art_crop/en/"+get_set_scryfall(cardsDb.get(tileGrpid).set)+"/"+cardsDb.get(tileGrpid).cid+".jpg");
+
+	change_background("https://img.scryfall.com/cards"+cardsDb.get(grpId).images["art_crop"]);
 
 	var cont = $('<div class="flex_item" style="flex-direction: column;"></div>');
     cont.append('<div class="draft_nav_container"><div class="draft_nav_prev"></div><div class="draft_nav_next"></div></div>');
@@ -1681,21 +1672,16 @@ function open_draft(id, tileGrpid, set) {
 
 	
 	pack.forEach(function(grpId) {
-		let dfc = '';
-		if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
-		if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
-		if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
         var d = $('<div style="width: '+cardSize+'px !important;" class="draft_card"></div>');
         var img = $('<img style="width: '+cardSize+'px !important;" class="draft_card_img"></img>');
         if (grpId == pick && draftPosition % 2 == 0) {
         	img.addClass('draft_card_picked');
         }
         var card = cardsDb.get(grpId);
-		img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
+        img.attr("src", "https://img.scryfall.com/cards"+card.images[cardQuality]);
+
 		img.appendTo(d);
-
 		addCardHover(img, card);
-
 		d.appendTo(pd);
 	});
 
@@ -2624,7 +2610,7 @@ function printCards() {
 	        }
 
 	        var img = $('<img style="width: '+cardSize+'px !important;" class="inventory_card_img"></img>');
-			img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/"+get_set_scryfall(card.set)+"/"+card.cid+dfc+".jpg");
+	        img.attr("src", "https://img.scryfall.com/cards"+card.images[cardQuality]);
 			img.appendTo(d);
 
 			addCardHover(img, card);
@@ -2780,6 +2766,7 @@ function open_settings(openSection) {
 
 	var d = $('<div style="width: '+cardSize+'px; !important" class="inventory_card_settings"></div>');
 	var img = $('<img style="width: '+cardSize+'px; !important" class="inventory_card_settings_img"></img>');
+	
 	img.attr("src", "https://img.scryfall.com/cards/"+cardQuality+"/en/m19/"+Math.round(Math.random()*314)+".jpg");
 	img.appendTo(d);
 

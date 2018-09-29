@@ -27,19 +27,6 @@ function addCardTile(grpId, indent, quantity, element) {
 		glow.on('mouseenter', function(e) {
 			var domid = $(this).attr('id');
 		    $('#'+domid).css('margin-top', '0px');
-		    /*
-			$('.main_hover').css("opacity", 1);
-			$('.loader').css("opacity", 1);
-			let dfc = '';
-			if (cardsDb.get(grpId).dfc == 'DFC_Back')	dfc = 'a';
-			if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
-			if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
-			$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
-
-			$('.main_hover').on('load', function(){
-				$('.loader').css("opacity", 0);
-			});
-			*/
 		});
 
 		glow.on('click', function(e) {
@@ -147,10 +134,8 @@ function addCardHover(div, _card) {
 			$('.main_hover_dfc').css("opacity", 1);
 			$('.loader_dfc').css("opacity", 1);
 			var dfcCard = cardsDb.get(_card.dfcId);
-			dfcf = '';
-			if (dfcCard.dfc == 'DFC_Back')	dfcf = 'a';
-			if (dfcCard.dfc == 'DFC_Front') dfcf = 'b';
-			$('.main_hover_dfc').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(dfcCard.set)+"/"+dfcCard.cid+dfcf+".jpg");
+
+			$('.main_hover_dfc').attr("src", "https://img.scryfall.com/cards"+dfcCard.images[cardQuality]);
 			$('.main_hover_dfc').on('load', function(){
 				$('.loader_dfc').css("opacity", 0);
 			});
@@ -160,7 +145,7 @@ function addCardHover(div, _card) {
 			$('.loader_dfc').hide();
 		}
 
-		$('.main_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(_card.set)+"/"+_card.cid+dfc+".jpg");
+		$('.main_hover').attr("src", "https://img.scryfall.com/cards"+_card.images[cardQuality]);
 
 		$('.main_hover').on('load', function(){
 			$('.loader').css("opacity", 0);
