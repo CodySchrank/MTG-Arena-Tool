@@ -50,10 +50,17 @@ function addCardTile(grpId, indent, quantity, element) {
 		fl.append('<div class="card_tile_name">'+card.name+'</div>');
 		div.append(fl);
 
-		fl = $('<div class="flex_item"></div>"');
+		fl = $('<div class="flex_item" style="line-height: 26px;"></div>"');
 		div.append(fl);
+
+		var prevc = true;
 		card.cost.forEach(function(cost) {
+			if (/^\d+$/.test(cost) && prevc == false) {
+				fl.append('//');
+			}
 			fl.append('<div class="mana_s16 flex_end mana_'+cost+'"></div>');
+
+			prevc = /^\d+$/.test(cost);
 		});
 
 		if (renderer == 0) {
@@ -135,7 +142,7 @@ function addCardHover(div, _card) {
 			$('.loader_dfc').css("opacity", 1);
 			var dfcCard = cardsDb.get(_card.dfcId);
 
-			$('.main_hover_dfc').attr("src", "https://img.scryfall.com/cards"+dfcCard.images[cardQuality]);
+			$('.main_hover_dfc').attr("src", "https://img.scryfall.com/cards"+dfcCard.images["normal"]);
 			$('.main_hover_dfc').on('load', function(){
 				$('.loader_dfc').css("opacity", 0);
 			});
@@ -145,7 +152,7 @@ function addCardHover(div, _card) {
 			$('.loader_dfc').hide();
 		}
 
-		$('.main_hover').attr("src", "https://img.scryfall.com/cards"+_card.images[cardQuality]);
+		$('.main_hover').attr("src", "https://img.scryfall.com/cards"+_card.images["normal"]);
 
 		$('.main_hover').on('load', function(){
 			$('.loader').css("opacity", 0);

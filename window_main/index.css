@@ -109,7 +109,7 @@ span i {
 }
 
 .top_username_id {
-    color: rgba(250, 229, 210, 0.5);
+    color: rgba(250, 229, 210, 0.35);
     font-size: 20px;
     margin-right: 32px;
     align-self: center;

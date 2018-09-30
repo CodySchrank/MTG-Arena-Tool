@@ -364,7 +364,7 @@ function hoverCard(grpId) {
 		if (cardsDb.get(grpId).dfc == 'DFC_Front')	dfc = 'b';
 		if (cardsDb.get(grpId).dfc == 'SplitHalf')	dfc = 'a';
 		$('.overlay_hover').css("opacity", 1);
-		$('.overlay_hover').attr("src", "https://img.scryfall.com/cards/normal/en/"+get_set_scryfall(cardsDb.get(grpId).set)+"/"+cardsDb.get(grpId).cid+dfc+".jpg");
+		$('.overlay_hover').attr("src", "https://img.scryfall.com/cards"+cardsDb.get(grpId).images["normal"]);
 		setTimeout(function () {
 			$('.overlay_hover').css("opacity", 0);
 		}, 10000);
