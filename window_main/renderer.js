@@ -280,21 +280,26 @@ $(".list_deck").on('mouseenter mouseleave', function(e) {
 
 
 //
-ipc.on('popup', function (event, arg) {
-	pop(arg);
+ipc.on('popup', function (event, arg, time) {
+	pop(arg, time);
 });
 
 var popTimeout = null;
-function pop(str) {
+function pop(str, timeout) {
     $('.popup').css("opacity", 1);
     $('.popup').html(str);
     if (popTimeout != null) {
 	    clearTimeout(popTimeout);
     }
-    popTimeout = setTimeout(function() {
-    	$('.popup').css("opacity", 0);
+    if (timeout < 1) {
     	popTimeout = null;
-    }, 3000);
+    }
+    else {
+	    popTimeout = setTimeout(function() {
+	    	$('.popup').css("opacity", 0);
+	    	popTimeout = null;
+	    }, timeout);
+    }
 }
 
 //

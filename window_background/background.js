@@ -280,7 +280,7 @@ function loadPlayerConfig(playerId) {
     history.matches = store.get('matches_index');
     
     for (let i=0; i<history.matches.length; i++) {
-        ipc_send("popup", "Reading history: "+i+" / "+history.matches.length);
+        ipc_send("popup", {"text": "Reading history: "+i+" / "+history.matches.length, "time": 0});
         var id = history.matches[i];
         if (id != null) {
             var item = entireConfig[id];
@@ -293,7 +293,7 @@ function loadPlayerConfig(playerId) {
     
     drafts.matches = store.get('draft_index');
     for (let i=0; i<drafts.matches.length; i++) {
-        ipc_send("popup", "Reading drafts: "+i+" / "+history.matches.length);
+        ipc_send("popup", {"text": "Reading drafts: "+i+" / "+history.matches.length, "time": 0});
         var id = drafts.matches[i];
 
         if (id != null) {
@@ -470,7 +470,7 @@ function processLog(err, bytecount, buff) {
         //ipc_send("ipc_log", "Async: ("+index+")");
         if (value == "%END%") {
             finishLoading();
-            ipc_send("popup", "100%");
+            ipc_send("popup", {"text": "100%", "time": 3000});
         }
         else if (value == "%CLOSE%") {
             fs.close(file);
@@ -478,7 +478,7 @@ function processLog(err, bytecount, buff) {
         else {
             processLogData(value);
             if (firstPass) {
-                ipc_send("popup", "Processing log: "+Math.round(100/splitString.length*index)+"%");
+                ipc_send("popup", {"text": "Processing log: "+Math.round(100/splitString.length*index)+"%", "time": 0});
             }
             
             if (debugLog) {
@@ -629,6 +629,7 @@ function processLogData(data) {
 
             select_deck(json);
             json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
+            console.log(json.CourseDeck, json.CourseDeck.colors)
             httpSubmitCourse(json._id, json);
         }
         return;
@@ -1496,7 +1497,7 @@ function saveMatch() {
     history[currentMatchId].type = "match";
     httpSetMatch(match);
     requestHistorySend(0);
-    ipc_send("popup", "Match saved!");
+    ipc_send("popup", {"text": "Match saved!", "time": 3000});
 }
 
 function saveDraft() {
@@ -1528,7 +1529,7 @@ function saveDraft() {
     history[draftId].type = "draft";
     httpSetMatch(draft);
     requestHistorySend(0);
-    ipc_send("popup", "Draft saved!");
+    ipc_send("popup", {"text": "Draft saved!", "time": 3000});
 }
 
 function finishLoading() {
@@ -1719,38 +1720,8 @@ function httpGetPicks(set) {
 
 function httpGetDatabase() {
     var _id = makeId(6);
-    ipc_send("popup", "Downloading metadata");
+    ipc_send("popup", {"text": "Downloading metadata", "time": 0});
     httpAsync.push({'reqId': _id, 'method': 'get_database', 'uid': playerId});
-}
-
-//
-function get_deck_colors(deck) {
-    deck.colors = [];
-    deck.mainDeck.forEach(function(card) {
-        var grpid = card.id;
-        if (card.quantity > 0) {
-            var card_name = cardsDb.get(grpid).name;
-            var card_cost = cardsDb.get(grpid).cost;
-            card_cost.forEach(function(c) {
-                if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
-                    deck.colors.push(c.color);
-                }
-            });
-        }
-    });
-    /*
-    deck.sideboard.forEach(function(card) {
-        var grpid = card.id;
-        var card_name = cardsDb.get(grpid).name;
-        var card_cost = cardsDb.get(grpid).cost;
-        card_cost.forEach(function(c) {
-            if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
-                deck.colors.push(c.color);
-            }
-        });
-    });
-    */
-    return deck.colors;
 }
 
 //

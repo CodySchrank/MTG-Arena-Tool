@@ -54,7 +54,7 @@ app.on('ready', () => {
                 break;
 
             case 'popup':
-                mainWindow.webContents.send("popup", arg);
+                mainWindow.webContents.send("popup", arg.text, arg.time);
                 break;
 
             case 'background_set_history':
