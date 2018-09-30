@@ -628,9 +628,11 @@ function processLogData(data) {
             delete json.Id;
 
             select_deck(json);
-            json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
-            console.log(json.CourseDeck, json.CourseDeck.colors)
-            httpSubmitCourse(json._id, json);
+            if (json.CourseDeck != null) {
+                json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
+                console.log(json.CourseDeck, json.CourseDeck.colors)
+                httpSubmitCourse(json._id, json);
+            }
         }
         return;
     }
@@ -654,6 +656,25 @@ function processLogData(data) {
         ipc_send("set_username", playerName);
         return;
     }
+
+    /*
+    // Use this to get precon decklists
+    strCheck = '<== Deck.GetPreconDecks(';
+    json = checkJsonWithStart(data, strCheck, '', ')');
+    if (json != false) {
+        var str = "";
+        var newline = '\n';
+        json.forEach(function(_deck) {
+            str += "**"_deck.name.replace("?=?Loc/Decks/Precon/", "")+newline;
+            _deck.mainDeck.forEach(function(_card) {
+                str += _card.quantity+" "+cardsDb.get(_card.id).name+newline;
+            });
+            str += newline+newline;
+        });
+        console.log(str);
+        return;
+    }
+    */
 
     strCheck = '==> Authenticate(';
 	if (data.indexOf(strCheck) > -1) {

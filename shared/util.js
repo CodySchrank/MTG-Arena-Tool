@@ -521,18 +521,7 @@ function get_deck_colors(deck) {
 			}
 		}
 	});
-	/*
-	deck.sideboard.forEach(function(card) {
-		var grpid = card.id;
-		var card_name = cardsDb.get(grpid).name;
-		var card_cost = cardsDb.get(grpid).cost;
-		card_cost.forEach(function(c) {
-			if (!deck.colors.includes(c.color) && c.color != 0 && c.color < 7) {
-				deck.colors.push(c.color);
-			}
-		});
-	});
-	*/
+
 	return deck.colors;
 }
 
