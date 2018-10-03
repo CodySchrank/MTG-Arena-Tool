@@ -236,6 +236,8 @@ function getReadableEvent(arg) {
 			return "Competitive Draft DOM"; break;
 		case "CompDraft_M_":
 			return "Competitive Draft M19"; break;
+		case "CompDraft_GRN_":
+			return "Competitive Draft GRN"; break;
 
 		case "QuickDraft_RIX_":
 			return "Quick Draft RIX"; break;
