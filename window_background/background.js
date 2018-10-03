@@ -89,6 +89,7 @@ var oppSeat = null;
 var oppWin = 0;
 var annotationsRead = [];
 
+var prevTurn = -1;
 var turnPhase = "";
 var turnStep  = "";
 var turnNumber = 0;
@@ -459,7 +460,7 @@ function processLog(err, bytecount, buff) {
     var splitString = rawString.split(/(\[UnityCrossThread|\[Client GRE\])+/);
 
     console.log('Reading:', bytecount, 'bytes, ',splitString.length, ' chunks');
-    ipc_send("ipc_log", 'Reading: '+bytecount+' bytes, '+splitString.length+' chunks');
+    //ipc_send("ipc_log", 'Reading: '+bytecount+' bytes, '+splitString.length+' chunks');
 
     if (firstPass) {
         splitString.push("%END%");
@@ -1089,6 +1090,29 @@ function gre_to_client(data) {
             gameObjs = {};
         }
         //console.log("Message: "+msg.msgId, msg);
+        if (msg.type == "GREMessageType_DeclareAttackersReq") {
+            msg.declareAttackersReq.attackers.forEach(function(obj) {
+                var att = obj.attackerInstanceId;
+                var str = gameObjs[att].name+" attacked ";
+                if (obj.selectedDamageRecipient !== undefined) {
+                    var rec = obj.selectedDamageRecipient;
+                    if (rec.type == "DamageRecType_Player") {
+                        ipc_send("ipc_log", str+getNameBySeat(rec.playerSystemSeatId));
+                    }
+                    //else if (rec.type == "") {
+                    //}
+                }
+                if (obj.legalDamageRecipients !== undefined) {
+                    var rec = obj.legalDamageRecipients.forEach(function(rec) {
+                        if (rec.type == "DamageRecType_Player") {
+                            ipc_send("ipc_log", str+getNameBySeat(rec.playerSystemSeatId));
+                        }
+                        //else if (rec.type == "") {
+                        //}
+                    });
+                }
+            });
+        }
         if (msg.type == "GREMessageType_GameStateMessage") {
             if (msg.gameStateMessage.type == "GameStateType_Full") {
                 if (msg.gameStateMessage.zones != undefined) {
@@ -1100,6 +1124,7 @@ function gre_to_client(data) {
             else if (msg.gameStateMessage.type == "GameStateType_Diff") {
 
                 if (msg.gameStateMessage.turnInfo != undefined) {
+                    prevTurn = turnNumber;
                     turnPhase = msg.gameStateMessage.turnInfo.phase;
                     turnStep  = msg.gameStateMessage.turnInfo.step;
                     turnNumber = msg.gameStateMessage.turnInfo.turnNumber;
@@ -1108,6 +1133,15 @@ function gre_to_client(data) {
                     turnDecision = msg.gameStateMessage.turnInfo.decisionPlayer;
                     turnStorm = msg.gameStateMessage.turnInfo.stormCount;
 
+                    if (prevTurn !== turnNumber) {
+                        ipc_send("ipc_log", ">");
+                        if (playerSeat == turnActive) {
+                            ipc_send("ipc_log", playerName+"'s turn begin. (#"+turnNumber+")");
+                        }
+                        else {
+                            ipc_send("ipc_log", oppName+"'s turn begin. (#"+turnNumber+")");
+                        }
+                    }
                     if (!firstPass) {
                         ipc.send("set_turn", playerSeat, turnPhase, turnStep, turnNumber, turnActive, turnPriority, turnDecision);
                     }
@@ -1151,16 +1185,30 @@ function gre_to_client(data) {
 
                         if (affected != undefined) {
                             affected.forEach(function(aff) {
-                                /*
+                                
                                 if (obj.type.includes("AnnotationType_EnteredZoneThisTurn")) {
                                     if (gameObjs[aff] !== undefined) {
-                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_EnteredZoneThisTurn - "+gameObjs[aff].name+" / zone: "+affector+" - "+zones[affector].type);
+                                        //ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_EnteredZoneThisTurn - ("+aff+") "+gameObjs[aff].name+" / zone: "+affector+" - "+zones[affector].type);
                                         gameObjs[aff].zoneId = affector;
                                         gameObjs[aff].zoneName = zones[affector].type;
                                     }
                                 }
-                                */
-
+                                if (obj.type.includes("AnnotationType_ResolutionStart")) {
+                                    var grpid = undefined;
+                                    obj.details.forEach(function(detail) {
+                                        if (detail.key == "grpid") {
+                                            grpid = detail.valueInt32[0]
+                                        }
+                                    });
+                                    if (grpid != undefined) {
+                                        card = cardsDb.get(grpid);
+                                        var aff = obj.affectorId;
+                                        var pn = oppName;
+                                        if (gameObjs[aff] != undefined) {
+                                            console.log(getNameBySeat(gameObjs[aff].controllerSeatId)+" cast "+card.name, gameObjs[aff]);
+                                        }
+                                    }
+                                }
                                 if (obj.type.includes("AnnotationType_ZoneTransfer")) {
                                     var _orig = undefined;
                                     var _new = undefined;
@@ -1177,12 +1225,12 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[aff] !== undefined) {
-                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest+" - "+zones[_dest].type);
+                                        //ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ZoneTransfer - "+gameObjs[aff].name+" / zone: "+_dest+" - "+zones[_dest].type);
+                                        ipc_send("ipc_log", gameObjs[aff].name+" moved to "+zones[_dest].type);
                                         gameObjs[aff].zoneId = _dest;
                                         gameObjs[aff].zoneName = zones[_dest].type;
                                     }
                                 }
-
                                 if (obj.type.includes("AnnotationType_ObjectIdChanged")) {
                                     var _orig = undefined;
                                     var _new = undefined;
@@ -1199,10 +1247,31 @@ function gre_to_client(data) {
                                         console.log("undefined value: ", obj)
                                     }
                                     else if (gameObjs[_orig] != undefined) {
-                                        ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
+                                        //ipc_send("ipc_log", "("+gameObjs[aff].instanceId+") AnnotationType_ObjectIdChanged - "+gameObjs[aff].name+" / newid: "+_new);
                                         gameObjs[_new] = JSON.parse(JSON.stringify(gameObjs[_orig]));
                                         gameObjs[_orig] = undefined;
                                     }
+                                }
+                                if (obj.type.includes("AnnotationType_DamageDealt")) {
+                                    var aff = obj.affectorId;
+                                    var affected = obj.affectedIds;
+                                    var damage = 0;
+                                    obj.details.forEach(function(detail) {
+                                        if (detail.key == "damage") {
+                                            damage = detail.valueInt32[0];
+                                        }
+                                    });
+
+                                    affected.forEach(function(affd) {
+                                        if (gameObjs[aff] !== undefined) {
+                                            if (affd == playerSeat || affd == oppSeat) {
+                                                ipc_send("ipc_log", gameObjs[aff].name+" dealt "+damage+" damage to "+getNameBySeat(affd));
+                                            }
+                                            else {
+                                                ipc_send("ipc_log", gameObjs[aff].name+" dealt "+damage+" damage to "+gameObjs[affd]);
+                                            }
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -1232,8 +1301,7 @@ function gre_to_client(data) {
                         }
                         obj.zoneName = zones[obj.zoneId].type;
                         gameObjs[obj.instanceId] = obj;
-
-                        ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") created at "+zones[obj.zoneId].type);
+                        //ipc_send("ipc_log", "Message: "+msg.msgId+" > ("+obj.instanceId+") created at "+zones[obj.zoneId].type);
                     });
                 }
                 
@@ -1247,11 +1315,20 @@ function gre_to_client(data) {
         }
         //
     });
-    
+
     var str = JSON.stringify(currentDeck);
     currentDeckUpdated = JSON.parse(str);
     forceDeckUpdate();
     update_deck(false);
+}
+
+function getNameBySeat(seat) {
+    if (seat == playerSeat) {
+        return playerName.slice(0, -6);
+    }
+    else {
+        return oppName.slice(0, -6);
+    }
 }
 
 function createMatch(arg) {

@@ -55,7 +55,7 @@ function addCardTile(grpId, indent, quantity, element) {
 
 		var prevc = true;
 		card.cost.forEach(function(cost) {
-			if (/^\d+$/.test(cost) && prevc == false) {
+			if (/^(x|\d)+$/.test(cost) && prevc == false) {
 				fl.append('//');
 			}
 			fl.append('<div class="mana_s16 flex_end mana_'+cost+'"></div>');
